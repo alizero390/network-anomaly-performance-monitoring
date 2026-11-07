@@ -17,6 +17,9 @@ The format follows these categories:
 - `scripts/analyze_attack_share.py` and results in `results/attack_share/` (tables, figures, README with findings).
 - `scripts/export_validation_categories.py` to export validation attack categories on the machine holding the raw data.
 
+### Changed
+- Provenance `git_uncommitted_changes` now ignores generated files in `results/`, so it reports only uncommitted code or documentation changes.
+
 ### Research
 - Window F1 variation is mostly real detection change, not attack-share arithmetic: pooled recall/FPR at each window's attack share explains R² = 0.17 of window F1; each window's own recall/FPR explains R² = 0.88.
 - Low-attack windows (two contiguous periods at the start and end of validation) have lower recall (0.868 vs 0.978) and higher FPR (0.79% vs 0.37%).

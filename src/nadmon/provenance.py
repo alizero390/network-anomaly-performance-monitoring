@@ -72,7 +72,8 @@ def package_versions() -> dict[str, str | None]:
 
 def run_metadata() -> dict[str, object]:
     commit = _git("rev-parse", "HEAD")
-    status = _git("status", "--porcelain")
+    # Uncommitted changes to code and docs; generated results are excluded.
+    status = _git("status", "--porcelain", "--", ".", ":(exclude)results")
     if commit is None:
         commit = read_head_commit(PROJECT_DIR / ".git")
 
