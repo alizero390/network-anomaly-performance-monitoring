@@ -1,0 +1,76 @@
+{
+  "observed": {
+    "pooled": {
+      "attack_share": 0.1980349307407726,
+      "recall": 0.9678680661754484,
+      "fpr": 0.005419879758487068
+    },
+    "windows": 58,
+    "spearman_with_attack_share": {
+      "recall": 0.7911826853230176,
+      "fpr": -0.4291191636715784,
+      "f1": 0.8317073558500333,
+      "mcc": 0.8004371536687939,
+      "balanced_accuracy": 0.7924349365751696,
+      "roc_auc": 0.7428459736739734,
+      "average_precision": 0.8487890115691159
+    },
+    "low_vs_high_share": {
+      "split": 0.12,
+      "n_low": 20,
+      "n_high": 38,
+      "low_mean": {
+        "recall": 0.8677506789169932,
+        "fpr": 0.007873816287952693,
+        "f1": 0.8804398779155349,
+        "mcc": 0.8721208169616149,
+        "balanced_accuracy": 0.9299384313145204,
+        "roc_auc": 0.9939675401274248,
+        "average_precision": 0.9519579620597585
+      },
+      "high_mean": {
+        "recall": 0.9783980608120811,
+        "fpr": 0.003669736475396538,
+        "f1": 0.9826775669522055,
+        "mcc": 0.9779146034263209,
+        "balanced_accuracy": 0.9873641621683426,
+        "roc_auc": 0.9995023157451205,
+        "average_precision": 0.9982863982947573
+      }
+    },
+    "f1_decomposition": {
+      "observed_sd": 0.06441240537419231,
+      "share_only_sd": 0.014615008888967463,
+      "performance_only_sd": 0.04825459035391991,
+      "r2_share_only": 0.16949554619209883,
+      "r2_performance_only": 0.8794368265180306
+    },
+    "missed_attacks": {
+      "total": 1849,
+      "with_score_at_least_0.3": 839
+    }
+  },
+  "settings": {
+    "window_size": 5000,
+    "seed": 20261108,
+    "simulated_windows_per_share": 4000,
+    "stream_length": 20,
+    "drop": 0.05,
+    "consecutive": 2
+  },
+  "categories": null,
+  "provenance": {
+    "created_utc": "2026-11-07T22:54:12+00:00",
+    "git_commit": "f47b75a479a44186df9cbadddc33619368009412",
+    "git_uncommitted_changes": true,
+    "python": "3.13.18",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39",
+    "packages": {
+      "numpy": "2.4.6",
+      "pandas": "3.0.6",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.8.0",
+      "joblib": "1.5.3"
+    }
+  }
+}
