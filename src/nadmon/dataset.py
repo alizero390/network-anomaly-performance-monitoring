@@ -26,6 +26,7 @@ COLUMN_NAMES: tuple[str, ...] = (
 )  # fmt: skip
 
 STIME_INDEX = 28
+ATTACK_CAT_INDEX = 47
 LABEL_INDEX = 48
 DSPORT_INDEX = 3
 
@@ -96,15 +97,24 @@ def find_validation_cutoff(timestamps: np.ndarray) -> int:
     return cutoff
 
 
-def load_train_validation(files: Sequence[Path], cutoff: int) -> pd.DataFrame:
-    """Load February records up to the cutoff, in stable chronological order."""
+def load_train_validation(
+    files: Sequence[Path],
+    cutoff: int,
+    extra_columns: Sequence[int] = (),
+) -> pd.DataFrame:
+    """Load February records up to the cutoff, in stable chronological order.
+
+    ``extra_columns`` adds raw columns (for example attack_cat) without
+    changing which rows are loaded or their order.
+    """
+    columns = sorted(set(REQUIRED_COLUMNS) | set(extra_columns))
     parts = []
     for file in files:
         print("Reading features:", file.name)
         for chunk in pd.read_csv(
             file,
             header=None,
-            usecols=REQUIRED_COLUMNS,
+            usecols=columns,
             chunksize=100_000,
             low_memory=False,
         ):
@@ -125,6 +135,13 @@ def load_train_validation(files: Sequence[Path], cutoff: int) -> pd.DataFrame:
         raise RuntimeError("Chronological ordering verification failed.")
 
     return data
+
+
+def normalize_attack_category(values: pd.Series) -> pd.Series:
+    """Clean attack_cat: strip spaces, label blanks as Normal, merge spelling variants."""
+    text = values.astype("string").str.strip().fillna("")
+    text = text.mask(text == "", "Normal")
+    return text.replace({"Backdoors": "Backdoor"}).astype(str)
 
 
 def convert_ports(values: pd.Series) -> pd.Series:

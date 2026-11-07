@@ -28,6 +28,7 @@ models/
 # Large generated experimental outputs
 results/validation_predictions.csv
 results/**/*_predictions.csv
+results/validation_categories.csv
 
 # Datasets (never committed)
 data/

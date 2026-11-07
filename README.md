@@ -102,16 +102,20 @@ network-anomaly-performance-monitoring/
 │   ├── config.py                # Machine-specific paths (configs/paths.toml)
 │   ├── dataset.py               # Column layout, February split, preprocessing
 │   ├── metrics.py               # Overall and window-level metrics
+│   ├── attack_share.py          # Attack-share effects, decomposition, resampling
 │   └── provenance.py            # Git commit and package versions for each run
 ├── scripts/
 │   ├── baseline.py              # Train and validate the Random Forest baseline
+│   ├── analyze_attack_share.py  # Window performance vs attack share (results/attack_share)
+│   ├── export_validation_categories.py  # Export attack_cat for validation rows (run locally)
 │   └── check_environment.py     # Check versions, dataset path and model loading
 ├── tests/                       # pytest suite
 ├── configs/
 │   └── paths.example.toml       # Copy to paths.toml (not committed)
 ├── results/
 │   ├── baseline_summary.json
-│   └── validation_window_metrics.csv
+│   ├── validation_window_metrics.csv
+│   └── attack_share/            # Findings, tables and figures
 ├── literature/                  # Literature review notes and references.bib
 ├── models/                      # Generated models; not committed
 ├── requirements.txt             # Pinned runtime packages

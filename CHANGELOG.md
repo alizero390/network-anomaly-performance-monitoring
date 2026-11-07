@@ -12,6 +12,17 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- `nadmon.attack_share`: closed-form F1/MCC from rates, vectorised window metrics (recall, FPR, MCC, balanced accuracy, ROC AUC, average precision), F1 decomposition, controlled attack-share resampling and the Strategy B alarm rule.
+- `scripts/analyze_attack_share.py` and results in `results/attack_share/` (tables, figures, README with findings).
+- `scripts/export_validation_categories.py` to export validation attack categories on the machine holding the raw data.
+
+### Research
+- Window F1 variation is mostly real detection change, not attack-share arithmetic: pooled recall/FPR at each window's attack share explains R² = 0.17 of window F1; each window's own recall/FPR explains R² = 0.88.
+- Low-attack windows (two contiguous periods at the start and end of validation) have lower recall (0.868 vs 0.978) and higher FPR (0.79% vs 0.37%).
+- Under pure attack-share change, the F1-drop rule raises false alarms in all simulated streams at shares of 2% or less; balanced accuracy and recall do not.
+- The candidate reference period (windows 1-10) is itself a low-performance regime; the reference choice changes which windows count as degraded.
+
 ### Fixed
 - Run provenance now records the git commit even when the git command line is not installed (for example with GitHub Desktop only), by reading it from the `.git` folder.
 - Baseline outputs are written with LF line endings on every OS, so re-runs on Windows no longer show unchanged result files as modified.

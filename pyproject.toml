@@ -25,6 +25,8 @@ src = ["src", "scripts", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "NPY", "PD", "BLE"]
+# PD010: unstack/pivot are clearer than pivot_table for reshaping summaries.
+ignore = ["PD010"]
 
 [tool.ruff.lint.per-file-ignores]
 # X / X_train are the standard ML names.
