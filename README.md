@@ -72,7 +72,7 @@ The model has not yet been evaluated through the complete monitoring framework.
 
 ## Setup (Windows, cmd)
 
-Requires Python 3.11 or newer (tested on 3.13). From the repository folder:
+Requires Python 3.11 or newer (tested on 3.13 and 3.14). From the repository folder:
 
 ```bat
 py -m venv .venv

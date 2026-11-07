@@ -12,6 +12,12 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Fixed
+- Run provenance now records the git commit even when the git command line is not installed (for example with GitHub Desktop only), by reading it from the `.git` folder.
+
+### Research
+- Baseline re-run in the pinned environment (Python 3.14.3, scikit-learn 1.8.0, Windows 11) reproduced all validation metrics exactly.
+
 ## 2026-11-07 — Reproducible repository setup
 
 ### Added

@@ -1,4 +1,4 @@
-# Pinned research environment. Python 3.11+ (tested on 3.13).
+# Pinned research environment. Python 3.11+ (tested on 3.13 and 3.14).
 # scikit-learn must stay at 1.8.0: the saved baseline model was trained with it.
 # Change a pin only deliberately, and record the change in CHANGELOG.md.
 numpy==2.4.6
