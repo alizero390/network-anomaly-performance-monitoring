@@ -14,6 +14,7 @@ The format follows these categories:
 
 ### Fixed
 - Run provenance now records the git commit even when the git command line is not installed (for example with GitHub Desktop only), by reading it from the `.git` folder.
+- Baseline outputs are written with LF line endings on every OS, so re-runs on Windows no longer show unchanged result files as modified.
 
 ### Research
 - Baseline re-run in the pinned environment (Python 3.14.3, scikit-learn 1.8.0, Windows 11) reproduced all validation metrics exactly.

@@ -112,10 +112,11 @@ def main() -> None:
     for key, value in overall.items():
         print(f"{key}: {round(value, 6) if isinstance(value, float) else value}")
 
+    # Outputs use "\n" line endings on every OS so Git sees no spurious changes.
     print("\n========== STEP 8: WINDOW METRICS ==========")
     windows = window_metrics(y_val, predictions, val_timestamps, dataset.WINDOW_SIZE)
     window_path = paths.results_dir / "validation_window_metrics.csv"
-    windows.to_csv(window_path, index=False)
+    windows.to_csv(window_path, index=False, lineterminator="\n")
     print(windows.to_string(index=False))
     print("\nIncomplete validation tail records:", len(y_val) % dataset.WINDOW_SIZE)
 
@@ -129,7 +130,7 @@ def main() -> None:
             "Prediction": predictions,
             "AttackProbability": probabilities,
         }
-    ).to_csv(prediction_path, index=False)
+    ).to_csv(prediction_path, index=False, lineterminator="\n")
 
     summary = {
         "experiment": "Random Forest baseline",
@@ -153,7 +154,7 @@ def main() -> None:
         "provenance": run_metadata(),
     }
     summary_path = paths.results_dir / "baseline_summary.json"
-    with open(summary_path, "w", encoding="utf-8") as handle:
+    with open(summary_path, "w", encoding="utf-8", newline="\n") as handle:
         json.dump(summary, handle, indent=4)
 
     print("\n========== EXPERIMENT COMPLETE ==========")
