@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nadmon"
+version = "0.1.0"
+description = "Network anomaly detection performance monitoring under delayed ground-truth feedback"
+requires-python = ">=3.11"
+authors = [{ name = "Ali" }]
+# Exact versions live in requirements.txt.
+dependencies = ["numpy", "pandas", "scipy", "scikit-learn", "joblib", "matplotlib"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "scripts", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "NPY", "PD", "BLE"]
+
+[tool.ruff.lint.per-file-ignores]
+# X / X_train are the standard ML names.
+"scripts/*" = ["N806"]
+"src/nadmon/dataset.py" = ["N806"]

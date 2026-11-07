@@ -1,0 +1,20 @@
+{
+    "experiment": "Random Forest baseline",
+    "dataset": "UNSW-NB15 February 18 session",
+    "training_records": 726426,
+    "validation_records": 290575,
+    "features": 26,
+    "numeric_features": 23,
+    "categorical_features": 3,
+    "trees": 200,
+    "class_weight": "balanced",
+    "random_state": 42,
+    "prediction_threshold": 0.5,
+    "accuracy": 0.989290200464596,
+    "precision": 0.9778257663541557,
+    "recall": 0.9678680661754484,
+    "f1": 0.9728214354334422,
+    "false_positive_rate": 0.005419879758487068,
+    "training_seconds": 134.70122575759888,
+    "prediction_seconds": 1.6933386325836182
+}
