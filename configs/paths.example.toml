@@ -4,3 +4,7 @@
 
 [paths]
 data_dir = "E:/UNSW-Dataset Original"
+
+# Improved CIC-IDS-2017 (Engelen et al. 2021; Liu et al. 2022): folder holding
+# monday.csv ... friday.csv. Overridden by NADMON_CICIDS2017_DIR.
+cicids2017_dir = "E:/CICIDS2017_improved original"

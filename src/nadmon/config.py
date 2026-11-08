@@ -77,3 +77,22 @@ def load_paths(config_file: Path = LOCAL_PATHS_FILE) -> Paths:
         raise ConfigError(f"{config_file} must define [paths] data_dir") from error
 
     return Paths(data_dir=Path(data_dir))
+
+
+def load_cicids2017_dir(config_file: Path = LOCAL_PATHS_FILE) -> Path:
+    """Folder with the improved CIC-IDS-2017 day files (monday.csv ... friday.csv).
+
+    Read from NADMON_CICIDS2017_DIR, else ``[paths] cicids2017_dir`` in paths.toml.
+    """
+    env_value = os.environ.get("NADMON_CICIDS2017_DIR")
+    if env_value:
+        return Path(env_value)
+    if config_file.is_file():
+        with open(config_file, "rb") as handle:
+            value = tomllib.load(handle).get("paths", {}).get("cicids2017_dir")
+        if value:
+            return Path(value)
+    raise ConfigError(
+        "No CIC-IDS-2017 folder configured. Add cicids2017_dir under [paths] in "
+        "configs/paths.toml, or set NADMON_CICIDS2017_DIR."
+    )

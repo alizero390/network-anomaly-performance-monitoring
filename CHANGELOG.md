@@ -16,6 +16,7 @@ The format follows these categories:
 - Four-run robustness summary (`results/robustness_summary.md`). Replicates in all runs: Fuzzers cause 89-98% of missed attacks; under pure attack-share change F1/MCC alarm falsely while recall and balanced accuracy do not. Reference-period sensitivity is February-specific. January shows false positive bursts (windows 12-14) that F1 flags but balanced accuracy hides, so Strategy B should monitor recall and FPR separately.
 
 ### Added
+- `scripts/profile_cicids2017.py`: profiles the improved CIC-IDS-2017 day files (rows, time ranges, ordering, labels, `Attempted Category`, invalid values) before the experiment is designed. Folder set by `cicids2017_dir` in `configs/paths.toml`.
 - Reference for the improved CIC-IDS-2017 / CSE-CIC-IDS-2018 datasets (Liu et al., IEEE CNS 2022).
 
 ### Added

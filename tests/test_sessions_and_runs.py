@@ -199,3 +199,23 @@ def test_train_stops_when_validation_has_no_attacks(synthetic_dataset, monkeypat
     monkeypatch.setattr(sys, "argv", ["train_model.py", "--session", "jan", "--model", "rf"])
     with pytest.raises(RuntimeError, match="cannot be measured"):
         train.main()
+
+
+def test_profile_cicids2017(tmp_path, monkeypatch):
+    sample = (PROJECT_DIR / "tests" / "data" / "cicids2017_sample.csv").read_text(encoding="utf-8")
+    for day in ("monday", "tuesday", "wednesday", "thursday", "friday"):
+        (tmp_path / f"{day}.csv").write_text(sample, encoding="utf-8")
+    profile = _load_script("profile_cicids2017")
+    monkeypatch.setattr(profile, "load_cicids2017_dir", lambda: tmp_path)
+    monkeypatch.setattr(profile, "OUT", tmp_path / "out")
+    profile.main()
+
+    summary = json.loads((tmp_path / "out" / "summary.json").read_text(encoding="utf-8"))
+    day = summary["days"]["wednesday"]
+    assert summary["same_columns_every_day"] and summary["total_rows"] == 20
+    assert len(summary["columns"]) == 91
+    assert day["rows_in_time_order"] is False  # row 4 is earlier than row 1
+    assert day["labels"] == {"BENIGN": 2, "DoS Hulk": 1, "DoS Hulk - Attempted": 1}
+    assert day["attack_flows_not_attempted"] == 1
+    invalid = pd.read_csv(tmp_path / "out" / "invalid_values.csv", index_col=0)
+    assert invalid.loc["Flow Bytes/s", "inf"].sum() == 5
