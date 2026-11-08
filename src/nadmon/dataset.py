@@ -155,8 +155,24 @@ def convert_ports(values: pd.Series) -> pd.Series:
     return converted
 
 
+def describe_invalid(raw: pd.DataFrame, converted: pd.DataFrame, examples: int = 8) -> str:
+    """Which feature columns failed conversion, how often, and example raw values."""
+    lines = []
+    for index in FEATURE_INDICES:
+        bad = converted[index].isna()
+        if bad.any():
+            values = raw.loc[bad, index].astype("string").fillna("<empty>")
+            counts = values.value_counts(dropna=False).head(examples)
+            shown = ", ".join(f"{v!r} x{n}" for v, n in counts.items())
+            lines.append(
+                f"  {feature_name(index)} (column {index}): {int(bad.sum()):,} rows; {shown}"
+            )
+    return "\n".join(lines)
+
+
 def preprocess(data: pd.DataFrame) -> tuple[pd.DataFrame, np.ndarray]:
     """Convert raw columns to model inputs. Returns (X, y)."""
+    raw = data
     data = data.copy()
 
     data[DSPORT_INDEX] = convert_ports(data[DSPORT_INDEX])
@@ -169,7 +185,9 @@ def preprocess(data: pd.DataFrame) -> tuple[pd.DataFrame, np.ndarray]:
         data[index] = data[index].astype("string").str.strip().astype(str)
 
     if data[list(FEATURE_INDICES)].isna().any().any():
-        raise RuntimeError("Missing or invalid values appeared after conversion.")
+        raise RuntimeError(
+            "Missing or invalid values appeared after conversion:\n" + describe_invalid(raw, data)
+        )
 
     labels = data[LABEL_INDEX].to_numpy(dtype=np.int8)
     if not np.isin(labels, [0, 1]).all():

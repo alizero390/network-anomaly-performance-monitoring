@@ -68,7 +68,7 @@ def test_preprocess_names_columns_by_original_index():
 def test_preprocess_rejects_invalid_numeric_values():
     raw = _raw_frame()
     raw[dataset.DSPORT_INDEX] = ["80", "bad", "53", "443"]
-    with pytest.raises(RuntimeError, match="Missing or invalid"):
+    with pytest.raises(RuntimeError, match=r"dsport \(column 3\): 1 rows; 'bad' x1"):
         dataset.preprocess(raw)
 
 
