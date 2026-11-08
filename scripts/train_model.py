@@ -55,7 +55,10 @@ def main() -> None:
     print(f"\n========== {run_name}: SPLIT ==========")
     all_ts = sessions.read_timestamps(paths.raw_files)
     if len(all_ts) != sessions.DATASET_TOTAL:
-        raise RuntimeError("Total record count does not match the audited dataset size.")
+        raise RuntimeError(
+            f"Total record count {len(all_ts):,} does not match the audited "
+            f"{sessions.DATASET_TOTAL:,}."
+        )
     counts = sessions.check_sessions_cover_dataset(all_ts)
     print("Records per session:", counts)
 

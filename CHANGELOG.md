@@ -21,6 +21,9 @@ The format follows these categories:
 - Scoping literature review (`literature/scoping_review.md`), search log and 13 new references.
 - Robustness-run decisions in RESEARCH_DECISIONS.md, section 13.
 
+### Fixed
+- Dataset total in `nadmon.sessions` corrected to the audited 2,540,047 records (was 2,540,044 from the dataset's published description); a test now ties it to PROJECT_CONTEXT.md.
+
 ### Research
 - Scoping review: Generic dominance (about 65% of UNSW-NB15 attacks) and Fuzzers overlapping normal traffic are already reported at the dataset level (Zoghi and Serpen; Flood et al.). The candidate contribution is their temporal consequence for window-level monitoring and degradation alarms.
 

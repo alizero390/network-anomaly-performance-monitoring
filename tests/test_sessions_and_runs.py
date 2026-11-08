@@ -39,6 +39,11 @@ def test_frozen_split_rejects_boundary_inside_group():
         sessions.split_session(np.array([1, 2, 2, 3, 4, 5]), frozen)
 
 
+def test_dataset_total_matches_project_documentation():
+    docs = (PROJECT_DIR / "PROJECT_CONTEXT.md").read_text(encoding="utf-8")
+    assert f"{sessions.DATASET_TOTAL:,} records in total" in docs
+
+
 def test_february_session_matches_frozen_constants():
     feb = sessions.FEBRUARY
     assert (feb.total, feb.train_end, feb.validation_end) == (1_452_844, 726_426, 1_017_001)

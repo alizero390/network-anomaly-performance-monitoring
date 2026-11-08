@@ -22,7 +22,7 @@ from nadmon import dataset
 
 TRAIN_FRACTION = 0.5
 VALIDATION_FRACTION = 0.2
-DATASET_TOTAL = 2_540_044  # all four raw files
+DATASET_TOTAL = 2_540_047  # all four raw files (audited; see PROJECT_CONTEXT.md)
 
 
 @dataclass(frozen=True)
