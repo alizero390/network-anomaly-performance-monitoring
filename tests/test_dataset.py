@@ -44,8 +44,22 @@ def test_convert_ports_handles_decimal_and_hex():
 
 
 def test_convert_ports_marks_invalid_values_missing():
-    converted = dataset.convert_ports(pd.Series(["-", "0xZZ", "21"], dtype=object))
+    converted = dataset.convert_ports(pd.Series(["", "0xZZ", "21"], dtype=object))
     assert converted.isna().tolist() == [True, True, False]
+
+
+def test_convert_ports_maps_no_port_and_short_hex():
+    converted = dataset.convert_ports(pd.Series(["-", " - ", "0x000c", "0x000b"], dtype=object))
+    assert converted.tolist() == [-1, -1, 12, 11]
+
+
+def test_preprocess_converts_both_port_columns():
+    raw = _raw_frame()
+    raw[dataset.SPORT_INDEX] = ["0x000c", "-", "1024", "53"]
+    raw[dataset.DSPORT_INDEX] = ["-", "0x50", "53", "443"]
+    X, _ = dataset.preprocess(raw)
+    assert X["1"].tolist() == [12, -1, 1024, 53]
+    assert X["3"].tolist() == [-1, 80, 53, 443]
 
 
 def _raw_frame(rows: int = 4) -> pd.DataFrame:

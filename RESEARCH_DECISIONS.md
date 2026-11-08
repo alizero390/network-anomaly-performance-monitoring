@@ -279,6 +279,20 @@ These values represent decimal port 52233.
 
 The model pipeline must convert hexadecimal and decimal representations correctly.
 
+**Extension (2026-11-08, January session).** The January session contains values the
+February session does not: `sport` has 6 hexadecimal values (`0x000c` x4, `0x000b` x2),
+and 9 port values are `-` (2 in `sport`, 7 in `dsport`), meaning no port (e.g. ICMP or
+ARP traffic). Decisions:
+
+- `sport` uses the same decimal/hexadecimal conversion as `dsport`.
+- `-` is encoded as -1, which cannot be a real port. This keeps every record, so the
+  January split and windows are unchanged. Dropping the records or keeping them as
+  missing values were the alternatives considered.
+- Any other non-numeric port value still stops preprocessing.
+
+February contains no `-` ports and no hexadecimal `sport` values, so February features,
+the baseline and `feb_hgb` are unaffected.
+
 Original raw CSV files must remain unchanged.
 
 ## 9. Validation and Test Separation

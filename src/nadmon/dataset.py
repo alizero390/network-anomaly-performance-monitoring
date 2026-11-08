@@ -28,7 +28,10 @@ COLUMN_NAMES: tuple[str, ...] = (
 STIME_INDEX = 28
 ATTACK_CAT_INDEX = 47
 LABEL_INDEX = 48
+SPORT_INDEX = 1
 DSPORT_INDEX = 3
+PORT_INDICES = (SPORT_INDEX, DSPORT_INDEX)
+NO_PORT = -1  # value for "-" (no port, e.g. ICMP/ARP); see RESEARCH_DECISIONS.md
 
 NUMERIC_FEATURES: tuple[int, ...] = (
     1, 3, 6, 7, 8, 9, 10, 11, 12,
@@ -145,13 +148,20 @@ def normalize_attack_category(values: pd.Series) -> pd.Series:
 
 
 def convert_ports(values: pd.Series) -> pd.Series:
-    """Convert decimal and hexadecimal ("0xcc09") port strings to numbers."""
+    """Convert port strings to numbers.
+
+    Decimal ("80") and hexadecimal ("0xcc09") values become their port number;
+    "-" (no port) becomes NO_PORT. Anything else becomes missing and is
+    rejected by ``preprocess``.
+    """
     text = values.astype("string").str.strip()
     hex_mask = text.str.fullmatch(r"0[xX][0-9a-fA-F]+").fillna(False).astype(bool)
+    no_port = (text == "-").fillna(False).astype(bool)
 
-    converted = pd.to_numeric(text.where(~hex_mask), errors="coerce").astype("float64")
+    converted = pd.to_numeric(text.where(~hex_mask & ~no_port), errors="coerce").astype("float64")
     if hex_mask.any():
         converted.loc[hex_mask] = text.loc[hex_mask].map(lambda v: int(v, 16))
+    converted.loc[no_port] = NO_PORT
     return converted
 
 
@@ -175,10 +185,11 @@ def preprocess(data: pd.DataFrame) -> tuple[pd.DataFrame, np.ndarray]:
     raw = data
     data = data.copy()
 
-    data[DSPORT_INDEX] = convert_ports(data[DSPORT_INDEX])
+    for index in PORT_INDICES:
+        data[index] = convert_ports(data[index])
 
     for index in NUMERIC_FEATURES:
-        if index != DSPORT_INDEX:
+        if index not in PORT_INDICES:
             data[index] = pd.to_numeric(data[index], errors="coerce")
 
     for index in CATEGORICAL_FEATURES:

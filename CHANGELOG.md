@@ -22,6 +22,7 @@ The format follows these categories:
 - Robustness-run decisions in RESEARCH_DECISIONS.md, section 13.
 
 ### Fixed
+- Port conversion extended for the January session: hexadecimal `sport` values are converted like `dsport`, and `-` (no port, 9 January records) is encoded as -1. Preprocessing errors now list failing columns and values. February is unaffected.
 - Dataset total in `nadmon.sessions` corrected to the audited 2,540,047 records (was 2,540,044 from the dataset's published description); a test now ties it to PROJECT_CONTEXT.md.
 
 ### Research
