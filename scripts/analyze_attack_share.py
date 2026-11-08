@@ -37,6 +37,7 @@ DROP = 0.05  # Strategy B: drop of at least 0.05 ...
 CONSECUTIVE = 2  # ... in two consecutive windows
 REFERENCE_WINDOWS = 10  # candidate reference period: first 10 windows
 LOW_SHARE = 0.12  # split used for the low/high attack-share comparison
+LATE_PERIOD_START = 50  # first window of the late low-attack period
 
 METRIC_LABELS = {
     "f1": "F1",
@@ -326,6 +327,37 @@ def categories(windows: pd.DataFrame) -> dict | None:
                 else None,
             }
             for cat in per_cat.index
+        }
+
+        # Split the pooled recall gap between low- and high-share windows into
+        # (a) a different category mix and (b) lower recall within categories.
+        low_g, high_g = grouped.xs(True, level="low"), grouped.xs(False, level="low")
+        mix_low = low_g["records"] / low_g["records"].sum()
+        mix_high = high_g["records"] / high_g["records"].sum()
+        rec_low = low_g["recall"]
+        rec_high = high_g["recall"].reindex(rec_low.index)
+        pooled_low = float((mix_low * rec_low).sum())
+        pooled_high = float((mix_high * high_g["recall"]).sum())
+        low_mix_high_recall = float((mix_low * rec_high).sum())
+        within_by_cat = (mix_low * (rec_high - rec_low)).dropna()
+        summary["recall_gap_decomposition"] = {
+            "pooled_recall_low": pooled_low,
+            "pooled_recall_high": pooled_high,
+            "gap": pooled_high - pooled_low,
+            "from_category_mix": pooled_high - low_mix_high_recall,
+            "from_within_category": low_mix_high_recall - pooled_low,
+            "within_category_by_category": within_by_cat.to_dict(),
+        }
+        fuzzers = cw[cw["AttackCategory"] == "Fuzzers"].copy()
+        fuzzers["period"] = pd.cut(
+            fuzzers["window"],
+            [0, REFERENCE_WINDOWS, LATE_PERIOD_START - 1, fuzzers["window"].max()],
+            labels=["start", "middle", "end"],
+        )
+        fp = fuzzers.groupby("period", observed=True)[["records", "detected"]].sum()
+        summary["fuzzers_recall_by_period"] = {
+            str(k): {"records": int(r.records), "recall": float(r.detected / r.records)}
+            for k, r in fp.iterrows()
         }
 
     figure_categories(windows, counts, expected)
