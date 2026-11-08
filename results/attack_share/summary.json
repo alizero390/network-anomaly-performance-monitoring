@@ -58,13 +58,63 @@
     "drop": 0.05,
     "consecutive": 2
   },
-  "categories": null,
+  "categories": {
+    "categories": [
+      {
+        "AttackCategory": "Generic",
+        "records": 39913,
+        "recall": 0.9999498910129532
+      },
+      {
+        "AttackCategory": "Exploits",
+        "records": 7198,
+        "recall": 0.9849958321756044
+      },
+      {
+        "AttackCategory": "Fuzzers",
+        "records": 3946,
+        "recall": 0.5810947795235681
+      },
+      {
+        "AttackCategory": "DoS",
+        "records": 2948,
+        "recall": 0.9915196743554953
+      },
+      {
+        "AttackCategory": "Reconnaissance",
+        "records": 2540,
+        "recall": 0.9964566929133858
+      },
+      {
+        "AttackCategory": "Backdoor",
+        "records": 367,
+        "recall": 0.997275204359673
+      },
+      {
+        "AttackCategory": "Analysis",
+        "records": 349,
+        "recall": 0.8567335243553008
+      },
+      {
+        "AttackCategory": "Shellcode",
+        "records": 252,
+        "recall": 0.996031746031746
+      },
+      {
+        "AttackCategory": "Worms",
+        "records": 31,
+        "recall": 1.0
+      }
+    ],
+    "r2_recall_explained_by_category_mix": 0.6654377839503717,
+    "spearman_expected_vs_observed_recall": 0.8801764299896527
+  },
   "provenance": {
-    "created_utc": "2026-11-07T22:54:29+00:00",
-    "git_commit": "37dc0ff70c4302498e27156575b6e811e3ba0db3",
-    "git_uncommitted_changes": false,
-    "python": "3.13.18",
-    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39",
+    "created_utc": "2026-11-08T06:52:41+00:00",
+    "git_commit": "bf3dd0e113aa3ff1ed62fac606f2b467a563e169",
+    "git_uncommitted_changes": null,
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26100-SP0",
     "packages": {
       "numpy": "2.4.6",
       "pandas": "3.0.6",
