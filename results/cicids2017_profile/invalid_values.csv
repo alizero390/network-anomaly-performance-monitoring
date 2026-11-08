@@ -1,0 +1,27 @@
+,nan,inf,negative,day
+Flow Bytes/s,0,3,0,monday
+Flow Packets/s,0,3,0,monday
+Fwd Header Length,0,0,46,monday
+Bwd Header Length,0,0,85,monday
+ICMP Code,0,0,371532,monday
+ICMP Type,0,0,371532,monday
+Fwd Header Length,0,0,60,tuesday
+Bwd Header Length,0,0,82,tuesday
+ICMP Code,0,0,321955,tuesday
+ICMP Type,0,0,321955,tuesday
+Flow Bytes/s,0,1,0,wednesday
+Flow Packets/s,0,1,0,wednesday
+Fwd Header Length,0,0,64,wednesday
+Bwd Header Length,0,0,88,wednesday
+ICMP Code,0,0,496617,wednesday
+ICMP Type,0,0,496617,wednesday
+Flow Bytes/s,0,1,0,thursday
+Flow Packets/s,0,1,0,thursday
+Fwd Header Length,0,0,99,thursday
+Bwd Header Length,0,0,128,thursday
+ICMP Code,0,0,361887,thursday
+ICMP Type,0,0,361887,thursday
+Fwd Header Length,0,0,40,friday
+Bwd Header Length,0,0,89,friday
+ICMP Code,0,0,547382,friday
+ICMP Type,0,0,547382,friday

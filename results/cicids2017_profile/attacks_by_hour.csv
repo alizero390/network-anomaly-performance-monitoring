@@ -1,0 +1,27 @@
+time,label,flows,day
+2017-07-04 12:00:00,FTP-Patator,2639,tuesday
+2017-07-04 13:00:00,FTP-Patator,1333,tuesday
+2017-07-04 17:00:00,SSH-Patator,2461,tuesday
+2017-07-04 18:00:00,SSH-Patator,499,tuesday
+2017-07-04 19:00:00,SSH-Patator,1,tuesday
+2017-07-05 12:00:00,DoS Slowloris,2077,wednesday
+2017-07-05 13:00:00,DoS Hulk,151005,wednesday
+2017-07-05 13:00:00,DoS Slowhttptest,1740,wednesday
+2017-07-05 13:00:00,DoS Slowloris,1782,wednesday
+2017-07-05 14:00:00,DoS GoldenEye,7567,wednesday
+2017-07-05 14:00:00,DoS Hulk,7463,wednesday
+2017-07-05 18:00:00,Heartbleed,11,wednesday
+2017-07-06 12:00:00,Web Attack - Brute Force,73,thursday
+2017-07-06 13:00:00,Web Attack - SQL Injection,13,thursday
+2017-07-06 13:00:00,Web Attack - XSS,18,thursday
+2017-07-06 17:00:00,Infiltration,19,thursday
+2017-07-06 17:00:00,Infiltration - Portscan,2974,thursday
+2017-07-06 18:00:00,Infiltration,17,thursday
+2017-07-06 18:00:00,Infiltration - Portscan,68793,thursday
+2017-07-07 13:00:00,Botnet,724,friday
+2017-07-07 14:00:00,Botnet,12,friday
+2017-07-07 16:00:00,Portscan,177,friday
+2017-07-07 17:00:00,Portscan,138818,friday
+2017-07-07 18:00:00,DDoS,15846,friday
+2017-07-07 18:00:00,Portscan,20071,friday
+2017-07-07 19:00:00,DDoS,79298,friday
