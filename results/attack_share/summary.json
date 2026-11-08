@@ -162,14 +162,52 @@
         0.9794589647545018
       ]
     },
-    "spearman_fpr_vs_fuzzers_share": 0.6849043113276736
+    "spearman_fpr_vs_fuzzers_share": 0.6849043113276736,
+    "within_category_recall_low_vs_high": {
+      "Generic": {
+        "low": 0.9974683544303797,
+        "high": 0.9999746931544983
+      },
+      "Exploits": {
+        "low": 0.9910586552217453,
+        "high": 0.9810459008906143
+      },
+      "Fuzzers": {
+        "low": 0.5112388917929953,
+        "high": 0.6443784051510649
+      },
+      "DoS": {
+        "low": 0.984251968503937,
+        "high": 0.9934952298352124
+      },
+      "Reconnaissance": {
+        "low": 0.9971724787935909,
+        "high": 0.9959404600811907
+      },
+      "Backdoor": {
+        "low": 1.0,
+        "high": 0.9964912280701754
+      },
+      "Analysis": {
+        "low": 1.0,
+        "high": 0.8452012383900929
+      },
+      "Shellcode": {
+        "low": 0.9921875,
+        "high": 1.0
+      },
+      "Worms": {
+        "low": 1.0,
+        "high": 1.0
+      }
+    }
   },
   "provenance": {
-    "created_utc": "2026-11-08T07:04:59+00:00",
-    "git_commit": "08f116abb54b2a47bd466ca097c6f12b87ca878d",
-    "git_uncommitted_changes": false,
-    "python": "3.13.18",
-    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39",
+    "created_utc": "2026-11-08T07:09:24+00:00",
+    "git_commit": "d191da5910fc66d00a5bead2b35c37ba7fc2b581",
+    "git_uncommitted_changes": null,
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26100-SP0",
     "packages": {
       "numpy": "2.4.6",
       "pandas": "3.0.6",
