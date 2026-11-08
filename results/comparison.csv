@@ -1,0 +1,26 @@
+,feb_rf (baseline)
+validation records,290575
+validation attack share,0.1980349307407726
+F1 (pooled),0.9728214354334422
+recall (pooled),0.9678680661754484
+FPR (pooled),0.005419879758487068
+windows,58
+windows with attack share < 12%,20
+R2 of window F1: attack share only,0.16949554619209883
+R2 of window F1: recall/FPR only,0.8794368265180306
+Spearman window F1 vs attack share,0.8317073558500333
+Spearman window recall vs attack share,0.7911826853230176
+"mean window recall, low / high share","(0.8677506789169932, 0.9783980608120811)"
+Generic share of attacks,0.6936083692478798
+recall excluding Generic,0.8952413362826839
+Fuzzers recall,0.5810947795235681
+Fuzzers share of missed attacks,0.8939967550027041
+R2 of window recall: category mix,0.6654377839503718
+recall gap low/high share,0.12095211456038635
+  of which category mix,0.08848245741905858
+  of which within categories,0.03246965714132777
+Fuzzers recall: first 10 / middle / last 9 windows,"(0.38629737609329445, 0.6435499515033948, 0.5802364864864865)"
+"F1 alarms, reference = first 10 windows",1
+"F1 alarms, reference = all windows",5
+simulated F1 alarm rate at 1% attacks,1.0
+simulated balanced-accuracy alarm rate at 1% attacks,0.0

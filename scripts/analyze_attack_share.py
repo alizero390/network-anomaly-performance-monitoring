@@ -1,16 +1,18 @@
-"""Attack-share analysis of the baseline's validation windows.
+"""Attack-share analysis of a model's validation windows.
 
-Usage:  python scripts/analyze_attack_share.py
+Usage:
+    python scripts/analyze_attack_share.py               # baseline (February, Random Forest)
+    python scripts/analyze_attack_share.py --run jan_hgb # any run from train_model.py
 
-Needs results/validation_predictions.csv (from scripts/baseline.py). If
-results/validation_categories.csv exists (from
-scripts/export_validation_categories.py), the attack-category analysis runs too.
-
-Writes everything to results/attack_share/.
+Baseline: reads results/validation_predictions.csv (from scripts/baseline.py) and,
+if present, results/validation_categories.csv; writes results/attack_share/.
+Other runs: reads results/runs/<run>/validation_predictions.csv, which already
+contains attack categories; writes results/runs/<run>/attack_share/.
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 
 import matplotlib
@@ -37,7 +39,7 @@ DROP = 0.05  # Strategy B: drop of at least 0.05 ...
 CONSECUTIVE = 2  # ... in two consecutive windows
 REFERENCE_WINDOWS = 10  # candidate reference period: first 10 windows
 LOW_SHARE = 0.12  # split used for the low/high attack-share comparison
-LATE_PERIOD_START = 50  # first window of the late low-attack period
+LAST_WINDOWS = 9  # "end" period: the last 9 windows (February: windows 50-58)
 
 METRIC_LABELS = {
     "f1": "F1",
@@ -73,6 +75,12 @@ def style() -> None:
             "lines.linewidth": 2,
         }
     )
+
+
+def set_output(out_dir) -> None:
+    global OUT, FIGURES
+    OUT = out_dir
+    FIGURES = OUT / "figures"
 
 
 def save(fig: plt.Figure, name: str) -> None:
@@ -221,20 +229,26 @@ EASY_CATEGORY = "Generic"
 
 
 def export_category_tables(pred: pd.DataFrame, n_windows: int) -> None:
-    """Write per-category tables from results/validation_categories.csv (local only)."""
-    path = RESULTS / "validation_categories.csv"
-    if not path.is_file():
-        print("validation_categories.csv not found; using committed category tables if present.")
-        return
+    """Write per-category tables.
 
-    cats = pd.read_csv(path)
-    merged = pred.merge(cats, on="FebruarySortedIndex", how="left", validate="one_to_one")
-    if (
-        merged["AttackCategory"].isna().any()
-        or (merged["Timestamp"].to_numpy() != merged["CategoryTimestamp"].to_numpy()).any()
-        or (merged["TrueLabel"].to_numpy() != merged["CategoryLabel"].to_numpy()).any()
-    ):
-        raise RuntimeError("Category file does not align with the predictions file.")
+    Categories come from the predictions file itself (runs from train_model.py)
+    or, for the baseline, from results/validation_categories.csv (local only).
+    """
+    if "AttackCategory" in pred.columns:
+        merged = pred
+    else:
+        path = RESULTS / "validation_categories.csv"
+        if not path.is_file():
+            print("validation_categories.csv not found; using committed category tables.")
+            return
+        cats = pd.read_csv(path)
+        merged = pred.merge(cats, on="FebruarySortedIndex", how="left", validate="one_to_one")
+        if (
+            merged["AttackCategory"].isna().any()
+            or (merged["Timestamp"].to_numpy() != merged["CategoryTimestamp"].to_numpy()).any()
+            or (merged["TrueLabel"].to_numpy() != merged["CategoryLabel"].to_numpy()).any()
+        ):
+            raise RuntimeError("Category file does not align with the predictions file.")
 
     attacks = merged[merged["TrueLabel"] == 1].copy()
     attacks["Detected"] = attacks["Prediction"] == 1
@@ -260,6 +274,7 @@ def export_category_tables(pred: pd.DataFrame, n_windows: int) -> None:
 
 def categories(windows: pd.DataFrame) -> dict | None:
     """Category analysis from the committed category tables."""
+    n_windows = len(windows)
     recall_path = OUT / "category_recall.csv"
     mix_path = OUT / "category_mix_by_window.csv"
     if not (recall_path.is_file() and mix_path.is_file()):
@@ -307,7 +322,9 @@ def categories(windows: pd.DataFrame) -> dict | None:
             "mix_percent_high": (mix[~low].mean() * 100).round(2).to_dict(),
             "expected_recall": [float(expected[low].mean()), float(expected[~low].mean())],
         },
-        "spearman_fpr_vs_fuzzers_share": float(w["fpr"].corr(mix["Fuzzers"], method="spearman")),
+        "spearman_fpr_vs_fuzzers_share": (
+            float(w["fpr"].corr(mix["Fuzzers"], method="spearman")) if "Fuzzers" in mix else None
+        ),
     }
 
     within = OUT / "category_window_counts.csv"
@@ -331,34 +348,39 @@ def categories(windows: pd.DataFrame) -> dict | None:
 
         # Split the pooled recall gap between low- and high-share windows into
         # (a) a different category mix and (b) lower recall within categories.
-        low_g, high_g = grouped.xs(True, level="low"), grouped.xs(False, level="low")
-        mix_low = low_g["records"] / low_g["records"].sum()
-        mix_high = high_g["records"] / high_g["records"].sum()
-        rec_low = low_g["recall"]
-        rec_high = high_g["recall"].reindex(rec_low.index)
-        pooled_low = float((mix_low * rec_low).sum())
-        pooled_high = float((mix_high * high_g["recall"]).sum())
-        low_mix_high_recall = float((mix_low * rec_high).sum())
-        within_by_cat = (mix_low * (rec_high - rec_low)).dropna()
-        summary["recall_gap_decomposition"] = {
-            "pooled_recall_low": pooled_low,
-            "pooled_recall_high": pooled_high,
-            "gap": pooled_high - pooled_low,
-            "from_category_mix": pooled_high - low_mix_high_recall,
-            "from_within_category": low_mix_high_recall - pooled_low,
-            "within_category_by_category": within_by_cat.to_dict(),
-        }
-        fuzzers = cw[cw["AttackCategory"] == "Fuzzers"].copy()
-        fuzzers["period"] = pd.cut(
-            fuzzers["window"],
-            [0, REFERENCE_WINDOWS, LATE_PERIOD_START - 1, fuzzers["window"].max()],
-            labels=["start", "middle", "end"],
-        )
-        fp = fuzzers.groupby("period", observed=True)[["records", "detected"]].sum()
-        summary["fuzzers_recall_by_period"] = {
-            str(k): {"records": int(r.records), "recall": float(r.detected / r.records)}
-            for k, r in fp.iterrows()
-        }
+        # Only possible when the run has windows on both sides of LOW_SHARE.
+        summary["recall_gap_decomposition"] = None
+        if cw["low"].any() and (~cw["low"]).any():
+            low_g, high_g = grouped.xs(True, level="low"), grouped.xs(False, level="low")
+            mix_low = low_g["records"] / low_g["records"].sum()
+            mix_high = high_g["records"] / high_g["records"].sum()
+            rec_low = low_g["recall"]
+            rec_high = high_g["recall"].reindex(rec_low.index)
+            pooled_low = float((mix_low * rec_low).sum())
+            pooled_high = float((mix_high * high_g["recall"]).sum())
+            low_mix_high_recall = float((mix_low * rec_high).sum())
+            within_by_cat = (mix_low * (rec_high - rec_low)).dropna()
+            summary["recall_gap_decomposition"] = {
+                "pooled_recall_low": pooled_low,
+                "pooled_recall_high": pooled_high,
+                "gap": pooled_high - pooled_low,
+                "from_category_mix": pooled_high - low_mix_high_recall,
+                "from_within_category": low_mix_high_recall - pooled_low,
+                "within_category_by_category": within_by_cat.to_dict(),
+            }
+        summary["fuzzers_recall_by_period"] = None
+        if n_windows > REFERENCE_WINDOWS + LAST_WINDOWS:
+            fuzzers = cw[cw["AttackCategory"] == "Fuzzers"].copy()
+            fuzzers["period"] = pd.cut(
+                fuzzers["window"],
+                [0, REFERENCE_WINDOWS, n_windows - LAST_WINDOWS, n_windows],
+                labels=["start", "middle", "end"],
+            )
+            fp = fuzzers.groupby("period", observed=True)[["records", "detected"]].sum()
+            summary["fuzzers_recall_by_period"] = {
+                str(k): {"records": int(r.records), "recall": float(r.detected / r.records)}
+                for k, r in fp.iterrows()
+            }
 
     figure_categories(windows, counts, expected)
     return summary
@@ -524,11 +546,21 @@ def figure_timeline(windows: pd.DataFrame) -> None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Attack-share analysis of validation windows")
+    parser.add_argument("--run", help="run name from train_model.py, e.g. jan_hgb")
+    args = parser.parse_args()
+    if args.run:
+        run_dir = RESULTS / "runs" / args.run
+        predictions_path = run_dir / "validation_predictions.csv"
+        set_output(run_dir / "attack_share")
+    else:
+        predictions_path = RESULTS / "validation_predictions.csv"
+
     OUT.mkdir(parents=True, exist_ok=True)
     FIGURES.mkdir(parents=True, exist_ok=True)
     style()
 
-    pred = pd.read_csv(RESULTS / "validation_predictions.csv")
+    pred = pd.read_csv(predictions_path)
 
     windows, obs = observed_windows(pred)
     windows.to_csv(OUT / "window_metrics_extended.csv", index=False, lineterminator="\n")

@@ -13,6 +13,18 @@ The format follows these categories:
 ## [Unreleased]
 
 ### Added
+- `nadmon.sessions`: January and February capture sessions with the same chronological 50/20/30 split rule (February keeps its frozen counts).
+- `nadmon.models`: Random Forest (baseline) and histogram gradient boosting pipelines.
+- `scripts/train_model.py`, `scripts/compare_runs.py`, `scripts/run_robustness.bat` for robustness runs on a second model and the January session.
+- `analyze_attack_share.py --run <name>` analyses any run; category data come from the run's predictions file.
+- End-to-end tests on synthetic raw files for both models.
+- Scoping literature review (`literature/scoping_review.md`), search log and 13 new references.
+- Robustness-run decisions in RESEARCH_DECISIONS.md, section 13.
+
+### Research
+- Scoping review: Generic dominance (about 65% of UNSW-NB15 attacks) and Fuzzers overlapping normal traffic are already reported at the dataset level (Zoghi and Serpen; Flood et al.). The candidate contribution is their temporal consequence for window-level monitoring and degradation alarms.
+
+### Added
 - `nadmon.attack_share`: closed-form F1/MCC from rates, vectorised window metrics (recall, FPR, MCC, balanced accuracy, ROC AUC, average precision), F1 decomposition, controlled attack-share resampling and the Strategy B alarm rule.
 - `scripts/analyze_attack_share.py` and results in `results/attack_share/` (tables, figures, README with findings).
 - `scripts/export_validation_categories.py` to export validation attack categories on the machine holding the raw data.

@@ -368,7 +368,30 @@ The following questions remain open:
 9. What statistical method is most appropriate for comparing repeated experimental results?
 10. How can controlled harmless and harmful traffic changes be constructed without introducing unintended confounding factors?
 
-## 13. Decision Change Policy
+## 13. Robustness Runs (added 2026-11-08)
+
+To test whether the attack-share findings generalise beyond one model and one capture
+day, the same analysis is repeated on additional runs. These do not replace the
+February Random Forest baseline or its frozen split.
+
+**January split.** The January 22-23 session is split on its own with the February
+rule: chronological, first 50% training, next 20% validation, last 30% test, each
+boundary moved forward to the end of its timestamp group. Records outside both
+sessions stop the run. The January test partition is never loaded. Implemented in
+`src/nadmon/sessions.py`.
+
+**Second model.** Histogram gradient boosting (`src/nadmon/models.py`): 200 iterations,
+learning rate 0.1, early stopping off, balanced class weights, native categorical
+handling, random state 42. Settings are fixed in advance and not tuned on validation
+data, matching the Random Forest's treatment.
+
+**Runs.** `feb_hgb`, `jan_rf`, `jan_hgb` (`scripts/train_model.py`), each analysed with
+`scripts/analyze_attack_share.py --run <name>` and compared with
+`scripts/compare_runs.py`. The analysis settings (window size 5,000, low-share split
+12%, Strategy B rule, first-10-window reference, resampling seed) are identical across
+runs.
+
+## 14. Decision Change Policy
 
 When a methodological decision changes:
 

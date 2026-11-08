@@ -103,20 +103,27 @@ network-anomaly-performance-monitoring/
 │   ├── dataset.py               # Column layout, February split, preprocessing
 │   ├── metrics.py               # Overall and window-level metrics
 │   ├── attack_share.py          # Attack-share effects, decomposition, resampling
+│   ├── sessions.py              # January and February sessions and their splits
+│   ├── models.py                # Random Forest and gradient boosting pipelines
 │   └── provenance.py            # Git commit and package versions for each run
 ├── scripts/
 │   ├── baseline.py              # Train and validate the Random Forest baseline
 │   ├── analyze_attack_share.py  # Window performance vs attack share (results/attack_share)
 │   ├── export_validation_categories.py  # Export attack_cat for validation rows (run locally)
-│   └── check_environment.py     # Check versions, dataset path and model loading
+│   ├── train_model.py           # Train rf/hgb on the feb or jan session
+│   ├── compare_runs.py          # Side-by-side table of all analysed runs
+│   └── run_robustness.bat       # Runs feb_hgb, jan_rf, jan_hgb and the comparison (Windows)
+│   ├── check_environment.py     # Check versions, dataset path and model loading
 ├── tests/                       # pytest suite
 ├── configs/
 │   └── paths.example.toml       # Copy to paths.toml (not committed)
 ├── results/
 │   ├── baseline_summary.json
 │   ├── validation_window_metrics.csv
-│   └── attack_share/            # Findings, tables and figures
-├── literature/                  # Literature review notes and references.bib
+│   ├── attack_share/            # Findings, tables and figures (baseline)
+│   ├── runs/                    # Robustness runs: <session>_<model>/
+│   └── comparison.md            # All runs side by side
+├── literature/                  # Scoping review, search log, references.bib
 ├── models/                      # Generated models; not committed
 ├── requirements.txt             # Pinned runtime packages
 ├── requirements-dev.txt         # Adds pytest and ruff

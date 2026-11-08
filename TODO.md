@@ -35,6 +35,10 @@ Status definitions:
 - [x] Audit attack-category composition across validation windows (Generic is 69% of attacks and drives attack-share swings; Fuzzers cause 89% of misses).
 - [x] Within-category recall by period (73% of the low/high recall gap is category mix, 27% is Fuzzers recall; Fuzzers recall 0.386 in windows 1-10).
 - [ ] Compare features of Fuzzers in windows 1-10 with later Fuzzers traffic.
+- [x] Scoping literature search (literature/scoping_review.md).
+- [ ] Run robustness runs locally: `scripts\run_robustness.bat` (feb_hgb, jan_rf, jan_hgb).
+- [ ] Systematic search in Scopus, IEEE Xplore, ACM DL and Google Scholar; log in literature/search_log.md.
+- [ ] Download corrected CIC-IDS2017 (Engelen et al.) for the external-dataset check.
 - [x] Investigate variation in window-level F1 (see results/attack_share/README.md: 88% of F1 variance is real recall/FPR change, 17% attack share alone).
 - [ ] Establish a defensible stable reference period (windows 1-10 are a low-attack, low-performance regime; see results/attack_share/README.md, finding 4).
 - [ ] Determine minimum labelled sample requirements.
