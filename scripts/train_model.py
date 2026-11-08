@@ -55,7 +55,7 @@ def main() -> None:
     out.mkdir(parents=True, exist_ok=True)
 
     print(f"\n========== {run_name}: SPLIT ==========")
-    all_ts = sessions.read_timestamps(paths.raw_files)
+    all_ts, all_labels = sessions.read_timestamps_and_labels(paths.raw_files)
     if len(all_ts) != sessions.DATASET_TOTAL:
         raise RuntimeError(
             f"Total record count {len(all_ts):,} does not match the audited "
@@ -64,12 +64,12 @@ def main() -> None:
     counts = sessions.check_sessions_cover_dataset(all_ts)
     print("Records per session:", counts)
 
-    ts = all_ts[(all_ts >= session.start) & (all_ts < session.end)]
-    split = sessions.split_session(ts, session)
+    in_session = (all_ts >= session.start) & (all_ts < session.end)
+    split = sessions.split_session(all_ts[in_session], session, all_labels[in_session])
     print(
-        f"Total {split.total:,} | train {split.train_end:,} | "
+        f"Rule {session.rule} | total {split.total:,} | train {split.train_end:,} | "
         f"validation {split.validation_end - split.train_end:,} | "
-        f"test (not loaded) {split.total - split.validation_end:,}"
+        f"after validation (not loaded) {split.total - split.validation_end:,}"
     )
 
     print(f"\n========== {run_name}: LOAD ==========")
@@ -130,6 +130,7 @@ def main() -> None:
         "session": args.session,
         "model": args.model,
         "split": {
+            "rule": session.rule,
             "total": split.total,
             "train_end": split.train_end,
             "validation_end": split.validation_end,

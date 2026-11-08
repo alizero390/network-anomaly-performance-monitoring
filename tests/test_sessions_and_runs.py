@@ -44,6 +44,31 @@ def test_dataset_total_matches_project_documentation():
     assert f"{sessions.DATASET_TOTAL:,} records in total" in docs
 
 
+def test_attack_period_split():
+    jan = sessions.Session("j", 0, 100, rule="attack_period_50_50")
+    ts = np.array([1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+    labels = np.array([1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0])
+    split = sessions.split_session(ts, jan, labels)
+    assert split.validation_end == 6  # last attack is the 6th record (timestamp 5)
+    assert split.train_end == 4  # 50% = 3 falls inside the "3" group -> moved to 4
+    assert split.total == 12
+
+
+def test_attack_period_split_follows_time_not_file_order():
+    jan = sessions.Session("j", 0, 100, rule="attack_period_50_50")
+    ts = np.array([9, 1, 5, 3, 7, 2, 8, 4, 6, 10])
+    labels = np.array([0, 1, 0, 0, 1, 0, 0, 0, 0, 0])  # attacks at times 1 and 7
+    split = sessions.split_session(ts, jan, labels)
+    assert split.validation_end == 7
+    assert split.cutoff == 7
+
+
+def test_attack_period_split_needs_labels():
+    jan = sessions.Session("j", 0, 100, rule="attack_period_50_50")
+    with pytest.raises(ValueError, match="needs labels"):
+        sessions.split_session(np.arange(5), jan)
+
+
 def test_february_session_matches_frozen_constants():
     feb = sessions.FEBRUARY
     assert (feb.total, feb.train_end, feb.validation_end) == (1_452_844, 726_426, 1_017_001)
@@ -65,9 +90,10 @@ def test_sessions_must_cover_dataset():
 CATEGORIES = ["Generic", "Exploits", "Fuzzers", "DoS"]
 
 
-def _raw_rows(n: int, start: int, rng: np.random.Generator) -> pd.DataFrame:
+def _raw_rows(n: int, start: int, rng: np.random.Generator, attacks_until=1.0) -> pd.DataFrame:
     frame = pd.DataFrame(rng.integers(0, 1000, size=(n, 49)))
     label = (rng.random(n) < 0.25).astype(int)
+    label[int(n * attacks_until) :] = 0  # rows are in time order here
     # Attacks have larger byte counts so the task is learnable.
     frame[7] = rng.integers(0, 1000, n) + label * 800
     frame[1] = rng.integers(1, 65535, n).astype(str)
@@ -85,7 +111,7 @@ def _raw_rows(n: int, start: int, rng: np.random.Generator) -> pd.DataFrame:
 @pytest.fixture
 def synthetic_dataset(tmp_path, monkeypatch):
     rng = np.random.default_rng(0)
-    jan = _raw_rows(3000, sessions.JANUARY.start, rng)
+    jan = _raw_rows(3000, sessions.JANUARY.start, rng, attacks_until=0.6)
     feb = _raw_rows(2000, sessions.FEBRUARY.start, rng)
     rows = pd.concat([jan, feb], ignore_index=True).sample(frac=1, random_state=1)
     data_dir = tmp_path / "data"
@@ -116,6 +142,8 @@ def test_train_and_analyze_january_run(synthetic_dataset, monkeypatch, model):
     run_dir = paths.results_dir / "runs" / f"jan_{model}"
     summary = json.loads((run_dir / "summary.json").read_text(encoding="utf-8"))
     assert summary["split"]["total"] == 3000
+    assert summary["split"]["rule"] == "attack_period_50_50"
+    assert summary["split"]["validation_end"] <= 1800  # attacks stop at 60%
     assert summary["records_per_session"] == {"feb": 2000, "jan": 3000}
     assert summary["label_category_mismatches"] == 0
     assert summary["recall"] > 0.6  # the synthetic task is learnable
@@ -153,7 +181,8 @@ def test_describe_january_session(synthetic_dataset, monkeypatch):
     out = paths.results_dir / "sessions" / "jan"
     summary = json.loads((out / "summary.json").read_text(encoding="utf-8"))
     assert summary["records"] == 3000
-    parts = summary["default_split_50_20_30"]
+    parts = summary["split"]
+    assert parts["after_validation"]["attacks"] == 0
     assert sum(p["records"] for p in parts.values()) == 3000
     assert sum(p["attacks"] for p in parts.values()) == summary["attacks"]
     timeline = pd.read_csv(out / "timeline.csv")

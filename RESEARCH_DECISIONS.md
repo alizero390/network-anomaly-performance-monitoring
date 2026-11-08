@@ -403,6 +403,24 @@ held-out test**. Its whole attack timeline, including the last 30%, may be inspe
 validation; that split will be recorded here before use. February's test partition stays
 unseen. `train_model.py` now stops if any partition has fewer than 100 attacks.
 
+**January split (approved 2026-11-08).** The January timeline
+(`results/sessions/jan/`) shows all 22,215 January attacks (2.04% of the session) in a
+two-hour burst, 11:49-13:49 UTC, covering the first 38 of 218 windows; the remaining
+traffic contains no attacks. Rule `attack_period_50_50`:
+
+- Attack period: from the session start to the end of the timestamp group of the last
+  attack.
+- Training: the first 50% of the attack period's records; validation: the rest. Both
+  boundaries at timestamp-group ends.
+- Attack-free traffic after the attack period is not used. There is no January test set.
+
+Alternatives considered: a 40/60 split (more validation windows, weaker model) and
+extending validation into the attack-free traffic (mixes a second question into the
+run). Expected size: about 95,000 training records and about 19 validation windows, so
+the first-10-window reference leaves about 9 monitored windows and the per-period
+Fuzzers analysis is skipped. January results are therefore a smaller, supporting
+replication, not a second primary experiment.
+
 **Second model.** Histogram gradient boosting (`src/nadmon/models.py`): 200 iterations,
 learning rate 0.1, early stopping off, balanced class weights, native categorical
 handling, random state 42. Settings are fixed in advance and not tuned on validation

@@ -62,7 +62,10 @@ def main() -> None:
 
     data = load_labels(paths.raw_files)
     n = len(data)
-    split = sessions.split_session(data[dataset.STIME_INDEX].to_numpy(), SESSION)
+    # Data are already in stable time order, so labels line up with timestamps.
+    split = sessions.split_session(
+        data[dataset.STIME_INDEX].to_numpy(), SESSION, data["label"].to_numpy()
+    )
     labels = data["label"].to_numpy()
     attack_pos = np.flatnonzero(labels == 1)
     print(f"January records: {n:,}  attacks: {len(attack_pos):,} ({labels.mean():.2%})")
@@ -88,8 +91,8 @@ def main() -> None:
     first_record = (timeline.index - 1) * WINDOW
     timeline["partition"] = np.select(
         [first_record < split.train_end, first_record < split.validation_end],
-        ["train_50_20_30", "validation_50_20_30"],
-        "test_50_20_30",
+        ["train", "validation"],
+        "after_validation",
     )
     timeline.to_csv(out / "timeline.csv", lineterminator="\n")
 
@@ -118,10 +121,11 @@ def main() -> None:
         },
         "windows_with_attacks": int((timeline["attacks"] > 0).sum()),
         "windows": int(len(timeline)),
-        "default_split_50_20_30": {
+        "split_rule": SESSION.rule,
+        "split": {
             "train": partition_stats(0, split.train_end),
             "validation": partition_stats(split.train_end, split.validation_end),
-            "test": partition_stats(split.validation_end, n),
+            "after_validation": partition_stats(split.validation_end, n),
         },
         "provenance": run_metadata(),
     }
@@ -138,7 +142,10 @@ def main() -> None:
         label = cat if i < len(COLORS) else None
         ax.bar(timeline.index, timeline[cat], bottom=bottom, width=0.9, color=color, label=label)
         bottom += timeline[cat].to_numpy()
-    for boundary, name in ((split.train_end, "50%"), (split.validation_end, "70%")):
+    for boundary, name in (
+        (split.train_end, "train end"),
+        (split.validation_end, "validation end"),
+    ):
         x = boundary / WINDOW + 0.5
         ax.axvline(x, color=INK_2, linewidth=0.8, linestyle=":")
         ax.text(x, ax.get_ylim()[1] * 0.95, f" {name}", color=INK_2, fontsize=8)
