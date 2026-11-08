@@ -26,6 +26,8 @@ The format follows these categories:
 - Dataset total in `nadmon.sessions` corrected to the audited 2,540,047 records (was 2,540,044 from the dataset's published description); a test now ties it to PROJECT_CONTEXT.md.
 
 ### Research
+- January's default validation partition contains no attacks (training: 4.09%). January becomes a replication-only session; its split will be chosen from its full attack timeline (`scripts/describe_session.py`). `train_model.py` now stops when a partition has fewer than 100 attacks.
+- `feb_hgb` (gradient boosting, February): recall 0.991, FPR 1.75%, F1 0.961; the reference-period effect and the pure attack-share false alarms replicate.
 - Scoping review: Generic dominance (about 65% of UNSW-NB15 attacks) and Fuzzers overlapping normal traffic are already reported at the dataset level (Zoghi and Serpen; Flood et al.). The candidate contribution is their temporal consequence for window-level monitoring and degradation alarms.
 
 ### Added

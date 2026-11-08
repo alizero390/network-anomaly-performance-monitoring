@@ -394,6 +394,15 @@ boundary moved forward to the end of its timestamp group. Records outside both
 sessions stop the run. The January test partition is never loaded. Implemented in
 `src/nadmon/sessions.py`.
 
+**January has no attacks in its default validation partition (2026-11-08).** With the
+50/20/30 rule, January's training partition has 4.09% attacks and its validation
+partition (217,442 records) has none, so detection performance cannot be measured there.
+Decision (approved 2026-11-08): January becomes a **replication-only session with no
+held-out test**. Its whole attack timeline, including the last 30%, may be inspected
+(`scripts/describe_session.py`) to choose a split with attacks in both training and
+validation; that split will be recorded here before use. February's test partition stays
+unseen. `train_model.py` now stops if any partition has fewer than 100 attacks.
+
 **Second model.** Histogram gradient boosting (`src/nadmon/models.py`): 200 iterations,
 learning rate 0.1, early stopping off, balanced class weights, native categorical
 handling, random state 42. Settings are fixed in advance and not tuned on validation

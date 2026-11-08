@@ -37,6 +37,8 @@ from nadmon.provenance import run_metadata
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
+MIN_ATTACKS = 100  # per partition; fewer makes recall and F1 meaningless
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -84,6 +86,12 @@ def main() -> None:
     val_ts = data[dataset.STIME_INDEX].to_numpy()[split.train_end :]
     print("Training attack %:", round(float(y_train.mean() * 100), 2))
     print("Validation attack %:", round(float(y_val.mean() * 100), 2))
+    for part, labels in (("training", y_train), ("validation", y_val)):
+        if labels.sum() < MIN_ATTACKS:
+            raise RuntimeError(
+                f"The {part} partition has {int(labels.sum())} attacks (minimum "
+                f"{MIN_ATTACKS}); detection performance cannot be measured with this split."
+            )
 
     print(f"\n========== {run_name}: TRAIN ==========")
     pipeline = MODELS[args.model]()

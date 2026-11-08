@@ -141,3 +141,32 @@ def test_train_and_analyze_january_run(synthetic_dataset, monkeypatch, model):
 def test_random_forest_matches_baseline_script():
     baseline = _load_script("baseline")
     assert repr(baseline.build_pipeline()) == repr(MODELS["rf"]())
+
+
+def test_describe_january_session(synthetic_dataset, monkeypatch):
+    paths = synthetic_dataset
+    describe = _load_script("describe_session")
+    monkeypatch.setattr(describe, "load_paths", lambda: paths)
+    monkeypatch.setattr(describe, "WINDOW", 100)
+    describe.main()
+
+    out = paths.results_dir / "sessions" / "jan"
+    summary = json.loads((out / "summary.json").read_text(encoding="utf-8"))
+    assert summary["records"] == 3000
+    parts = summary["default_split_50_20_30"]
+    assert sum(p["records"] for p in parts.values()) == 3000
+    assert sum(p["attacks"] for p in parts.values()) == summary["attacks"]
+    timeline = pd.read_csv(out / "timeline.csv")
+    assert timeline["records"].sum() == 3000
+    assert timeline["attacks"].sum() == summary["attacks"]
+    assert (out / "timeline.png").is_file()
+
+
+def test_train_stops_when_validation_has_no_attacks(synthetic_dataset, monkeypatch):
+    paths = synthetic_dataset
+    train = _load_script("train_model")
+    monkeypatch.setattr(train, "load_paths", lambda: paths)
+    monkeypatch.setattr(train, "MIN_ATTACKS", 10_000)
+    monkeypatch.setattr(sys, "argv", ["train_model.py", "--session", "jan", "--model", "rf"])
+    with pytest.raises(RuntimeError, match="cannot be measured"):
+        train.main()
