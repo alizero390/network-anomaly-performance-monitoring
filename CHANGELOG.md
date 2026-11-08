@@ -12,6 +12,12 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- Four-run robustness summary (`results/robustness_summary.md`). Replicates in all runs: Fuzzers cause 89-98% of missed attacks; under pure attack-share change F1/MCC alarm falsely while recall and balanced accuracy do not. Reference-period sensitivity is February-specific. January shows false positive bursts (windows 12-14) that F1 flags but balanced accuracy hides, so Strategy B should monitor recall and FPR separately.
+
+### Added
+- Reference for the improved CIC-IDS-2017 / CSE-CIC-IDS-2018 datasets (Liu et al., IEEE CNS 2022).
+
 ### Added
 - `nadmon.sessions`: January and February capture sessions with the same chronological 50/20/30 split rule (February keeps its frozen counts).
 - `nadmon.models`: Random Forest (baseline) and histogram gradient boosting pipelines.
