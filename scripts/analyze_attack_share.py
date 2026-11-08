@@ -216,11 +216,15 @@ def resampling(pred: pd.DataFrame, reference_share: float) -> tuple[pd.DataFrame
 # ----------------------------------------------------------------------------
 
 
-def categories(pred: pd.DataFrame, windows: pd.DataFrame) -> dict | None:
+EASY_CATEGORY = "Generic"
+
+
+def export_category_tables(pred: pd.DataFrame, n_windows: int) -> None:
+    """Write per-category tables from results/validation_categories.csv (local only)."""
     path = RESULTS / "validation_categories.csv"
     if not path.is_file():
-        print("Category file not found; skipping category analysis.")
-        return None
+        print("validation_categories.csv not found; using committed category tables if present.")
+        return
 
     cats = pd.read_csv(path)
     merged = pred.merge(cats, on="FebruarySortedIndex", how="left", validate="one_to_one")
@@ -238,27 +242,141 @@ def categories(pred: pd.DataFrame, windows: pd.DataFrame) -> dict | None:
         .agg(records=("Detected", "size"), recall=("Detected", "mean"))
         .sort_values("records", ascending=False)
     )
-    per_cat.to_csv(OUT / "category_recall.csv")
+    per_cat.to_csv(OUT / "category_recall.csv", lineterminator="\n")
 
     attacks["window"] = attacks.index // WINDOW_SIZE + 1
-    attacks = attacks[attacks["window"] <= len(windows)]
+    attacks = attacks[attacks["window"] <= n_windows]
     mix = pd.crosstab(attacks["window"], attacks["AttackCategory"], normalize="index")
-    mix.to_csv(OUT / "category_mix_by_window.csv")
+    mix.to_csv(OUT / "category_mix_by_window.csv", lineterminator="\n")
 
-    # Recall each window would have if each category kept its pooled recall:
-    # differences are then explained purely by the category mix.
+    counts = (
+        attacks.groupby(["window", "AttackCategory"])
+        .agg(records=("Detected", "size"), detected=("Detected", "sum"))
+        .reset_index()
+    )
+    counts.to_csv(OUT / "category_window_counts.csv", index=False, lineterminator="\n")
+
+
+def categories(windows: pd.DataFrame) -> dict | None:
+    """Category analysis from the committed category tables."""
+    recall_path = OUT / "category_recall.csv"
+    mix_path = OUT / "category_mix_by_window.csv"
+    if not (recall_path.is_file() and mix_path.is_file()):
+        print("Category tables not found; skipping category analysis.")
+        return None
+
+    per_cat = pd.read_csv(recall_path, index_col="AttackCategory")
+    mix = pd.read_csv(mix_path, index_col="window")
+    w = windows.set_index("window").loc[mix.index]
+    attacks_per_window = w["tp"] + w["fn"]
+    counts = mix.mul(attacks_per_window, axis=0)  # attacks per category per window
+
+    # Recall each window would have if every category kept its pooled recall,
+    # so window differences come only from the category mix.
     expected = mix.mul(per_cat["recall"], axis=1).sum(axis=1)
-    observed = windows.set_index("window").loc[mix.index, "recall"]
-    return {
+
+    easy = counts[EASY_CATEGORY]
+    other = counts.drop(columns=EASY_CATEGORY).sum(axis=1)
+    low = w["attack_share"] < LOW_SHARE
+    misses = per_cat["records"] * (1 - per_cat["recall"])
+    others = per_cat.drop(index=EASY_CATEGORY)
+
+    summary = {
         "categories": per_cat.reset_index().to_dict(orient="records"),
-        "r2_recall_explained_by_category_mix": ash.r_squared(observed, expected),
-        "spearman_expected_vs_observed_recall": float(observed.corr(expected, method="spearman")),
+        "r2_recall_explained_by_category_mix": ash.r_squared(w["recall"], expected),
+        "spearman_expected_vs_observed_recall": float(
+            w["recall"].corr(expected, method="spearman")
+        ),
+        "easy_category": EASY_CATEGORY,
+        "easy_share_of_attacks": float(
+            per_cat.loc[EASY_CATEGORY, "records"] / per_cat["records"].sum()
+        ),
+        "recall_excluding_easy": float(
+            (others["records"] * others["recall"]).sum() / others["records"].sum()
+        ),
+        "share_of_misses": {k: float(v) for k, v in (misses / misses.sum()).items()},
+        "spearman_with_attack_share": {
+            "easy_count": float(easy.corr(w["attack_share"], method="spearman")),
+            "other_attack_count": float(other.corr(w["attack_share"], method="spearman")),
+        },
+        "low_vs_high_share": {
+            "easy_per_window": [float(easy[low].mean()), float(easy[~low].mean())],
+            "other_attacks_per_window": [float(other[low].mean()), float(other[~low].mean())],
+            "mix_percent_low": (mix[low].mean() * 100).round(2).to_dict(),
+            "mix_percent_high": (mix[~low].mean() * 100).round(2).to_dict(),
+            "expected_recall": [float(expected[low].mean()), float(expected[~low].mean())],
+        },
+        "spearman_fpr_vs_fuzzers_share": float(w["fpr"].corr(mix["Fuzzers"], method="spearman")),
     }
+
+    within = OUT / "category_window_counts.csv"
+    if within.is_file():
+        cw = pd.read_csv(within)
+        cw = cw.merge(w[["attack_share"]], left_on="window", right_index=True)
+        cw["low"] = cw["attack_share"] < LOW_SHARE
+        grouped = cw.groupby(["AttackCategory", "low"])[["records", "detected"]].sum()
+        grouped["recall"] = grouped["detected"] / grouped["records"]
+        summary["within_category_recall_low_vs_high"] = {
+            cat: {
+                "low": float(grouped.loc[(cat, True), "recall"])
+                if (cat, True) in grouped.index
+                else None,
+                "high": float(grouped.loc[(cat, False), "recall"])
+                if (cat, False) in grouped.index
+                else None,
+            }
+            for cat in per_cat.index
+        }
+
+    figure_categories(windows, counts, expected)
+    return summary
 
 
 # ----------------------------------------------------------------------------
 # Figures
 # ----------------------------------------------------------------------------
+
+
+def figure_categories(windows: pd.DataFrame, counts: pd.DataFrame, expected: pd.Series) -> None:
+    w = windows.set_index("window").loc[counts.index]
+    easy = counts[EASY_CATEGORY]
+    other = counts.drop(columns=EASY_CATEGORY).sum(axis=1)
+
+    fig, ax = plt.subplots(figsize=(7.2, 3.2))
+    ax.bar(counts.index, other, color=COLORS["mcc"], width=0.8, label="All other attack categories")
+    ax.bar(
+        counts.index,
+        easy,
+        bottom=other,
+        color=COLORS["f1"],
+        width=0.8,
+        label=f"{EASY_CATEGORY} attacks",
+    )
+    ax.set_xlabel("Validation window (5,000 records each)")
+    ax.set_ylabel("Attack records")
+    ax.set_title(f"Apart from one DoS/Exploits burst, attack volume swings are {EASY_CATEGORY}")
+    ax.legend(loc="upper right")
+    save(fig, "fig5_attack_categories_by_window")
+
+    fig, ax = plt.subplots(figsize=(4.4, 3.8))
+    lo, hi = 0.6, 1.005
+    ax.plot([lo, hi], [lo, hi], color=INK_2, linewidth=1, linestyle="--")
+    ax.scatter(
+        expected,
+        w["recall"],
+        s=26,
+        color=COLORS["f1"],
+        edgecolor="white",
+        linewidth=0.8,
+        zorder=3,
+    )
+    ax.text(0.66, 0.675, "Observed = expected", color=INK_2, fontsize=8, rotation=41)
+    ax.set_xlim(lo, hi)
+    ax.set_ylim(lo, hi)
+    ax.set_xlabel("Recall expected from category mix")
+    ax.set_ylabel("Observed window recall")
+    ax.set_title("Category mix predicts window recall")
+    save(fig, "fig6_recall_expected_from_category_mix")
 
 
 def figure_f1_vs_share(windows: pd.DataFrame, pooled: dict) -> None:
@@ -391,7 +509,8 @@ def main() -> None:
     sim_summary.to_csv(OUT / "resampling_quantiles.csv", index=False, lineterminator="\n")
     sim_alarms.to_csv(OUT / "resampling_alarm_rates.csv", index=False, lineterminator="\n")
 
-    category_summary = categories(pred, windows)
+    export_category_tables(pred, len(windows))
+    category_summary = categories(windows)
 
     figure_f1_vs_share(windows, obs["pooled"])
     figure_rates_vs_share(windows)
