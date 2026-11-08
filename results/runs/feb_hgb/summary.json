@@ -1,0 +1,46 @@
+{
+    "run": "feb_hgb",
+    "session": "feb",
+    "model": "hgb",
+    "split": {
+        "total": 1452844,
+        "train_end": 726426,
+        "validation_end": 1017001,
+        "cutoff_timestamp": 1424250181
+    },
+    "records_per_session": {
+        "feb": 1452844,
+        "jan": 1087203
+    },
+    "label_category_mismatches": 0,
+    "training_attack_share": 0.21053211201140928,
+    "validation_attack_share": 0.1980349307407726,
+    "random_state": 42,
+    "threshold": 0.5,
+    "classifier": "HistGradientBoostingClassifier(categorical_features=[0, 1, 2],\n                               class_weight='balanced', early_stopping=False,\n                               max_iter=200, random_state=42)",
+    "accuracy": 0.9842278241417879,
+    "precision": 0.9331762935335591,
+    "recall": 0.9913457528152371,
+    "f1": 0.9613819254265852,
+    "false_positive_rate": 0.017529856542691746,
+    "tn": 228946,
+    "fp": 4085,
+    "fn": 498,
+    "tp": 57046,
+    "training_seconds": 10.544420003890991,
+    "prediction_seconds": 2.5205695629119873,
+    "provenance": {
+        "created_utc": "2026-11-08T08:11:20+00:00",
+        "git_commit": "a5d0a2c05ee080276ce0825ddc6b00de4d8f0829",
+        "git_uncommitted_changes": null,
+        "python": "3.14.3",
+        "platform": "Windows-11-10.0.26100-SP0",
+        "packages": {
+            "numpy": "2.4.6",
+            "pandas": "3.0.6",
+            "scipy": "1.17.1",
+            "scikit-learn": "1.8.0",
+            "joblib": "1.5.3"
+        }
+    }
+}

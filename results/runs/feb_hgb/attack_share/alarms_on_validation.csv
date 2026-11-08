@@ -1,0 +1,9 @@
+metric,reference,reference_value,monitored_windows,windows_below_threshold,confirmed_alarm_windows,first_alarm_window
+f1,first_10_windows_mean,0.8463772583901571,48,2,1,57.0
+f1,all_validation_windows_mean,0.9322376536167719,58,13,9,2.0
+mcc,first_10_windows_mean,0.8433915554948559,48,2,1,57.0
+mcc,all_validation_windows_mean,0.9264374781568776,58,12,9,2.0
+balanced_accuracy,first_10_windows_mean,0.9697772104434937,48,1,0,
+balanced_accuracy,all_validation_windows_mean,0.983316737281189,58,2,1,57.0
+recall,first_10_windows_mean,0.9632360837657707,48,1,0,
+recall,all_validation_windows_mean,0.9832698541337384,58,4,1,57.0
