@@ -1,0 +1,47 @@
+{
+    "run": "jan_hgb",
+    "session": "jan",
+    "model": "hgb",
+    "split": {
+        "rule": "attack_period_50_50",
+        "total": 1087203,
+        "train_end": 93456,
+        "validation_end": 186812,
+        "cutoff_timestamp": 1421934448
+    },
+    "records_per_session": {
+        "feb": 1452844,
+        "jan": 1087203
+    },
+    "label_category_mismatches": 0,
+    "training_attack_share": 0.10965588084232152,
+    "validation_attack_share": 0.12818672608080894,
+    "random_state": 42,
+    "threshold": 0.5,
+    "classifier": "HistGradientBoostingClassifier(categorical_features=[0, 1, 2],\n                               class_weight='balanced', early_stopping=False,\n                               max_iter=200, random_state=42)",
+    "accuracy": 0.977387634431638,
+    "precision": 0.856120826709062,
+    "recall": 0.9899724241664578,
+    "f1": 0.9181941484208487,
+    "false_positive_rate": 0.02446276523854575,
+    "tn": 79398,
+    "fp": 1991,
+    "fn": 120,
+    "tp": 11847,
+    "training_seconds": 2.572406768798828,
+    "prediction_seconds": 0.6585323810577393,
+    "provenance": {
+        "created_utc": "2026-11-08T09:10:49+00:00",
+        "git_commit": "c7468acf7e0140e99df98e15fadc3f9c86d48d17",
+        "git_uncommitted_changes": null,
+        "python": "3.14.3",
+        "platform": "Windows-11-10.0.26100-SP0",
+        "packages": {
+            "numpy": "2.4.6",
+            "pandas": "3.0.6",
+            "scipy": "1.17.1",
+            "scikit-learn": "1.8.0",
+            "joblib": "1.5.3"
+        }
+    }
+}

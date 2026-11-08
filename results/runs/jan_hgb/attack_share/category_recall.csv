@@ -1,0 +1,10 @@
+AttackCategory,records,recall
+Generic,6428,0.9998444306160548
+Exploits,2176,1.0
+Fuzzers,1943,0.9397838394235718
+Reconnaissance,873,1.0
+DoS,329,1.0
+Shellcode,105,0.9904761904761905
+Analysis,62,1.0
+Backdoor,42,0.9761904761904762
+Worms,9,1.0

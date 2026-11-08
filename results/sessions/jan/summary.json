@@ -28,39 +28,50 @@
   },
   "windows_with_attacks": 38,
   "windows": 218,
-  "default_split_50_20_30": {
+  "split_rule": "attack_period_50_50",
+  "split": {
     "train": {
-      "records": 543603,
-      "attacks": 22215,
-      "attack_share": 0.04086622038509721,
+      "records": 93456,
+      "attacks": 10248,
+      "attack_share": 0.10965588084232152,
       "categories": {
-        "Generic": 7522,
-        "Exploits": 5409,
-        "Fuzzers": 5051,
-        "Reconnaissance": 1759,
-        "DoS": 1167,
-        "Backdoor": 534,
-        "Analysis": 526,
-        "Shellcode": 223,
-        "Worms": 24
+        "Exploits": 3233,
+        "Fuzzers": 3108,
+        "Generic": 1094,
+        "Reconnaissance": 886,
+        "DoS": 838,
+        "Backdoor": 492,
+        "Analysis": 464,
+        "Shellcode": 118,
+        "Worms": 15
       }
     },
     "validation": {
-      "records": 217442,
-      "attacks": 0,
-      "attack_share": 0.0,
-      "categories": {}
+      "records": 93356,
+      "attacks": 11967,
+      "attack_share": 0.12818672608080894,
+      "categories": {
+        "Generic": 6428,
+        "Exploits": 2176,
+        "Fuzzers": 1943,
+        "Reconnaissance": 873,
+        "DoS": 329,
+        "Shellcode": 105,
+        "Analysis": 62,
+        "Backdoor": 42,
+        "Worms": 9
+      }
     },
-    "test": {
-      "records": 326158,
+    "after_validation": {
+      "records": 900391,
       "attacks": 0,
       "attack_share": 0.0,
       "categories": {}
     }
   },
   "provenance": {
-    "created_utc": "2026-11-08T08:26:08+00:00",
-    "git_commit": "a5c309e563d94b938591a38adecd3d91534ecb50",
+    "created_utc": "2026-11-08T09:09:54+00:00",
+    "git_commit": "c7468acf7e0140e99df98e15fadc3f9c86d48d17",
     "git_uncommitted_changes": null,
     "python": "3.14.3",
     "platform": "Windows-11-10.0.26100-SP0",

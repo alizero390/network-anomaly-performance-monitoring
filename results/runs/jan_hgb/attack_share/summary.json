@@ -1,0 +1,238 @@
+{
+  "observed": {
+    "pooled": {
+      "attack_share": 0.12818672608080894,
+      "recall": 0.9899724241664578,
+      "fpr": 0.02446276523854575
+    },
+    "windows": 18,
+    "spearman_with_attack_share": {
+      "recall": 0.21177685950413225,
+      "fpr": -0.4646360970248059,
+      "f1": 0.5141972807074519,
+      "mcc": 0.48735163954601873,
+      "balanced_accuracy": 0.482189016245743,
+      "roc_auc": 0.506969608087066,
+      "average_precision": 0.5792463342909248
+    },
+    "low_vs_high_share": {
+      "split": 0.12,
+      "n_low": 7,
+      "n_high": 11,
+      "low_mean": {
+        "recall": 0.9875372906944742,
+        "fpr": 0.04027894598092836,
+        "f1": 0.8539779362881308,
+        "mcc": 0.8485081048135769,
+        "balanced_accuracy": 0.9736291723567729,
+        "roc_auc": 0.991567840916893,
+        "average_precision": 0.9296199382270899
+      },
+      "high_mean": {
+        "recall": 0.9919376392942154,
+        "fpr": 0.014355453380168047,
+        "f1": 0.9540401686724101,
+        "mcc": 0.9477271862634811,
+        "balanced_accuracy": 0.9887910929570236,
+        "roc_auc": 0.9981837670829773,
+        "average_precision": 0.9872154285747154
+      }
+    },
+    "f1_decomposition": {
+      "observed_sd": 0.09008301156388414,
+      "share_only_sd": 0.028474939628525067,
+      "performance_only_sd": 0.07007234304661374,
+      "r2_share_only": 0.12459214975717547,
+      "r2_performance_only": 0.9175428019835923
+    },
+    "missed_attacks": {
+      "total": 120,
+      "with_score_at_least_0.3": 68
+    }
+  },
+  "settings": {
+    "window_size": 5000,
+    "seed": 20261108,
+    "simulated_windows_per_share": 4000,
+    "stream_length": 20,
+    "drop": 0.05,
+    "consecutive": 2
+  },
+  "categories": {
+    "categories": [
+      {
+        "AttackCategory": "Generic",
+        "records": 6428,
+        "recall": 0.9998444306160548
+      },
+      {
+        "AttackCategory": "Exploits",
+        "records": 2176,
+        "recall": 1.0
+      },
+      {
+        "AttackCategory": "Fuzzers",
+        "records": 1943,
+        "recall": 0.9397838394235718
+      },
+      {
+        "AttackCategory": "Reconnaissance",
+        "records": 873,
+        "recall": 1.0
+      },
+      {
+        "AttackCategory": "DoS",
+        "records": 329,
+        "recall": 1.0
+      },
+      {
+        "AttackCategory": "Shellcode",
+        "records": 105,
+        "recall": 0.9904761904761904
+      },
+      {
+        "AttackCategory": "Analysis",
+        "records": 62,
+        "recall": 1.0
+      },
+      {
+        "AttackCategory": "Backdoor",
+        "records": 42,
+        "recall": 0.9761904761904762
+      },
+      {
+        "AttackCategory": "Worms",
+        "records": 9,
+        "recall": 1.0
+      }
+    ],
+    "r2_recall_explained_by_category_mix": 0.49517326737679623,
+    "spearman_expected_vs_observed_recall": 0.5937016795316965,
+    "easy_category": "Generic",
+    "easy_share_of_attacks": 0.5371438121500793,
+    "recall_excluding_easy": 0.9785159776132876,
+    "share_of_misses": {
+      "Generic": 0.008333333333332877,
+      "Exploits": 0.0,
+      "Fuzzers": 0.9750000000000003,
+      "Reconnaissance": 0.0,
+      "DoS": 0.0,
+      "Shellcode": 0.008333333333333403,
+      "Analysis": 0.0,
+      "Backdoor": 0.008333333333333345,
+      "Worms": 0.0
+    },
+    "spearman_with_attack_share": {
+      "easy_count": 0.9607236425059532,
+      "other_attack_count": -0.18378938948981213
+    },
+    "low_vs_high_share": {
+      "easy_per_window": [
+        163.14285714285714,
+        480.27272727272725
+      ],
+      "other_attacks_per_window": [
+        321.142857142857,
+        283.9999999999998
+      ],
+      "mix_percent_low": {
+        "Analysis": 0.1,
+        "Backdoor": 0.37,
+        "DoS": 4.18,
+        "Exploits": 28.02,
+        "Fuzzers": 23.71,
+        "Generic": 30.24,
+        "Reconnaissance": 11.84,
+        "Shellcode": 1.46,
+        "Worms": 0.08
+      },
+      "mix_percent_high": {
+        "Analysis": 0.82,
+        "Backdoor": 0.33,
+        "DoS": 2.29,
+        "Exploits": 15.46,
+        "Fuzzers": 12.2,
+        "Generic": 62.25,
+        "Reconnaissance": 5.86,
+        "Shellcode": 0.72,
+        "Worms": 0.06
+      },
+      "expected_recall": [
+        0.9854488188315921,
+        0.9924062738709046
+      ]
+    },
+    "spearman_fpr_vs_fuzzers_share": 0.29205366357069146,
+    "within_category_recall_low_vs_high": {
+      "Generic": {
+        "low": 0.999124343257443,
+        "high": 1.0
+      },
+      "Exploits": {
+        "low": 1.0,
+        "high": 1.0
+      },
+      "Fuzzers": {
+        "low": 0.9491094147582697,
+        "high": 0.9349282296650717
+      },
+      "Reconnaissance": {
+        "low": 1.0,
+        "high": 1.0
+      },
+      "DoS": {
+        "low": 1.0,
+        "high": 1.0
+      },
+      "Shellcode": {
+        "low": 0.9777777777777777,
+        "high": 1.0
+      },
+      "Analysis": {
+        "low": 1.0,
+        "high": 1.0
+      },
+      "Backdoor": {
+        "low": 0.9285714285714286,
+        "high": 1.0
+      },
+      "Worms": {
+        "low": 1.0,
+        "high": 1.0
+      }
+    },
+    "recall_gap_decomposition": {
+      "pooled_recall_low": 0.987315634218289,
+      "pooled_recall_high": 0.9919115023194958,
+      "gap": 0.004595868101206713,
+      "from_category_mix": 0.00699893933520479,
+      "from_within_category": -0.0024030712339980775,
+      "within_category_by_category": {
+        "Analysis": 0.0,
+        "Backdoor": 0.000294985250737463,
+        "DoS": 0.0,
+        "Exploits": 0.0,
+        "Fuzzers": -0.0032880269862105077,
+        "Generic": 0.00029498525073747836,
+        "Reconnaissance": 0.0,
+        "Shellcode": 0.00029498525073746356,
+        "Worms": 0.0
+      }
+    },
+    "fuzzers_recall_by_period": null
+  },
+  "provenance": {
+    "created_utc": "2026-11-08T09:10:54+00:00",
+    "git_commit": "c7468acf7e0140e99df98e15fadc3f9c86d48d17",
+    "git_uncommitted_changes": null,
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26100-SP0",
+    "packages": {
+      "numpy": "2.4.6",
+      "pandas": "3.0.6",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.8.0",
+      "joblib": "1.5.3"
+    }
+  }
+}

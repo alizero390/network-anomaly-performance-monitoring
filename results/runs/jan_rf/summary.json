@@ -1,0 +1,47 @@
+{
+    "run": "jan_rf",
+    "session": "jan",
+    "model": "rf",
+    "split": {
+        "rule": "attack_period_50_50",
+        "total": 1087203,
+        "train_end": 93456,
+        "validation_end": 186812,
+        "cutoff_timestamp": 1421934448
+    },
+    "records_per_session": {
+        "feb": 1452844,
+        "jan": 1087203
+    },
+    "label_category_mismatches": 0,
+    "training_attack_share": 0.10965588084232152,
+    "validation_attack_share": 0.12818672608080894,
+    "random_state": 42,
+    "threshold": 0.5,
+    "classifier": "RandomForestClassifier(class_weight='balanced', n_estimators=200, n_jobs=-1,\n                       random_state=42)",
+    "accuracy": 0.9813616693088821,
+    "precision": 0.8996483001172333,
+    "recall": 0.9618952118325395,
+    "f1": 0.9297310394960019,
+    "false_positive_rate": 0.015776087677696005,
+    "tn": 80105,
+    "fp": 1284,
+    "fn": 456,
+    "tp": 11511,
+    "training_seconds": 6.445558071136475,
+    "prediction_seconds": 0.5360496044158936,
+    "provenance": {
+        "created_utc": "2026-11-08T09:10:27+00:00",
+        "git_commit": "c7468acf7e0140e99df98e15fadc3f9c86d48d17",
+        "git_uncommitted_changes": null,
+        "python": "3.14.3",
+        "platform": "Windows-11-10.0.26100-SP0",
+        "packages": {
+            "numpy": "2.4.6",
+            "pandas": "3.0.6",
+            "scipy": "1.17.1",
+            "scikit-learn": "1.8.0",
+            "joblib": "1.5.3"
+        }
+    }
+}
