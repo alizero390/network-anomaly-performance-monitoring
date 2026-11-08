@@ -78,7 +78,7 @@
       {
         "AttackCategory": "DoS",
         "records": 2948,
-        "recall": 0.9915196743554953
+        "recall": 0.9915196743554952
       },
       {
         "AttackCategory": "Reconnaissance",
@@ -106,15 +106,70 @@
         "recall": 1.0
       }
     ],
-    "r2_recall_explained_by_category_mix": 0.6654377839503717,
-    "spearman_expected_vs_observed_recall": 0.8801764299896527
+    "r2_recall_explained_by_category_mix": 0.6654377839503718,
+    "spearman_expected_vs_observed_recall": 0.8801764299896527,
+    "easy_category": "Generic",
+    "easy_share_of_attacks": 0.6936083692478798,
+    "recall_excluding_easy": 0.8952413362826839,
+    "share_of_misses": {
+      "Generic": 0.0010816657652785173,
+      "Exploits": 0.05840995132504038,
+      "Fuzzers": 0.8939967550027041,
+      "DoS": 0.013520822065981769,
+      "Reconnaissance": 0.004867495943753432,
+      "Backdoor": 0.0005408328826392723,
+      "Analysis": 0.02704164413196323,
+      "Shellcode": 0.0005408328826392624,
+      "Worms": 0.0
+    },
+    "spearman_with_attack_share": {
+      "easy_count": 0.8908439332305529,
+      "other_attack_count": -0.6111939954888763
+    },
+    "low_vs_high_share": {
+      "easy_per_window": [
+        19.749999999999982,
+        1039.8684210526317
+      ],
+      "other_attacks_per_window": [
+        332.7999999999999,
+        287.60526315789434
+      ],
+      "mix_percent_low": {
+        "Analysis": 0.28,
+        "Backdoor": 1.04,
+        "DoS": 8.41,
+        "Exploits": 40.93,
+        "Fuzzers": 25.87,
+        "Generic": 5.75,
+        "Reconnaissance": 15.65,
+        "Shellcode": 1.86,
+        "Worms": 0.22
+      },
+      "mix_percent_high": {
+        "Analysis": 0.45,
+        "Backdoor": 0.32,
+        "DoS": 2.61,
+        "Exploits": 7.47,
+        "Fuzzers": 4.39,
+        "Generic": 81.71,
+        "Reconnaissance": 2.74,
+        "Shellcode": 0.28,
+        "Worms": 0.03
+      },
+      "expected_recall": [
+        0.8837006856434358,
+        0.9794589647545018
+      ]
+    },
+    "spearman_fpr_vs_fuzzers_share": 0.6849043113276736
   },
   "provenance": {
-    "created_utc": "2026-11-08T06:52:41+00:00",
-    "git_commit": "bf3dd0e113aa3ff1ed62fac606f2b467a563e169",
-    "git_uncommitted_changes": null,
-    "python": "3.14.3",
-    "platform": "Windows-11-10.0.26100-SP0",
+    "created_utc": "2026-11-08T07:04:59+00:00",
+    "git_commit": "08f116abb54b2a47bd466ca097c6f12b87ca878d",
+    "git_uncommitted_changes": false,
+    "python": "3.13.18",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39",
     "packages": {
       "numpy": "2.4.6",
       "pandas": "3.0.6",
