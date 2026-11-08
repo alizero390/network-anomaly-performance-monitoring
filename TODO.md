@@ -32,7 +32,8 @@ Status definitions:
 - [x] Calculate validation-window metrics.
 - [x] Save baseline summary.
 - [ ] Add automated baseline tests.
-- [~] Audit attack-category composition across validation windows (script ready: run `scripts/export_validation_categories.py` locally, then `scripts/analyze_attack_share.py`).
+- [x] Audit attack-category composition across validation windows (Generic is 69% of attacks and drives attack-share swings; Fuzzers cause 89% of misses).
+- [ ] Re-run `scripts/analyze_attack_share.py` locally to create `category_window_counts.csv` (within-category recall by period).
 - [x] Investigate variation in window-level F1 (see results/attack_share/README.md: 88% of F1 variance is real recall/FPR change, 17% attack share alone).
 - [ ] Establish a defensible stable reference period (windows 1-10 are a low-attack, low-performance regime; see results/attack_share/README.md, finding 4).
 - [ ] Determine minimum labelled sample requirements.

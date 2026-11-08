@@ -4,9 +4,11 @@ Analysis of the Random Forest baseline's 58 validation windows (5,000 records ea
 Produced by `scripts/analyze_attack_share.py` from `results/validation_predictions.csv`.
 All numbers below come from the files in this folder.
 
-**Status:** observed-window and resampling analyses complete. The attack-category
-analysis is pending: it needs `results/validation_categories.csv`, produced locally by
-`scripts/export_validation_categories.py`.
+**Status:** complete for the validation partition. The category tables were produced
+on the machine holding the raw data (`scripts/export_validation_categories.py`, 0
+label/category mismatches); everything else is recomputed from committed files.
+A within-category comparison by period needs one more local re-run to create
+`category_window_counts.csv`.
 
 ## Question
 
@@ -46,8 +48,8 @@ attack share alone would predict.
 
 Metrics that do not depend on the attack share (recall, FPR, balanced accuracy, ROC AUC)
 also correlate with it (Spearman ρ = 0.79, −0.43, 0.79 and 0.74). So the low-attack
-windows contain traffic the model handles worse; the leading hypothesis is a different
-mix of attack categories, which the pending category analysis tests.
+windows contain traffic the model handles worse. Finding 5 shows why: they contain a
+different mix of attack categories.
 
 ROC AUC stays above 0.99 even in the low-attack windows, so the model still ranks most
 attacks above normal traffic there; the misses are partly a threshold effect. Of the
@@ -107,6 +109,45 @@ validation period (F1 down to 0.72) is mostly not flagged; with the overall mean
 the start of the period is flagged. The same pattern holds for MCC, balanced accuracy
 and recall (`alarms_on_validation.csv`), so changing the metric alone does not solve it.
 
+### 5. The attack categories explain it: Generic attacks dominate the headline numbers
+
+| Category | Validation attacks | Recall | Share of all missed attacks |
+|---|---:|---:|---:|
+| Generic | 39,913 (69%) | 1.000 | 0.1% |
+| Exploits | 7,198 | 0.985 | 5.8% |
+| Fuzzers | 3,946 | 0.581 | **89.4%** |
+| DoS | 2,948 | 0.992 | 1.4% |
+| Reconnaissance | 2,540 | 0.996 | 0.5% |
+| Backdoor | 367 | 0.997 | 0.1% |
+| Analysis | 349 | 0.857 | 2.7% |
+| Shellcode | 252 | 0.996 | 0.1% |
+| Worms | 31 | 1.000 | 0% |
+
+- **The attack-share swings are Generic attacks.** The number of Generic attacks per
+  window rises with the attack share (Spearman ρ = 0.89); the number of all other
+  attacks does not (ρ = −0.61). Low-attack windows have about 20 Generic attacks and
+  333 others; high-attack windows have about 1,040 Generic and 288 others. The one
+  exception is a DoS/Exploits burst in windows 12-13, which the model also detects
+  well (recall 0.996).
+- **The category mix predicts window recall.** If each category kept its pooled recall,
+  the mix alone would give a recall of 0.884 in low-attack windows and 0.979 in
+  high-attack windows (observed: 0.868 and 0.978). The mix explains R² = 0.67 of the
+  variation in window recall (Spearman ρ = 0.88).
+- **Fuzzers are the real weakness.** They are 26% of attacks in low-attack windows but
+  4% in high-attack windows, and account for 89% of all missed attacks. Excluding
+  Generic, pooled recall is 0.895, not 0.968.
+- **False positives rise with Fuzzers too** (Spearman ρ = 0.68 between window FPR and
+  the Fuzzers share), consistent with Fuzzers traffic overlapping with normal traffic.
+  This is a correlation; it is not yet tested directly.
+
+The overall validation F1 of 0.973 therefore mostly measures how well the model detects
+Generic attacks, which it detects almost perfectly. When Generic attacks are absent, the
+same model has visibly lower performance, with no change to the model.
+
+![Attack categories by window](figures/fig5_attack_categories_by_window.png)
+
+![Recall expected from category mix](figures/fig6_recall_expected_from_category_mix.png)
+
 ## Implications
 
 - **For Strategy B:** a single global reference value is fragile because validation
@@ -116,6 +157,12 @@ and recall (`alarms_on_validation.csv`), so changing the metric alone does not s
 - **For the metric:** F1 and MCC should not be the only monitored metric if deployment
   attack shares can fall below about 5%. Recall with FPR, or balanced accuracy, is
   stable under pure attack-share change.
+- **For reporting:** report recall per attack category, and overall metrics with and
+  without Generic. A single pooled F1 on UNSW-NB15 hides that 89% of misses come from
+  one category.
+- **For monitoring:** a change in the attack-category mix changes measured performance
+  without any change to the model. Strategy A should treat category-mix shift as a
+  possible cause, and Strategy B's reference should match the mix being monitored.
 - **For the experiments:** scenarios that inject a shift should hold the attack share
   and category mix fixed, or vary them on purpose, so their effect is not mistaken for
   the injected shift.
@@ -126,8 +173,11 @@ and recall (`alarms_on_validation.csv`), so changing the metric alone does not s
 - Resampling assumes records are exchangeable within each class; it isolates the
   arithmetic effect but does not model correlated traffic within a window.
 - The low/high split at 12% is descriptive; the correlations do not depend on it.
-- The cause of the low-attack performance drop is not yet established (category audit
-  pending).
+- The category mix explains two-thirds of recall variation; the remaining third (for
+  example whether Fuzzers are themselves harder in some periods) needs the per-window,
+  per-category counts.
+- Check the literature on known UNSW-NB15 issues before claiming Generic dominance as
+  new; it may already be reported and should then be cited.
 
 ## Files
 
@@ -138,4 +188,6 @@ and recall (`alarms_on_validation.csv`), so changing the metric alone does not s
 | `resampling_quantiles.csv` | 5th, 50th and 95th percentiles of each metric per simulated attack share |
 | `resampling_alarm_rates.csv` | Per-window flag rate and per-stream alarm rate, per metric and share |
 | `summary.json` | All headline numbers, settings and provenance |
-| `figures/` | Figures 1-4 as PNG and PDF |
+| `category_recall.csv` | Validation attacks and recall per category |
+| `category_mix_by_window.csv` | Share of each category among a window's attacks |
+| `figures/` | Figures 1-6 as PNG and PDF |

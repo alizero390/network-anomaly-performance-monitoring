@@ -25,6 +25,8 @@ The format follows these categories:
 - Low-attack windows (two contiguous periods at the start and end of validation) have lower recall (0.868 vs 0.978) and higher FPR (0.79% vs 0.37%).
 - Under pure attack-share change, the F1-drop rule raises false alarms in all simulated streams at shares of 2% or less; balanced accuracy and recall do not.
 - The candidate reference period (windows 1-10) is itself a low-performance regime; the reference choice changes which windows count as degraded.
+- Category audit: Generic attacks are 69% of validation attacks (recall 1.000) and cause the attack-share swings; Fuzzers (recall 0.581) cause 89% of misses. The category mix explains R² = 0.67 of window recall. Recall excluding Generic is 0.895.
+- Category analysis split into a local export step and a summary step that runs from the committed category tables; added figures 5 and 6.
 
 ### Fixed
 - Run provenance now records the git commit even when the git command line is not installed (for example with GitHub Desktop only), by reading it from the `.git` folder.
