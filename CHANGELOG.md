@@ -26,6 +26,7 @@ The format follows these categories:
 - Under pure attack-share change, the F1-drop rule raises false alarms in all simulated streams at shares of 2% or less; balanced accuracy and recall do not.
 - The candidate reference period (windows 1-10) is itself a low-performance regime; the reference choice changes which windows count as degraded.
 - Category audit: Generic attacks are 69% of validation attacks (recall 1.000) and cause the attack-share swings; Fuzzers (recall 0.581) cause 89% of misses. The category mix explains R² = 0.67 of window recall. Recall excluding Generic is 0.895.
+- Within-category analysis: of the 0.121 pooled recall gap between low- and high-attack windows, 0.088 (73%) comes from the category mix and 0.032 (27%) from lower recall within categories, all of it Fuzzers (recall 0.386 in windows 1-10, 0.644 in windows 11-49).
 - Category analysis split into a local export step and a summary step that runs from the committed category tables; added figures 5 and 6.
 
 ### Fixed

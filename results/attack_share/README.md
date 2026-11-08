@@ -7,8 +7,6 @@ All numbers below come from the files in this folder.
 **Status:** complete for the validation partition. The category tables were produced
 on the machine holding the raw data (`scripts/export_validation_categories.py`, 0
 label/category mismatches); everything else is recomputed from committed files.
-A within-category comparison by period needs one more local re-run to create
-`category_window_counts.csv`.
 
 ## Question
 
@@ -140,6 +138,25 @@ and recall (`alarms_on_validation.csv`), so changing the metric alone does not s
   the Fuzzers share), consistent with Fuzzers traffic overlapping with normal traffic.
   This is a correlation; it is not yet tested directly.
 
+**The rest of the gap is Fuzzers getting harder to detect.** Pooling the records in each
+group, recall is 0.862 in low-attack windows and 0.983 in high-attack windows, a gap of
+0.121. Giving the low-attack windows the high-attack windows' recall for every category
+closes 0.088 of it (73%): that part is the category mix. The remaining 0.032 (27%) is
+lower recall within categories, and Fuzzers account for all of it (0.036; the other
+categories net slightly negative). Fuzzers recall differs sharply by period:
+
+| Period | Fuzzers attacks | Fuzzers recall |
+|---|---:|---:|
+| Start (windows 1-10) | 686 | 0.386 |
+| Middle (windows 11-49) | 2,062 | 0.644 |
+| End (windows 50-58) | 1,184 | 0.580 |
+
+Every other category stays at 0.98 or above in both groups, except Analysis (349
+attacks, 1.000 in low-attack windows and 0.845 in high-attack windows). So the start
+of the validation period contains Fuzzers traffic that the model detects much worse
+than Fuzzers traffic later on: a within-category shift, which is exactly the kind of
+change a monitor should catch.
+
 The overall validation F1 of 0.973 therefore mostly measures how well the model detects
 Generic attacks, which it detects almost perfectly. When Generic attacks are absent, the
 same model has visibly lower performance, with no change to the model.
@@ -173,9 +190,8 @@ same model has visibly lower performance, with no change to the model.
 - Resampling assumes records are exchangeable within each class; it isolates the
   arithmetic effect but does not model correlated traffic within a window.
 - The low/high split at 12% is descriptive; the correlations do not depend on it.
-- The category mix explains two-thirds of recall variation; the remaining third (for
-  example whether Fuzzers are themselves harder in some periods) needs the per-window,
-  per-category counts.
+- Why Fuzzers in windows 1-10 are harder to detect is not yet known; comparing their
+  features with later Fuzzers traffic is the next step.
 - Check the literature on known UNSW-NB15 issues before claiming Generic dominance as
   new; it may already be reported and should then be cited.
 
@@ -190,4 +206,5 @@ same model has visibly lower performance, with no change to the model.
 | `summary.json` | All headline numbers, settings and provenance |
 | `category_recall.csv` | Validation attacks and recall per category |
 | `category_mix_by_window.csv` | Share of each category among a window's attacks |
+| `category_window_counts.csv` | Attacks and detected attacks per window and category |
 | `figures/` | Figures 1-6 as PNG and PDF |
