@@ -16,16 +16,18 @@ CATEGORICAL = [dataset.model_column(i) for i in dataset.CATEGORICAL_FEATURES]
 NUMERIC = [dataset.model_column(i) for i in dataset.NUMERIC_FEATURES]
 
 
-def random_forest() -> Pipeline:
-    """The baseline: identical to scripts/baseline.py."""
+def random_forest(categorical=None, numeric=None) -> Pipeline:
+    """The baseline: identical to scripts/baseline.py (UNSW-NB15 columns by default)."""
+    categorical = CATEGORICAL if categorical is None else list(categorical)
+    numeric = NUMERIC if numeric is None else list(numeric)
     preprocessor = ColumnTransformer(
         transformers=[
             (
                 "categorical",
                 OneHotEncoder(handle_unknown="ignore", sparse_output=True),
-                CATEGORICAL,
+                categorical,
             ),
-            ("numerical", "passthrough", NUMERIC),
+            ("numerical", "passthrough", numeric),
         ]
     )
     classifier = RandomForestClassifier(
@@ -37,12 +39,14 @@ def random_forest() -> Pipeline:
     return Pipeline(steps=[("preprocessor", preprocessor), ("classifier", classifier)])
 
 
-def gradient_boosting() -> Pipeline:
+def gradient_boosting(categorical=None, numeric=None) -> Pipeline:
     """Histogram gradient boosting with native categorical handling.
 
     Unseen categories become missing values, which the model handles natively.
     Early stopping is off so no random internal validation split is drawn.
     """
+    categorical = CATEGORICAL if categorical is None else list(categorical)
+    numeric = NUMERIC if numeric is None else list(numeric)
     preprocessor = ColumnTransformer(
         transformers=[
             (
@@ -52,9 +56,9 @@ def gradient_boosting() -> Pipeline:
                     unknown_value=np.nan,
                     encoded_missing_value=np.nan,
                 ),
-                CATEGORICAL,
+                categorical,
             ),
-            ("numerical", "passthrough", NUMERIC),
+            ("numerical", "passthrough", numeric),
         ]
     )
     classifier = HistGradientBoostingClassifier(
@@ -62,7 +66,7 @@ def gradient_boosting() -> Pipeline:
         learning_rate=0.1,
         early_stopping=False,
         class_weight="balanced",
-        categorical_features=list(range(len(CATEGORICAL))),
+        categorical_features=list(range(len(categorical))),
         random_state=RANDOM_STATE,
     )
     return Pipeline(steps=[("preprocessor", preprocessor), ("classifier", classifier)])

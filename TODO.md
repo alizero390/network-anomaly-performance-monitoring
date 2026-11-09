@@ -38,7 +38,8 @@ Status definitions:
 - [x] Scoping literature search (literature/scoping_review.md).
 - [x] Run robustness runs locally (feb_hgb, jan_rf, jan_hgb); see results/robustness_summary.md.
 - [ ] Systematic search in Scopus, IEEE Xplore, ACM DL and Google Scholar; log in literature/search_log.md.
-- [ ] Download corrected CIC-IDS2017 (Engelen et al.) for the external-dataset check.
+- [x] Download and profile improved CIC-IDS-2017 (results/cicids2017_profile).
+- [ ] Run CIC-IDS-2017: `train_cicids2017.py --model rf|hgb`, then `analyze_attack_share.py --run cic_rf|cic_hgb`.
 - [x] Investigate variation in window-level F1 (see results/attack_share/README.md: 88% of F1 variance is real recall/FPR change, 17% attack share alone).
 - [ ] Establish a defensible stable reference period (windows 1-10 are a low-attack, low-performance regime; see results/attack_share/README.md, finding 4).
 - [ ] Determine minimum labelled sample requirements.

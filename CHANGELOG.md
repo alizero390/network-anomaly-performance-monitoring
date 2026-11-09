@@ -12,6 +12,14 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- CIC-IDS-2017 pipeline: `nadmon.cicids2017` (loading, cleaning, time sorting, features) and `scripts/train_cicids2017.py` (train Monday-Thursday, monitor Friday), analysable with `analyze_attack_share.py --run cic_<model>`. Decisions in RESEARCH_DECISIONS.md, section 14.
+- End-to-end CIC-IDS-2017 tests on synthetic day files built on the real header.
+
+### Changed
+- Window metrics that are undefined (e.g. recall in a window without attacks) are NaN instead of 0, and the Strategy B rule skips such windows. UNSW-NB15 results are unchanged (verified). Alarm tables gain an `eligible_windows` column.
+- Model pipelines accept any feature columns; analysis no longer assumes UNSW-NB15's Generic and Fuzzers categories exist.
+
 ### Research
 - Four-run robustness summary (`results/robustness_summary.md`). Replicates in all runs: Fuzzers cause 89-98% of missed attacks; under pure attack-share change F1/MCC alarm falsely while recall and balanced accuracy do not. Reference-period sensitivity is February-specific. January shows false positive bursts (windows 12-14) that F1 flags but balanced accuracy hides, so Strategy B should monitor recall and FPR separately.
 

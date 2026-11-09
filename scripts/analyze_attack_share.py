@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import warnings
 
 import matplotlib
 
@@ -26,6 +27,11 @@ from nadmon import attack_share as ash
 from nadmon.config import PROJECT_DIR
 from nadmon.dataset import WINDOW_SIZE
 from nadmon.provenance import run_metadata
+
+# Windows without attacks make some metrics undefined (NaN) by design; the
+# resulting empty-slice and constant-input warnings are expected.
+warnings.filterwarnings("ignore", message="Mean of empty slice")
+warnings.filterwarnings("ignore", message="An input array is constant")
 
 RESULTS = PROJECT_DIR / "results"
 OUT = RESULTS / "attack_share"
@@ -154,13 +160,22 @@ def observed_alarms(windows: pd.DataFrame) -> pd.DataFrame:
         values = windows[metric].to_numpy()
         # (name, reference value, first monitored window index)
         references = [
-            ("first_10_windows_mean", float(values[:REFERENCE_WINDOWS].mean()), REFERENCE_WINDOWS),
-            ("all_validation_windows_mean", float(values.mean()), 0),
+            (
+                "first_10_windows_mean",
+                float(np.nanmean(values[:REFERENCE_WINDOWS])),
+                REFERENCE_WINDOWS,
+            ),
+            ("all_validation_windows_mean", float(np.nanmean(values)), 0),
         ]
         for ref_name, ref, start in references:
-            flagged = values <= ref - DROP
+            # Windows where the metric is undefined (NaN) are not eligible: they are
+            # skipped, neither counting towards nor breaking a run of drops.
+            eligible = np.isfinite(values)
+            flagged = eligible & (values <= ref - DROP)
             run, confirmed = 0, []
             for i in range(start, len(values)):
+                if not eligible[i]:
+                    continue
                 run = run + 1 if flagged[i] else 0
                 if run >= CONSECUTIVE:
                     confirmed.append(i + 1)
@@ -170,6 +185,7 @@ def observed_alarms(windows: pd.DataFrame) -> pd.DataFrame:
                     "reference": ref_name,
                     "reference_value": ref,
                     "monitored_windows": len(values) - start,
+                    "eligible_windows": int(eligible[start:].sum()),
                     "windows_below_threshold": int(flagged[start:].sum()),
                     "confirmed_alarm_windows": len(confirmed),
                     "first_alarm_window": confirmed[0] if confirmed else None,
@@ -291,11 +307,12 @@ def categories(windows: pd.DataFrame) -> dict | None:
     # so window differences come only from the category mix.
     expected = mix.mul(per_cat["recall"], axis=1).sum(axis=1)
 
-    easy = counts[EASY_CATEGORY]
-    other = counts.drop(columns=EASY_CATEGORY).sum(axis=1)
+    has_easy = EASY_CATEGORY in per_cat.index and EASY_CATEGORY in counts.columns
+    easy = counts[EASY_CATEGORY] if has_easy else pd.Series(0.0, index=counts.index)
+    other = counts.drop(columns=EASY_CATEGORY, errors="ignore").sum(axis=1)
     low = w["attack_share"] < LOW_SHARE
     misses = per_cat["records"] * (1 - per_cat["recall"])
-    others = per_cat.drop(index=EASY_CATEGORY)
+    others = per_cat.drop(index=EASY_CATEGORY, errors="ignore")
 
     summary = {
         "categories": per_cat.reset_index().to_dict(orient="records"),
@@ -303,16 +320,22 @@ def categories(windows: pd.DataFrame) -> dict | None:
         "spearman_expected_vs_observed_recall": float(
             w["recall"].corr(expected, method="spearman")
         ),
-        "easy_category": EASY_CATEGORY,
-        "easy_share_of_attacks": float(
-            per_cat.loc[EASY_CATEGORY, "records"] / per_cat["records"].sum()
+        "easy_category": EASY_CATEGORY if has_easy else None,
+        "easy_share_of_attacks": (
+            float(per_cat.loc[EASY_CATEGORY, "records"] / per_cat["records"].sum())
+            if has_easy
+            else None
         ),
-        "recall_excluding_easy": float(
-            (others["records"] * others["recall"]).sum() / others["records"].sum()
+        "recall_excluding_easy": (
+            float((others["records"] * others["recall"]).sum() / others["records"].sum())
+            if has_easy
+            else None
         ),
         "share_of_misses": {k: float(v) for k, v in (misses / misses.sum()).items()},
         "spearman_with_attack_share": {
-            "easy_count": float(easy.corr(w["attack_share"], method="spearman")),
+            "easy_count": (
+                float(easy.corr(w["attack_share"], method="spearman")) if has_easy else None
+            ),
             "other_attack_count": float(other.corr(w["attack_share"], method="spearman")),
         },
         "low_vs_high_share": {
@@ -393,6 +416,12 @@ def categories(windows: pd.DataFrame) -> dict | None:
 
 def figure_categories(windows: pd.DataFrame, counts: pd.DataFrame, expected: pd.Series) -> None:
     w = windows.set_index("window").loc[counts.index]
+    if EASY_CATEGORY in counts.columns:
+        figure_easy_vs_other(counts)
+    figure_expected_recall(w, expected)
+
+
+def figure_easy_vs_other(counts: pd.DataFrame) -> None:
     easy = counts[EASY_CATEGORY]
     other = counts.drop(columns=EASY_CATEGORY).sum(axis=1)
 
@@ -412,8 +441,12 @@ def figure_categories(windows: pd.DataFrame, counts: pd.DataFrame, expected: pd.
     ax.legend(loc="upper right")
     save(fig, "fig5_attack_categories_by_window")
 
+
+def figure_expected_recall(w: pd.DataFrame, expected: pd.Series) -> None:
+
     fig, ax = plt.subplots(figsize=(4.4, 3.8))
-    lo, hi = 0.6, 1.005
+    observed_min = np.nanmin(np.r_[expected.to_numpy(), w["recall"].to_numpy()])
+    lo, hi = min(0.6, np.floor(observed_min * 10) / 10), 1.005
     ax.plot([lo, hi], [lo, hi], color=INK_2, linewidth=1, linestyle="--")
     ax.scatter(
         expected,

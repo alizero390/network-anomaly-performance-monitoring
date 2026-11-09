@@ -54,10 +54,17 @@ def mcc_from_rates(tpr, fpr, share):
 
 
 def metrics_from_counts(tp, fp, fn, tn) -> dict[str, np.ndarray]:
+    """Window metrics from confusion counts.
+
+    A metric that is undefined for a window (for example recall in a window with no
+    attacks) is NaN, not 0, so monitoring treats the window as ineligible for that
+    metric instead of as a performance drop. F1 is 0 when a window has no attacks but
+    some false positives (2TP + FP + FN > 0), and NaN only when it is 0/0.
+    """
     tp, fp, fn, tn = (np.asarray(v, dtype=float) for v in (tp, fp, fn, tn))
 
     def ratio(a, b):
-        return np.divide(a, b, out=np.zeros_like(a), where=b > 0)
+        return np.divide(a, b, out=np.full_like(a, np.nan), where=b > 0)
 
     recall = ratio(tp, tp + fn)
     fpr = ratio(fp, fp + tn)
@@ -66,7 +73,7 @@ def metrics_from_counts(tp, fp, fn, tn) -> dict[str, np.ndarray]:
     mcc_den = np.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
     mcc = ratio(tp * tn - fp * fn, mcc_den)
     return {
-        "attack_share": ratio(tp + fn, tp + fp + fn + tn),
+        "attack_share": np.nan_to_num(ratio(tp + fn, tp + fp + fn + tn)),
         "recall": recall,
         "fpr": fpr,
         "precision": precision,
@@ -97,8 +104,14 @@ def window_table(
     table = pd.DataFrame(metrics_from_counts(tp, fp, fn, tn))
     table.insert(0, "window", np.arange(1, n_windows + 1))
     sc = scores[:cut].reshape(n_windows, window_size)
-    table["roc_auc"] = [roc_auc_score(yt[i], sc[i]) for i in range(n_windows)]
-    table["average_precision"] = [average_precision_score(yt[i], sc[i]) for i in range(n_windows)]
+    both_classes = [0 < yt[i].sum() < window_size for i in range(n_windows)]
+    table["roc_auc"] = [
+        roc_auc_score(yt[i], sc[i]) if both_classes[i] else np.nan for i in range(n_windows)
+    ]
+    table["average_precision"] = [
+        average_precision_score(yt[i], sc[i]) if both_classes[i] else np.nan
+        for i in range(n_windows)
+    ]
     table[["tp", "fp", "fn", "tn"]] = np.column_stack([tp, fp, fn, tn])
     table["start_utc"] = pd.to_datetime(timestamps[:cut:window_size], unit="s", utc=True)
     return table
@@ -110,7 +123,13 @@ def window_table(
 
 
 def r_squared(observed: np.ndarray, predicted: np.ndarray) -> float:
-    observed, predicted = np.asarray(observed), np.asarray(predicted)
+    """R² of predicted against observed, over pairs where both are defined."""
+    observed = np.asarray(observed, dtype=float)
+    predicted = np.asarray(predicted, dtype=float)
+    keep = np.isfinite(observed) & np.isfinite(predicted)
+    observed, predicted = observed[keep], predicted[keep]
+    if len(observed) < 2:
+        return float("nan")
     total = ((observed - observed.mean()) ** 2).sum()
     return float(1 - ((observed - predicted) ** 2).sum() / total) if total > 0 else float("nan")
 

@@ -105,12 +105,16 @@ network-anomaly-performance-monitoring/
 │   ├── attack_share.py          # Attack-share effects, decomposition, resampling
 │   ├── sessions.py              # January and February sessions and their splits
 │   ├── models.py                # Random Forest and gradient boosting pipelines
+│   ├── cicids2017.py            # Improved CIC-IDS-2017 loading and features
 │   └── provenance.py            # Git commit and package versions for each run
 ├── scripts/
 │   ├── baseline.py              # Train and validate the Random Forest baseline
 │   ├── analyze_attack_share.py  # Window performance vs attack share (results/attack_share)
 │   ├── export_validation_categories.py  # Export attack_cat for validation rows (run locally)
 │   ├── train_model.py           # Train rf/hgb on the feb or jan session
+│   ├── train_cicids2017.py      # Train on CIC-IDS-2017 Mon-Thu, monitor Friday
+│   ├── profile_cicids2017.py    # Profile the CIC-IDS-2017 day files
+│   ├── describe_session.py      # January attack timeline
 │   ├── compare_runs.py          # Side-by-side table of all analysed runs
 │   └── run_robustness.bat       # Runs feb_hgb, jan_rf, jan_hgb and the comparison (Windows)
 │   ├── check_environment.py     # Check versions, dataset path and model loading

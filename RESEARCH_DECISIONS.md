@@ -432,7 +432,42 @@ data, matching the Random Forest's treatment.
 12%, Strategy B rule, first-10-window reference, resampling seed) are identical across
 runs.
 
-## 14. Decision Change Policy
+## 14. Second Dataset: Improved CIC-IDS-2017 (added 2026-11-09)
+
+**Data.** The improved CIC-IDS-2017 of Engelen et al. (2021), in the IEEE CNS 2022
+version by Liu et al. (five day files, Monday-Friday, 2,099,976 flows, 91 columns),
+profiled in `results/cicids2017_profile/`. Each attack type runs in its own 1-2 hour
+block and each day introduces new attack types, so the within-window category-mix
+analysis of UNSW-NB15 does not carry over directly. CIC-IDS-2017 instead tests whether
+monitoring separates real degradation (unseen attack types) from harmless change
+(attacks stopping).
+
+**Decisions (approved 2026-11-09).**
+
+- **Split:** train on Monday-Thursday (time-sorted), monitor Friday (time-sorted).
+  Friday contains Portscan (similar to Thursday's Infiltration-Portscan), DDoS (related
+  to Wednesday's DoS), Botnet (unseen) and long attack-free stretches. No test set is
+  held out. Alternative considered: train Monday-Wednesday, monitor Thursday-Friday.
+- **Attempted flows** (failed attack connections, 12,926 flows) are labelled BENIGN,
+  as in the dataset authors' own benchmark (Engelen et al. 2021). Alternatives
+  considered: excluding them, or labelling them as attacks.
+- **Invalid values:** the 8 rows with infinite `Flow Bytes/s` or `Flow Packets/s` are
+  dropped; negative header lengths (about 790 rows) are kept as recorded.
+- **Features** (consistent with the UNSW-NB15 decisions): identifiers (`id`, `Flow ID`,
+  `Src IP`, `Dst IP`, `Timestamp`) are excluded; ports are kept; `Protocol` is
+  categorical; all other columns are numeric features. The port ablation in TODO
+  applies to both datasets.
+- **Timestamps** carry no time zone; they are used as given.
+- **Models:** the same Random Forest and gradient boosting settings as for UNSW-NB15.
+
+**Undefined window metrics.** Windows without attacks make recall, balanced accuracy
+and MCC undefined. They are recorded as NaN and treated as ineligible: the Strategy B
+rule skips them (they neither count towards nor break a run of drops). F1 is 0 in a
+window with no attacks but at least one false positive, and NaN only when it is 0/0.
+UNSW-NB15 results are unchanged by this rule because every UNSW-NB15 window contains
+attacks.
+
+## 15. Decision Change Policy
 
 When a methodological decision changes:
 
