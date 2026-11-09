@@ -142,8 +142,8 @@
     "fuzzers_recall_by_period": {}
   },
   "provenance": {
-    "created_utc": "2026-11-09T10:39:41+00:00",
-    "git_commit": "2e1b469da7cc8fad04061c92557ec17c60b913fe",
+    "created_utc": "2026-11-09T11:13:44+00:00",
+    "git_commit": "84336b2378bf5629398d7cffe9a903a9a87901bd",
     "git_uncommitted_changes": false,
     "python": "3.14.3",
     "platform": "Windows-11-10.0.26100-SP0",
