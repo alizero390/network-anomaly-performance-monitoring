@@ -7,3 +7,5 @@ balanced_accuracy,first_10_windows_mean,0.5,99,73,0,0,
 balanced_accuracy,all_validation_windows_mean,0.901328354632101,109,75,15,13,10.0
 recall,first_10_windows_mean,0.0,99,73,0,0,
 recall,all_validation_windows_mean,0.8032099558402317,109,75,15,13,10.0
+f1_calibrated,first_10_windows_mean,0.0,99,73,0,0,
+f1_calibrated,all_validation_windows_mean,0.8120098382054851,109,75,15,13,10.0

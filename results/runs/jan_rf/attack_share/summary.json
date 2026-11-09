@@ -10,6 +10,7 @@
       "recall": 0.32524526791736413,
       "fpr": -0.43985550518348293,
       "f1": 0.5307176752683339,
+      "f1_calibrated": 0.44708317780386875,
       "mcc": 0.5121322313873417,
       "balanced_accuracy": 0.3871967475206716,
       "roc_auc": 0.4997419354666801,
@@ -23,6 +24,7 @@
         "recall": 0.951050451691196,
         "fpr": 0.024441697952047387,
         "f1": 0.8810825222237426,
+        "f1_calibrated": 0.9016953747689735,
         "mcc": 0.8713219815970392,
         "balanced_accuracy": 0.9633043768695743,
         "roc_auc": 0.9926057784675358,
@@ -32,6 +34,7 @@
         "recall": 0.9677390305071729,
         "fpr": 0.010334077696714898,
         "f1": 0.9527871769173895,
+        "f1_calibrated": 0.9501322106781713,
         "mcc": 0.9452755937445011,
         "balanced_accuracy": 0.978702476405229,
         "roc_auc": 0.9983115645812475,
@@ -222,9 +225,9 @@
     "fuzzers_recall_by_period": null
   },
   "provenance": {
-    "created_utc": "2026-11-08T09:10:32+00:00",
-    "git_commit": "c7468acf7e0140e99df98e15fadc3f9c86d48d17",
-    "git_uncommitted_changes": null,
+    "created_utc": "2026-11-09T22:26:13+00:00",
+    "git_commit": "61278d70fd4767abc7c000a9fea8d780f68ebcfb",
+    "git_uncommitted_changes": false,
     "python": "3.14.3",
     "platform": "Windows-11-10.0.26100-SP0",
     "packages": {
