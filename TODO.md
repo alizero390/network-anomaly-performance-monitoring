@@ -40,7 +40,7 @@ Status definitions:
 - [ ] Systematic search in Scopus, IEEE Xplore, ACM DL and Google Scholar; log in literature/search_log.md.
 - [x] Download and profile improved CIC-IDS-2017 (results/cicids2017_profile).
 - [x] Run CIC-IDS-2017 (cic_rf, cic_hgb) and attribute alarms (results/alarm_attribution).
-- [ ] Re-run CIC-IDS-2017 runs after the timestamp fix (times only).
+- [x] Re-run CIC-IDS-2017 runs after the timestamp fix (times corrected, metrics identical).
 - [ ] Strategy B design: minimum labelled attacks per window, persistence rule for zero recall, reference from pre-deployment labelled data.
 - [x] Investigate variation in window-level F1 (see results/attack_share/README.md: 88% of F1 variance is real recall/FPR change, 17% attack share alone).
 - [ ] Establish a defensible stable reference period (windows 1-10 are a low-attack, low-performance regime; see results/attack_share/README.md, finding 4).

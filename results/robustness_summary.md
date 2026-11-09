@@ -132,6 +132,6 @@ minimum number of labelled attacks per window, add a persistence rule for consis
 zero recall, and take the reference from labelled data before deployment rather than
 from the first monitored windows.
 
-**Known issue:** window start times in the committed CIC-IDS-2017 outputs show 1970
-dates (a unit bug, fixed on 2026-11-09). Window order and all metrics are unaffected; the
-times will be correct after re-running the two CIC runs.
+Window times run 11:59-19:57 on 2017-07-07 (corrected 2026-11-10 after a unit bug that
+showed 1970 dates; all metrics were unaffected). The first confirmed alarms fall at
+13:02, in the Botnet hour.
