@@ -36,6 +36,7 @@ All queries, with counts, are in `search_log.md`.
 | poenaru2022drift | Poenaru-Olaru et al., arXiv 2211.13098 ([link](https://arxiv.org/abs/2211.13098)) | Drift detectors are unreliable alarm systems; high false-positive rates; class imbalance raises misses | Supports the alarm-quality framing; no NIDS data, no prevalence change |
 | oda2026whatchanged | Oda, arXiv 2609.27865 ([link](https://arxiv.org/abs/2609.27865)) | Separates real from virtual drift; error-stream detectors fire on pure covariate shift; delayed labels slow real-drift detection by the delay | Same spirit as "harmless vs harmful shift"; label shift not studied; no NIDS data |
 | xu2020lagged | Xu and Klabjan 2020 ([PDF](https://www.mccormick.northwestern.edu/research/deep-learning/documents/publications/drift_detection.pdf)) | Ensemble of label-based and label-free drift signals under lagged labels | Precedent for Strategy C; no NIDS data |
+| botacin2024labeldelays | Botacin and Gomes, *Computers & Security* 2024 ([author's copy](https://marcusbotacin.github.io/files/label-delays.pdf)) | Label delays from analyst/sandbox queues delay drift-triggered retraining; an 81-epoch delay raises exposure (accumulated false negatives) by about 50% | Direct precedent for RQ4 (label delay); malware, not NIDS; proposes a time-aware 'exposure' metric |
 | hindy2020zeroday | Hindy et al. 2020, arXiv 2006.15344 ([link](https://arxiv.org/abs/2006.15344)) | Autoencoder trained on benign traffic detects unseen CIC-IDS-2017 attacks at 75-98% | Context for the CIC-IDS-2017 unseen-attack result (different set-up: one-class) |
 
 **Russian-language studies** (needed for a Russian journal):
@@ -81,7 +82,8 @@ metrics behave on NIDS traffic**, not as a discovery that F1 depends on prevalen
 ## Limits of this search
 
 - Web search only; Scopus, IEEE Xplore and ACM DL not queried.
-- Two candidates could not be opened (Zoghi 2024 in *Concurrency and Computation*; a
-  label-delay study in malware detection on NSF PAR) and are not counted as read.
+- Zoghi and Serpen 2024 (*Concurrency and Computation*) has no free full text; it needs
+  HSE library access (see `database_queries.md`). The label-delay study was read from the
+  author's copy.
 - Russian-language literature: two web queries only (three studies included); a search in
   eLibrary is still needed.

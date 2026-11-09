@@ -38,7 +38,7 @@ Status definitions:
 - [x] Scoping literature search (literature/scoping_review.md).
 - [x] Run robustness runs locally (feb_hgb, jan_rf, jan_hgb); see results/robustness_summary.md.
 - [x] Structured web search for Paper 1 (literature/structured_search.md): novelty assessed per claim.
-- [ ] Repeat key queries in Scopus / IEEE Xplore / eLibrary before submission.
+- [ ] Run the database queries in literature/database_queries.md (Scopus, IEEE Xplore, eLibrary) and export results; download Zoghi 2024.
 - [ ] Add calibrated F1 (Siblini et al.) as a comparison metric in the attack-share simulation.
 - [x] Download and profile improved CIC-IDS-2017 (results/cicids2017_profile).
 - [x] Run CIC-IDS-2017 (cic_rf, cic_hgb) and attribute alarms (results/alarm_attribution).

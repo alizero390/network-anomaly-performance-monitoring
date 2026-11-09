@@ -36,3 +36,4 @@ bibliographic databases for the systematic review.
 | 2026-11-10 | Web | intrusion detection model monitoring label scarcity analyst feedback delayed ground truth performance estimation production | 10 | 0 | Label-delay malware study on NSF PAR could not be opened |
 | 2026-11-10 | Web | обнаружение сетевых атак машинное обучение дрейф данных концептуальный дрейф мониторинг качества модели статья | 9 | 3 | namiot2022shift, kotenko2024attacks, bashmakova2024botnet |
 | 2026-11-10 | Web | UNSW-NB15 CICIDS2017 оценка систем обнаружения вторжений несбалансированные классы метрики F1 статья ВАК | 9 | 0 | English results only |
+| 2026-11-10 | Web | "Towards more realistic evaluations: The impact of label delays in malware detection pipelines" pdf arxiv | 10 | 1 | botacin2024labeldelays (author's copy) |
