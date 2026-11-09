@@ -94,6 +94,9 @@ def test_load_days_drops_inf_sorts_and_counts(cic_folder):
     assert report["inf_rows_dropped"] == {"monday": 1, "tuesday": 0, "wednesday": 0, "thursday": 0}
     assert report["attempted_as_benign"]["tuesday"] == 1
     assert data["time"].is_monotonic_increasing
+    first = pd.Timestamp(data["time"].iloc[0])
+    assert data["timestamp"].iloc[0] == pytest.approx(first.timestamp())  # true epoch seconds
+    assert pd.Timestamp(data["timestamp"].iloc[0], unit="s").year == 2017
     assert len(data) == 4 * 1200 - 1
     X, y = cic.preprocess(data)
     assert np.isfinite(X.drop(columns="Protocol").to_numpy()).all()

@@ -1,4 +1,4 @@
-# Robustness of the attack-share findings across models and capture days
+# Robustness of the findings across models, capture days and datasets
 
 Four runs: two models (Random Forest `rf`, histogram gradient boosting `hgb`) on two
 UNSW-NB15 capture days (February 18: frozen 50/20/30 split; January 22: attack period
@@ -81,3 +81,57 @@ fall in attack share with an FPR rise; balanced accuracy hides the FPR rise.
 | Category mix explains window recall | 4/4 runs, R² 0.31-0.67 |
 | Reference period decides alarms | February only |
 | Balanced accuracy misses FPR bursts | Observed in January (2/2 runs) |
+
+## Second dataset: improved CIC-IDS-2017 (added 2026-11-09)
+
+Train Monday-Thursday, monitor Friday (109 windows; RESEARCH_DECISIONS.md, section 14).
+Each attack type runs in its own 1-2 hour block, so Friday mixes attack-free hours with
+Botnet (unseen), Portscan and DDoS (related to, but not the same labels as, training
+attacks). Numbers: `runs/cic_rf/`, `runs/cic_hgb/`, `comparison.md`,
+`cicids2017_findings.xlsx`.
+
+| | cic_rf | cic_hgb |
+|---|---:|---:|
+| Friday recall: Botnet / DDoS / Portscan | 0.000 / 0.448 / 0.902 | 0.000 / 0.998 / 0.990 |
+| Pooled FPR | 0.000 | 0.0004 |
+| Simulated F1 false-alarm rate at 1% attacks | 16% | 5% |
+| Simulated recall false-alarm rate at 1% attacks | 65.5% | 0% |
+| R² of window recall: category mix | 0.73 | 0.76 |
+
+- **Unseen attacks are missed entirely** (Botnet recall 0 for both models).
+- **The reference-period effect replicates in its most extreme form.** Friday's first 10
+  windows contain almost no attacks: the reference F1 is 0 and recall and MCC are
+  undefined, so no metric can alarm, including during the Botnet hour.
+- **Attack-share false alarms follow FPR across all six runs:** near-zero-FPR models
+  (CIC) have F1 false-alarm rates of 5-16% at 1% attacks; every UNSW-NB15 run (FPR
+  0.5-2.4%) has 100%.
+- **Recall becomes noisy when attacks are rare:** with about 50 attacks per window and
+  recall 0.73, chance alone moves window recall by about 0.063, more than the 0.05
+  threshold.
+
+## Alarm attribution (all six runs)
+
+`alarm_attribution/summary.md` labels every confirmed alarm window by cause (missed
+attacks, false-positive burst, too few attacks to judge, attack-share effect).
+
+- With the all-window reference, **almost every CIC-IDS-2017 recall alarm is real**:
+  missed Botnet, DDoS or Portscan attacks.
+- **January alarms are all false-positive bursts**; February alarms are mostly missed
+  Fuzzers, plus (feb_hgb) false-positive bursts and attack-share effects.
+- **F1 and MCC add harmless alarms** that recall does not raise: windows without attacks
+  but with a few false positives (F1 = 0; cic_hgb: 21 of 34 F1 alarms) and pure
+  attack-share effects (MCC; cic_hgb: 11 of 13).
+- **Trade-off of a minimum-attack eligibility rule.** cic_rf misses every Botnet flow in
+  11 consecutive windows, but 8 of them contain fewer attacks (13-85) than the
+  noise-based minimum (79), so such a rule would suppress most of that real alarm. A
+  persistence rule (same failure over many consecutive small windows) is a candidate
+  complement.
+
+**Implication for Strategy B:** monitor recall and FPR as separate signals, require a
+minimum number of labelled attacks per window, add a persistence rule for consistently
+zero recall, and take the reference from labelled data before deployment rather than
+from the first monitored windows.
+
+**Known issue:** window start times in the committed CIC-IDS-2017 outputs show 1970
+dates (a unit bug, fixed on 2026-11-09). Window order and all metrics are unaffected; the
+times will be correct after re-running the two CIC runs.

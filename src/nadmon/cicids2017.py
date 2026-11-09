@@ -79,7 +79,8 @@ def load_days(folder: Path, days: Sequence[str]) -> tuple[pd.DataFrame, dict]:
     data = data.sort_values("time", kind="stable").reset_index(drop=True)
     data["label"] = (data["category"] != NORMAL_CATEGORY).astype(np.int8)
     # Seconds since the epoch, for the shared window and timeline code.
-    data["timestamp"] = data["time"].astype("int64") / 1e9
+    # Unit-independent: pandas may store parsed times in us or ns.
+    data["timestamp"] = (data["time"] - pd.Timestamp("1970-01-01")) / pd.Timedelta(seconds=1)
     return data, report
 
 

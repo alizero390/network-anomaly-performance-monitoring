@@ -13,6 +13,14 @@ The format follows these categories:
 ## [Unreleased]
 
 ### Added
+- `scripts/attribute_alarms.py`: labels every confirmed alarm window by cause (missed attacks with category and whether it was seen in training, false-positive burst, too few attacks to judge, attack-share effect), checked against each run's alarm table. Results in `results/alarm_attribution/`.
+- `results/cicids2017_findings.xlsx`: spreadsheet of the CIC-IDS-2017 findings.
+- CIC-IDS-2017 section and alarm attribution in `results/robustness_summary.md`.
+
+### Fixed
+- CIC-IDS-2017 epoch seconds were computed from microseconds as if nanoseconds, so window start times showed 1970. Window order and metrics were unaffected. Re-run the two CIC runs to correct the committed times.
+
+### Added
 - CIC-IDS-2017 pipeline: `nadmon.cicids2017` (loading, cleaning, time sorting, features) and `scripts/train_cicids2017.py` (train Monday-Thursday, monitor Friday), analysable with `analyze_attack_share.py --run cic_<model>`. Decisions in RESEARCH_DECISIONS.md, section 14.
 - End-to-end CIC-IDS-2017 tests on synthetic day files built on the real header.
 
