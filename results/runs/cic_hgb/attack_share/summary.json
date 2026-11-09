@@ -1,0 +1,158 @@
+{
+  "observed": {
+    "pooled": {
+      "attack_share": 0.4656063204378722,
+      "recall": 0.990370509833455,
+      "fpr": 0.0004271883148617106
+    },
+    "windows": 109,
+    "spearman_with_attack_share": {
+      "recall": 0.46074884718235143,
+      "fpr": -0.47178052263557296,
+      "f1": 0.7365333563942894,
+      "mcc": -0.5664086412311927,
+      "balanced_accuracy": 0.45600223890021674,
+      "roc_auc": 0.16320207665556033,
+      "average_precision": 0.4894682326541975
+    },
+    "low_vs_high_share": {
+      "split": 0.12,
+      "n_low": 51,
+      "n_high": 58,
+      "low_mean": {
+        "recall": 0.1512351347515859,
+        "fpr": 0.0004569882212009579,
+        "f1": 0.07589915952909905,
+        "mcc": 0.6251500458732892,
+        "balanced_accuracy": 0.5755144379851679,
+        "roc_auc": 0.991357384105928,
+        "average_precision": 0.655827025296271
+      },
+      "high_mean": {
+        "recall": 0.9943060240903521,
+        "fpr": 0.0006549498951887512,
+        "f1": 0.9971063405693459,
+        "mcc": 0.885264722178727,
+        "balanced_accuracy": 0.9968255370975816,
+        "roc_auc": 0.9997150837044454,
+        "average_precision": 0.9999814001425646
+      }
+    },
+    "f1_decomposition": {
+      "observed_sd": 0.47639448679842994,
+      "share_only_sd": 0.4592589978017145,
+      "performance_only_sd": 0.4898232738558549,
+      "r2_share_only": 0.4647506826253037,
+      "r2_performance_only": 0.9993964906009924
+    },
+    "missed_attacks": {
+      "total": 2455,
+      "with_score_at_least_0.3": 91
+    }
+  },
+  "settings": {
+    "window_size": 5000,
+    "seed": 20261108,
+    "simulated_windows_per_share": 4000,
+    "stream_length": 20,
+    "drop": 0.05,
+    "consecutive": 2
+  },
+  "categories": {
+    "categories": [
+      {
+        "AttackCategory": "Portscan",
+        "records": 159066,
+        "recall": 0.9901173097959336
+      },
+      {
+        "AttackCategory": "DDoS",
+        "records": 95144,
+        "recall": 0.9984549735138316
+      },
+      {
+        "AttackCategory": "Botnet",
+        "records": 736,
+        "recall": 0.0
+      }
+    ],
+    "r2_recall_explained_by_category_mix": 0.7548716304062365,
+    "spearman_expected_vs_observed_recall": 0.8587903063747223,
+    "easy_category": null,
+    "easy_share_of_attacks": null,
+    "recall_excluding_easy": null,
+    "share_of_misses": {
+      "Portscan": 0.6403258655804506,
+      "DDoS": 0.059877800407333294,
+      "Botnet": 0.2997963340122161
+    },
+    "spearman_with_attack_share": {
+      "easy_count": null,
+      "other_attack_count": 0.9999999999999999
+    },
+    "low_vs_high_share": {
+      "easy_per_window": [
+        0.0,
+        0.0
+      ],
+      "other_attacks_per_window": [
+        106.70588235294117,
+        4364.3448275862065
+      ],
+      "mix_percent_low": {
+        "Botnet": 64.71,
+        "DDoS": 0.0,
+        "Portscan": 35.29
+      },
+      "mix_percent_high": {
+        "Botnet": 0.0,
+        "DDoS": 39.66,
+        "Portscan": 60.34
+      },
+      "expected_recall": [
+        0.3494531681632707,
+        0.9934236247185484
+      ]
+    },
+    "spearman_fpr_vs_fuzzers_share": null,
+    "within_category_recall_low_vs_high": {
+      "Portscan": {
+        "low": 0.7198515769944341,
+        "high": 0.9919614147909968
+      },
+      "DDoS": {
+        "low": null,
+        "high": 0.9984549735138316
+      },
+      "Botnet": {
+        "low": 0.0,
+        "high": null
+      }
+    },
+    "recall_gap_decomposition": {
+      "pooled_recall_low": 0.4277839029768467,
+      "pooled_recall_high": 0.9944021301139325,
+      "gap": 0.5666182271370859,
+      "from_category_mix": 0.40491238086106895,
+      "from_within_category": 0.16170584627601686,
+      "within_category_by_category": {
+        "Portscan": 0.1617058462760168
+      }
+    },
+    "fuzzers_recall_by_period": {}
+  },
+  "provenance": {
+    "created_utc": "2026-11-09T10:39:41+00:00",
+    "git_commit": "2e1b469da7cc8fad04061c92557ec17c60b913fe",
+    "git_uncommitted_changes": false,
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26100-SP0",
+    "packages": {
+      "numpy": "2.4.6",
+      "pandas": "3.0.6",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.8.0",
+      "joblib": "1.5.3"
+    }
+  }
+}
