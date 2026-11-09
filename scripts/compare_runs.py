@@ -82,7 +82,13 @@ def collect(name: str, folder, model_summary: dict) -> dict:
         else None,
         "F1 alarms, reference = first 10 windows": _alarms(folder, "f1", "first_10_windows_mean"),
         "F1 alarms, reference = all windows": _alarms(folder, "f1", "all_validation_windows_mean"),
+        "calibrated F1 alarms, reference = all windows": _alarms(
+            folder, "f1_calibrated", "all_validation_windows_mean"
+        ),
         "simulated F1 alarm rate at 1% attacks": _sim_alarm(folder, "f1", 0.01),
+        "simulated calibrated-F1 alarm rate at 1% attacks": _sim_alarm(
+            folder, "f1_calibrated", 0.01
+        ),
         "simulated balanced-accuracy alarm rate at 1% attacks": _sim_alarm(
             folder, "balanced_accuracy", 0.01
         ),

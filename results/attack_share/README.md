@@ -90,6 +90,15 @@ false degradation alarm is:
 So the arithmetic effect is small within UNSW-NB15's observed range (5-71%) but decisive
 below about 5%, which is where real networks usually operate.
 
+**Calibrated F1** (Siblini et al.; F1 recomputed from the window's recall and FPR at a
+fixed reference attack share, here the pooled validation share of 19.8%) removes the
+arithmetic effect by construction: its median stays at 0.971-0.976 at every share, and
+false-alarm rates are 0-0.5% of streams. On the real validation windows it raises the
+same alarms as recall (4 with the all-window reference, 1 with the first-10 reference),
+all caused by missed Fuzzers (`results/alarm_attribution/`). Unlike recall and balanced
+accuracy, it still drops when false positives rise: see the January runs in
+`results/robustness_summary.md`.
+
 ![Resampled metrics](figures/fig3_resampled_metrics_vs_attack_share.png)
 
 ### 4. The reference period decides what counts as degradation
@@ -172,8 +181,9 @@ same model has visibly lower performance, with no change to the model.
   model is expected to see, or the reference should be conditioned on the traffic
   regime (for example the attack share or category mix).
 - **For the metric:** F1 and MCC should not be the only monitored metric if deployment
-  attack shares can fall below about 5%. Recall with FPR, or balanced accuracy, is
-  stable under pure attack-share change.
+  attack shares can fall below about 5%. Calibrated F1, recall with FPR, and balanced
+  accuracy are stable under pure attack-share change; of these, calibrated F1 is the
+  single metric that also responds to false-positive bursts.
 - **For reporting:** report recall per attack category, and overall metrics with and
   without Generic. A single pooled F1 on UNSW-NB15 hides that 89% of misses come from
   one category.

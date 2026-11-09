@@ -36,7 +36,7 @@ OUT = RESULTS / "alarm_attribution"
 DROP = 0.05
 CONSECUTIVE = 2
 REFERENCE_WINDOWS = 10
-METRICS = ("f1", "mcc", "balanced_accuracy", "recall")
+METRICS = ("f1", "f1_calibrated", "mcc", "balanced_accuracy", "recall")
 FP_BURST_MIN = 0.005
 CAUSES = ("missed_attacks", "false_positive_burst", "too_few_attacks", "attack_share_effect")
 
@@ -104,6 +104,8 @@ def attribute(name: str, folder, summary_path) -> pd.DataFrame:
     recall_refs = references(windows["recall"].to_numpy(dtype=float))
     rows = []
     for metric in METRICS:
+        if metric not in windows.columns:  # runs analysed before the metric existed
+            continue
         values = windows[metric].to_numpy(dtype=float)
         for ref_name, (ref, start) in references(values).items():
             if not np.isfinite(ref):

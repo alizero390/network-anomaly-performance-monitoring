@@ -22,5 +22,7 @@ recall gap low/high share,0.12095211456038635,0.5666182271370859,0.3148852477158
 Fuzzers recall: first 10 / middle / last 9 windows,"(0.38629737609329445, 0.6435499515033948, 0.5802364864864865)",,,"(0.8279883381924198, 0.9117361784675073, 0.8741554054054054)",,
 "F1 alarms, reference = first 10 windows",1,0,0,1,2,2
 "F1 alarms, reference = all windows",5,34,20,9,2,2
+"calibrated F1 alarms, reference = all windows",4.0,,,,,
 simulated F1 alarm rate at 1% attacks,1.0,0.05,0.16,1.0,1.0,1.0
+simulated calibrated-F1 alarm rate at 1% attacks,0.005,,,,,
 simulated balanced-accuracy alarm rate at 1% attacks,0.0,0.0,0.025,0.0,0.0,0.0

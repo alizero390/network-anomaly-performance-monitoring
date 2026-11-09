@@ -73,7 +73,8 @@ metrics behave on NIDS traffic**, not as a discovery that F1 depends on prevalen
 
 - **Add calibrated F1 (Siblini et al.) as a comparison metric.** Reviewers will ask why
   not simply rescale F1 to a reference attack share; running it through the existing
-  simulation answers that directly.
+  simulation answers that directly. *Done 2026-11-10: calibrated F1 is in the analysis
+  for all runs (see `results/attack_share/README.md`, finding 3).*
 - **Cite Guesné et al. for prevalence dependence and state where our results agree and
   where they qualify it** (balanced accuracy and FPR bursts).
 - **Frame Strategy B's design rules** (separate recall and FPR, minimum attacks, persistence,

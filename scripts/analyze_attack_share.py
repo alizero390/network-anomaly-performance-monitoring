@@ -52,10 +52,17 @@ METRIC_LABELS = {
     "mcc": "MCC",
     "balanced_accuracy": "Balanced accuracy",
     "recall": "Recall",
+    "f1_calibrated": "Calibrated F1",
 }
 
-# Reference palette (light mode, categorical slots 1-4) and text inks.
-COLORS = {"f1": "#2a78d6", "mcc": "#eb6834", "balanced_accuracy": "#1baf7a", "recall": "#eda100"}
+# Reference palette (light mode, categorical slots 1-5) and text inks.
+COLORS = {
+    "f1": "#2a78d6",
+    "mcc": "#eb6834",
+    "balanced_accuracy": "#1baf7a",
+    "recall": "#eda100",
+    "f1_calibrated": "#e87ba4",
+}
 INK, INK_2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 
 
@@ -114,12 +121,25 @@ def observed_windows(pred: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     tpr = float(yhat[y == 1].mean())
     fpr = float(yhat[y == 0].mean())
 
-    windows = ash.window_table(y, yhat, score, pred["Timestamp"].to_numpy(), WINDOW_SIZE)
+    # Calibrated F1 uses the run's pooled validation attack share as its fixed
+    # reference (Siblini et al.), so it equals ordinary F1 at that share.
+    windows = ash.window_table(
+        y, yhat, score, pred["Timestamp"].to_numpy(), WINDOW_SIZE, reference_share=share
+    )
     windows = ash.decompose_f1(windows, tpr, fpr, share)
 
     low = windows[windows["attack_share"] < LOW_SHARE]
     high = windows[windows["attack_share"] >= LOW_SHARE]
-    cols = ["recall", "fpr", "f1", "mcc", "balanced_accuracy", "roc_auc", "average_precision"]
+    cols = [
+        "recall",
+        "fpr",
+        "f1",
+        "f1_calibrated",
+        "mcc",
+        "balanced_accuracy",
+        "roc_auc",
+        "average_precision",
+    ]
 
     # Missed attacks close to the 0.5 threshold.
     missed = (y == 1) & (yhat == 0)
@@ -203,7 +223,9 @@ def resampling(pred: pd.DataFrame, reference_share: float) -> tuple[pd.DataFrame
     y = pred["TrueLabel"].to_numpy()
     yhat = pred["Prediction"].to_numpy()
     shares = tuple(sorted({*SHARES, round(reference_share, 3)}))
-    sim = ash.resample_at_shares(y, yhat, shares, WINDOW_SIZE, SIM_WINDOWS, SEED)
+    sim = ash.resample_at_shares(
+        y, yhat, shares, WINDOW_SIZE, SIM_WINDOWS, SEED, reference_share=reference_share
+    )
 
     summary = (
         sim.groupby("target_share")[list(METRIC_LABELS) + ["fpr", "precision"]]
@@ -542,22 +564,16 @@ def figure_resampling(summary: pd.DataFrame, reference_share: float) -> None:
             alpha=0.15,
             linewidth=0,
         )
-        ax.plot(x, summary[f"{metric}_q50"], color=COLORS[metric], marker="o", markersize=4)
-        ax.text(
-            x.iloc[0] * 0.93,
-            summary[f"{metric}_q50"].iloc[0],
-            label,
-            ha="right",
-            va="center",
-            fontsize=8,
-            color=INK,
+        ax.plot(
+            x, summary[f"{metric}_q50"], color=COLORS[metric], marker="o", markersize=4, label=label
         )
     ax.axvline(reference_share * 100, color=INK_2, linewidth=0.8, linestyle=":")
-    ax.text(reference_share * 100 * 1.05, 0.66, "Validation\nshare", fontsize=7, color=INK_2)
+    ax.text(reference_share * 100 * 1.05, 0.85, "Validation\nshare", fontsize=7, color=INK_2)
+    ax.legend(loc="lower right", fontsize=7.5, frameon=True, framealpha=1, edgecolor="none")
     ax.set_xscale("log")
     ax.set_xticks([0.5, 1, 2, 5, 10, 20, 50])
     ax.set_xticklabels(["0.5", "1", "2", "5", "10", "20", "50"])
-    ax.set_xlim(0.09, 60)
+    ax.set_xlim(0.4, 60)
     ax.set_xlabel("Attack share of window (%, log scale)")
     ax.set_ylabel("Metric value (median, 5-95% band)")
     ax.set_title("Same model, only the attack share varies")

@@ -12,6 +12,15 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- Calibrated F1 (Siblini et al.) as a monitored metric: `nadmon.attack_share.calibrated_f1`, column `f1_calibrated` in window tables and the resampling simulation, with the run's pooled validation attack share as the reference share. Included in alarm attribution and `results/comparison.md`. Three new tests.
+
+### Changed
+- Figure 3 (resampled metrics) uses a legend instead of line-end labels, which overlapped.
+
+### Research
+- February RF baseline: calibrated F1 gives 0-0.5% simulated false alarms at every attack share (F1 and MCC: 100% at 0.5-2%) and the same real alarms as recall (4 all-window, 1 first-10), all from missed Fuzzers. Existing metrics and alarm counts unchanged.
+
 ### Research
 - Structured literature search for Paper 1 (`literature/structured_search.md`, 12 new logged queries, 12 new studies including 3 in Russian). No study found combining windowed monitoring of NIDS models, changing attack prevalence and alarm-level evaluation. Prevalence dependence of F1/MCC is known (Guesné et al. 2024; Siblini et al.), so Paper 1 is framed as an empirical study of monitoring-metric behaviour and should add calibrated F1 as a comparison.
 

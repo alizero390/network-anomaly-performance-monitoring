@@ -96,3 +96,28 @@ def test_normalize_attack_category():
         "Backdoor",
         "Generic",
     ]
+
+
+def test_calibrated_f1_equals_f1_at_reference_share():
+    tpr, fpr, pi0 = np.array([0.9, 0.5]), np.array([0.01, 0.2]), 0.2
+    expected = ash.f1_from_rates(tpr, fpr, pi0)
+    assert np.allclose(ash.calibrated_f1(tpr, fpr, pi0), expected)
+
+
+def test_calibrated_f1_is_nan_without_attacks():
+    metrics = ash.metrics_from_counts([0], [3], [0], [97], reference_share=0.2)
+    assert np.isnan(metrics["f1_calibrated"][0])
+    assert ash.metrics_from_counts([0], [3], [0], [97])["f1"][0] == 0
+    assert "f1_calibrated" not in ash.metrics_from_counts([1], [0], [0], [1])
+
+
+def test_calibrated_f1_does_not_follow_attack_share_in_resampling():
+    rng = np.random.default_rng(0)
+    y_true = (rng.random(20000) < 0.2).astype(int)
+    y_pred = np.where(y_true == 1, rng.random(20000) < 0.95, rng.random(20000) < 0.02).astype(int)
+    sims = ash.resample_at_shares(
+        y_true, y_pred, [0.01, 0.2, 0.5], 5000, 200, 1, reference_share=0.2
+    )
+    medians = sims.groupby("target_share")[["f1", "f1_calibrated"]].median()
+    assert medians["f1_calibrated"].max() - medians["f1_calibrated"].min() < 0.02
+    assert medians["f1"].max() - medians["f1"].min() > 0.2

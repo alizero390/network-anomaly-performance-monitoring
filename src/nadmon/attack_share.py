@@ -39,6 +39,30 @@ def f1_from_rates(tpr, fpr, share):
     return np.divide(2 * tp, denom, out=np.zeros_like(denom, dtype=float), where=denom > 0)
 
 
+def calibrated_f1(tpr, fpr, reference_share: float):
+    """Calibrated F1 (Siblini et al.): F1 at a fixed reference attack share.
+
+    Uses only recall (TPR) and FPR, so a change in the window's own attack share
+    cannot move it. NaN where recall or FPR is undefined.
+    """
+    tpr = np.asarray(tpr, dtype=float)
+    fpr = np.asarray(fpr, dtype=float)
+    pi0 = float(reference_share)
+    precision = np.divide(
+        tpr * pi0,
+        tpr * pi0 + fpr * (1 - pi0),
+        out=np.full_like(tpr, np.nan),
+        where=(tpr * pi0 + fpr * (1 - pi0)) > 0,
+    )
+    f1 = np.divide(
+        2 * precision * tpr,
+        precision + tpr,
+        out=np.zeros_like(tpr),
+        where=(precision + tpr) > 0,
+    )
+    return np.where(np.isnan(tpr) | np.isnan(fpr), np.nan, f1)
+
+
 def mcc_from_rates(tpr, fpr, share):
     """Matthews correlation implied by TPR, FPR and attack share."""
     tpr, fpr, share = np.asarray(tpr), np.asarray(fpr), np.asarray(share)
@@ -53,13 +77,16 @@ def mcc_from_rates(tpr, fpr, share):
 # ----------------------------------------------------------------------------
 
 
-def metrics_from_counts(tp, fp, fn, tn) -> dict[str, np.ndarray]:
+def metrics_from_counts(
+    tp, fp, fn, tn, reference_share: float | None = None
+) -> dict[str, np.ndarray]:
     """Window metrics from confusion counts.
 
     A metric that is undefined for a window (for example recall in a window with no
     attacks) is NaN, not 0, so monitoring treats the window as ineligible for that
     metric instead of as a performance drop. F1 is 0 when a window has no attacks but
     some false positives (2TP + FP + FN > 0), and NaN only when it is 0/0.
+    With ``reference_share``, calibrated F1 at that attack share is added.
     """
     tp, fp, fn, tn = (np.asarray(v, dtype=float) for v in (tp, fp, fn, tn))
 
@@ -80,6 +107,11 @@ def metrics_from_counts(tp, fp, fn, tn) -> dict[str, np.ndarray]:
         "f1": f1,
         "mcc": mcc,
         "balanced_accuracy": (recall + (1 - fpr)) / 2,
+        **(
+            {"f1_calibrated": calibrated_f1(recall, fpr, reference_share)}
+            if reference_share is not None
+            else {}
+        ),
     }
 
 
@@ -89,6 +121,7 @@ def window_table(
     scores: np.ndarray,
     timestamps: np.ndarray,
     window_size: int,
+    reference_share: float | None = None,
 ) -> pd.DataFrame:
     """Threshold and ranking metrics for consecutive complete windows."""
     n_windows = len(y_true) // window_size
@@ -101,7 +134,7 @@ def window_table(
     fn = ((yt == 1) & (yp == 0)).sum(axis=1)
     tn = ((yt == 0) & (yp == 0)).sum(axis=1)
 
-    table = pd.DataFrame(metrics_from_counts(tp, fp, fn, tn))
+    table = pd.DataFrame(metrics_from_counts(tp, fp, fn, tn, reference_share))
     table.insert(0, "window", np.arange(1, n_windows + 1))
     sc = scores[:cut].reshape(n_windows, window_size)
     both_classes = [0 < yt[i].sum() < window_size for i in range(n_windows)]
@@ -160,6 +193,7 @@ def resample_at_shares(
     window_size: int,
     n_windows: int,
     seed: int,
+    reference_share: float | None = None,
 ) -> pd.DataFrame:
     """Simulate windows with a fixed attack share by sampling with replacement.
 
@@ -179,7 +213,7 @@ def resample_at_shares(
         nor_idx = rng.integers(0, len(normal_hit), size=(n_windows, n_normals))
         tp = attack_hit[att_idx].sum(axis=1)
         fp = normal_hit[nor_idx].sum(axis=1)
-        metrics = metrics_from_counts(tp, fp, n_attacks - tp, n_normals - fp)
+        metrics = metrics_from_counts(tp, fp, n_attacks - tp, n_normals - fp, reference_share)
         frame = pd.DataFrame(metrics)
         frame.insert(0, "target_share", share)
         frame.insert(1, "replicate", np.arange(n_windows))
