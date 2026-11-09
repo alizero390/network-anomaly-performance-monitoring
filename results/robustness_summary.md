@@ -67,6 +67,30 @@ from 0.5% to 5% lowers it by only about 0.02. So balanced accuracy is not a safe
 replacement for F1 either: it is robust to attack-share change but blind to FPR
 increases that matter in practice.
 
+## Calibrated F1 (all six runs, added 2026-11-10)
+
+Calibrated F1 (Siblini et al.) is F1 recomputed from a window's recall and FPR at a fixed
+attack share: the run's pooled validation share. Confirmed alarms, all-window reference
+(`alarm_attribution/summary.md`), and simulated false-alarm rate at 1% attacks
+(`comparison.md`):
+
+| Run | F1 alarms | Calibrated F1 alarms | Causes of calibrated F1 alarms | Simulated false alarms at 1%: F1 / calibrated F1 |
+|---|---:|---:|---|---|
+| feb_rf | 5 | 4 | 4 missed Fuzzers | 100% / 0.5% |
+| feb_hgb | 9 (4 attack-share effect) | 3 | 2 missed attacks, 1 FP burst | 100% / 0% |
+| jan_rf | 2 | 2 | 2 FP bursts | 100% / 0% |
+| jan_hgb | 2 | 2 | 2 FP bursts | 100% / 0% |
+| cic_rf | 20 | 20 | 12 missed, 8 too few attacks | 16% / 16% |
+| cic_hgb | 34 (21 too few attacks) | 13 | 13 missed attacks | 5% / 0% |
+
+- **It removes the attack-share alarms** (feb_hgb: all 4) and the alarms on attack-free
+  windows with a few false positives (cic_hgb: all 21), where F1 is 0.
+- **It keeps the false-positive bursts** that recall and balanced accuracy miss
+  (January, both runs), so it is the only single metric tested that does both.
+- **Limit: it does not fix small samples.** cic_rf has FPR 0 on Friday, where calibrated
+  F1 equals F1 exactly; its remaining false alarms come from recall noise with few
+  attacks per window. The minimum-attack and persistence rules are still needed.
+
 **Implication for Strategy B:** monitor recall and FPR (or the number of false alerts
 per window) as separate signals instead of any single combined metric. F1 conflates a
 fall in attack share with an FPR rise; balanced accuracy hides the FPR rise.
@@ -81,6 +105,7 @@ fall in attack share with an FPR rise; balanced accuracy hides the FPR rise.
 | Category mix explains window recall | 4/4 runs, R² 0.31-0.67 |
 | Reference period decides alarms | February only |
 | Balanced accuracy misses FPR bursts | Observed in January (2/2 runs) |
+| Calibrated F1 removes attack-share false alarms, keeps FPR bursts | 6/6 runs (section below) |
 
 ## Second dataset: improved CIC-IDS-2017 (added 2026-11-09)
 
@@ -127,7 +152,8 @@ attacks, false-positive burst, too few attacks to judge, attack-share effect).
   persistence rule (same failure over many consecutive small windows) is a candidate
   complement.
 
-**Implication for Strategy B:** monitor recall and FPR as separate signals, require a
+**Implication for Strategy B:** monitor recall and FPR as separate signals (or calibrated
+F1 as one combined signal), require a
 minimum number of labelled attacks per window, add a persistence rule for consistently
 zero recall, and take the reference from labelled data before deployment rather than
 from the first monitored windows.

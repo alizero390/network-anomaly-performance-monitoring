@@ -19,6 +19,7 @@ The format follows these categories:
 - Figure 3 (resampled metrics) uses a legend instead of line-end labels, which overlapped.
 
 ### Research
+- Calibrated F1 across all six runs (`results/robustness_summary.md`): removes every attack-share and attack-free-window alarm (feb_hgb 9 -> 3, cic_hgb 34 -> 13 alarms), keeps both January false-positive bursts, and has 0-0.5% simulated false alarms at 1% attacks except cic_rf (FPR 0, identical to F1; residual alarms are small-sample recall noise). Added as claim 6 in `paper1_status_and_claims.xlsx`.
 - February RF baseline: calibrated F1 gives 0-0.5% simulated false alarms at every attack share (F1 and MCC: 100% at 0.5-2%) and the same real alarms as recall (4 all-window, 1 first-10), all from missed Fuzzers. Existing metrics and alarm counts unchanged.
 
 ### Research
