@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- Structured literature search for Paper 1 (`literature/structured_search.md`, 12 new logged queries, 12 new studies including 3 in Russian). No study found combining windowed monitoring of NIDS models, changing attack prevalence and alarm-level evaluation. Prevalence dependence of F1/MCC is known (Guesné et al. 2024; Siblini et al.), so Paper 1 is framed as an empirical study of monitoring-metric behaviour and should add calibrated F1 as a comparison.
+
 ### Added
 - `scripts/attribute_alarms.py`: labels every confirmed alarm window by cause (missed attacks with category and whether it was seen in training, false-positive burst, too few attacks to judge, attack-share effect), checked against each run's alarm table. Results in `results/alarm_attribution/`.
 - `results/cicids2017_findings.xlsx`: spreadsheet of the CIC-IDS-2017 findings.

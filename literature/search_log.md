@@ -24,3 +24,15 @@ bibliographic databases for the systematic review.
 | 2026-11-08 | Web | Engelen improved CICIDS2017 CSE-CIC-IDS2018 corrected dataset download distrinet | 10 | 0 | Dataset source |
 | 2026-11-08 | Web | Garg "Leveraging Unlabeled Data to Predict Out-of-Distribution Performance" average thresholded confidence | 10 | 1 | garg2022atc |
 | 2026-11-08 | Web | monitoring machine learning model performance prior probability shift F1 drop false alarm prevalence change | 9 | 0 | No direct overlap found |
+| 2026-11-10 | Web | intrusion detection evaluation metrics class imbalance base rate F1 MCC misleading prevalence network traffic | 9 | 1 | thiyagarajan2025mcc |
+| 2026-11-10 | Web | performance monitoring deployed network intrusion detection model degradation alarm sliding window F1 threshold reference period | 10 | 1 | jin2026benchmarkshift |
+| 2026-11-10 | Web | F1 score depends on prevalence label shift performance monitoring false alarms Matthews correlation coefficient prevalence dependence | 9 | 1 | guesne2024prevalence |
+| 2026-11-10 | Web | per-class evaluation UNSW-NB15 CIC-IDS2017 unseen attacks generalization zero-day recall temporal evaluation | 10 | 1 | parlanti2025temporal |
+| 2026-11-10 | Web | Siblini "Master your metrics with calibration" F1 precision reference class ratio | 10 | 1 | siblini2020calibration |
+| 2026-11-10 | Web | network intrusion detection concept drift detection delayed labels label latency windowed performance evaluation drift detector false alarms | 9 | 3 | poenaru2022drift, oda2026whatchanged, xu2020lagged |
+| 2026-11-10 | Web | label shift prior probability shift drift detection false alarm performance drop without concept drift monitoring | 9 | 0 | Mostly blogs; nothing on label shift alarms |
+| 2026-11-10 | Web | UNSW-NB15 Generic attacks inflate accuracy per-category results Fuzzers lowest detection rate analysis | 9 | 0 | Zoghi 2024 (Concurrency Comput.) could not be opened |
+| 2026-11-10 | Web | CIC-IDS2017 chronological day split train earlier days test Friday Botnet DDoS PortScan unseen detection results | 10 | 1 | hindy2020zeroday |
+| 2026-11-10 | Web | intrusion detection model monitoring label scarcity analyst feedback delayed ground truth performance estimation production | 10 | 0 | Label-delay malware study on NSF PAR could not be opened |
+| 2026-11-10 | Web | обнаружение сетевых атак машинное обучение дрейф данных концептуальный дрейф мониторинг качества модели статья | 9 | 3 | namiot2022shift, kotenko2024attacks, bashmakova2024botnet |
+| 2026-11-10 | Web | UNSW-NB15 CICIDS2017 оценка систем обнаружения вторжений несбалансированные классы метрики F1 статья ВАК | 9 | 0 | English results only |
