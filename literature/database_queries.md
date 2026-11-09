@@ -55,7 +55,7 @@ Q4  UNSW-NB15 CICIDS2017
 
 | Paper | How | File name |
 |---|---|---|
-| Zoghi Z., Serpen G. Building an intrusion detection system on UNSW-NB15: Reducing the margin of error to deal with data overlap and imbalance. *Concurrency and Computation: Practice and Experience*, 2024. DOI 10.1002/cpe.8242 | Open `https://doi.org/10.1002/cpe.8242` while logged in to the HSE library (or through the library's e-resources page); download the PDF | `zoghi2024overlap.pdf` |
+| Zoghi Z., Serpen G. Building an intrusion detection system on UNSW-NB15: Reducing the margin of error to deal with data overlap and imbalance. *Concurrency and Computation: Practice and Experience*, 2024. DOI 10.1002/cpe.8242 | Done 2026-11-10 (PDF supplied; read) | - |
 
 Already read without login (no download needed): Botacin and Gomes, label delays in
 malware detection, *Computers & Security* 2024 (author's copy).

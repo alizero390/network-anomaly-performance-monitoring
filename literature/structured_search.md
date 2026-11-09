@@ -36,6 +36,7 @@ All queries, with counts, are in `search_log.md`.
 | poenaru2022drift | Poenaru-Olaru et al., arXiv 2211.13098 ([link](https://arxiv.org/abs/2211.13098)) | Drift detectors are unreliable alarm systems; high false-positive rates; class imbalance raises misses | Supports the alarm-quality framing; no NIDS data, no prevalence change |
 | oda2026whatchanged | Oda, arXiv 2609.27865 ([link](https://arxiv.org/abs/2609.27865)) | Separates real from virtual drift; error-stream detectors fire on pure covariate shift; delayed labels slow real-drift detection by the delay | Same spirit as "harmless vs harmful shift"; label shift not studied; no NIDS data |
 | xu2020lagged | Xu and Klabjan 2020 ([PDF](https://www.mccormick.northwestern.edu/research/deep-learning/documents/publications/drift_detection.pdf)) | Ensemble of label-based and label-free drift signals under lagged labels | Precedent for Strategy C; no NIDS data |
+| zoghi2024overlap | Zoghi and Serpen, *Concurrency and Computation: Practice and Experience* 36:e8242, 2024 ([DOI](https://doi.org/10.1002/cpe.8242); open access) | Ensemble with threshold adjustment for class overlap and imbalance; Fuzzers, Backdoor and Normal overlap; attack types that mimic normal traffic (Fuzzers, Analysis, Shellcode) are confused with Normal; multi-class Fuzzers sensitivity 72.25% | Uses the official randomly partitioned training/testing sets (175,341 / 82,332) with stratified random validation: no temporal split, windows or monitoring. Dataset-level support for claim 5; confirms the temporal angle is not covered |
 | botacin2024labeldelays | Botacin and Gomes, *Computers & Security* 2024 ([author's copy](https://marcusbotacin.github.io/files/label-delays.pdf)) | Label delays from analyst/sandbox queues delay drift-triggered retraining; an 81-epoch delay raises exposure (accumulated false negatives) by about 50% | Direct precedent for RQ4 (label delay); malware, not NIDS; proposes a time-aware 'exposure' metric |
 | hindy2020zeroday | Hindy et al. 2020, arXiv 2006.15344 ([link](https://arxiv.org/abs/2006.15344)) | Autoencoder trained on benign traffic detects unseen CIC-IDS-2017 attacks at 75-98% | Context for the CIC-IDS-2017 unseen-attack result (different set-up: one-class) |
 
@@ -82,8 +83,7 @@ metrics behave on NIDS traffic**, not as a discovery that F1 depends on prevalen
 ## Limits of this search
 
 - Web search only; Scopus, IEEE Xplore and ACM DL not queried.
-- Zoghi and Serpen 2024 (*Concurrency and Computation*) has no free full text; it needs
-  HSE library access (see `database_queries.md`). The label-delay study was read from the
-  author's copy.
+- Zoghi and Serpen 2024 was read from a PDF supplied by the author of this thesis (the
+  publisher page blocked automated access); the label-delay study from the author's copy.
 - Russian-language literature: two web queries only (three studies included); a search in
   eLibrary is still needed.
