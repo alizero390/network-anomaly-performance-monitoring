@@ -12,6 +12,15 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- `nadmon.evaluation`: event scoring per stream (D12), Wilson intervals, bootstrap median delay, McNemar and Wilcoxon paired comparisons (D13).
+- `nadmon.experiment`: partitions, label conditions, per-stream runs of A, B-F1, B, C-passive and C-active, calibration of Strategy A's q and Strategy C's association period, full grid (D14).
+- `scripts/run_strategy_experiment.py`: loads February validation features, calibrates, writes `configs/strategies.toml`, runs the validation grid, writes `results/strategies/validation/`. `--quick` for a short first run.
+- 8 end-to-end tests on a synthetic partition (103 tests in total).
+
+### Research
+- Synthetic end-to-end check: B detects harmful shifts; A warns on every input shift including harmless ones; plain F1 alarms on fewer attacks while calibrated F1 does not. Alert-first labelling inflates the estimated FPR and makes calibrated F1 alarm on a healthy model (design spec D7 note).
+
 ### Changed
 - **Decision change (RESEARCH_DECISIONS.md sections 3 and 16):** Strategy B's primary metric is calibrated F1 instead of F1; plain F1 stays as variant B-F1. Approved by Ali on 2026-11-12 with all design-spec decisions D1-D14.
 

@@ -181,6 +181,13 @@ and a low-performance period on February validation (first alarm at window 57 vs
   attacks are then rarely labelled, so recall is overestimated. This tests the most
   realistic bias without a full grid.
 
+*First observation (synthetic test, 2026-11-12).* Alert-first labelling makes the labelled
+normal records mostly false positives, so the estimated FPR is far too high (about 9%
+instead of 0.6% in the test data) and calibrated F1 alarms on a healthy model in nearly
+every stable stream. Plain F1 is less affected there. Because the labelling probabilities
+are known in this condition, an inverse-probability-weighted estimate of recall and FPR
+is a possible correction; to be decided after the validation results.
+
 **Why.** The first three items are the approved grid with its mechanics made explicit.
 The alert-first condition answers open question 8 with one realistic case instead of
 leaving it as a limitation.
