@@ -13,6 +13,9 @@ The format follows these categories:
 ## [Unreleased]
 
 ### Added
+- `STRATEGY_DESIGN_SPEC.md`: proposed design for Strategies A, B and C under delayed and partial labels (decisions D1-D14, answering the open questions in RESEARCH_DECISIONS.md section 12). Awaiting approval; RESEARCH_DECISIONS.md stays authoritative until then.
+
+### Added
 - Calibrated F1 (Siblini et al.) as a monitored metric: `nadmon.attack_share.calibrated_f1`, column `f1_calibrated` in window tables and the resampling simulation, with the run's pooled validation attack share as the reference share. Included in alarm attribution and `results/comparison.md`. Three new tests.
 
 ### Changed
