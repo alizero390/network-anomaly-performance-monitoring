@@ -127,3 +127,31 @@ def test_scoring_and_stats():
     assert p == 0 and lo == 0 and 0 < hi < 0.1
     assert ev.mcnemar_p([True] * 10, [False] * 10) < 0.01
     assert ev.mcnemar_p([True, False], [True, False]) == 1.0
+
+
+def test_harder_variants_keep_ground_truth():
+    part = _partition()
+    rates = sc.stratum_rates(part.strata, part.y, part.p)
+    pi0 = float(part.y.mean())
+    base = sc.standard_scenarios(rates, pi0)
+    variants = sc.harder_variants(base)
+    names = {v.name for v in variants}
+    assert {"X1_hard_attack_mix_rare", "X1_hard_attack_mix_gradual"} <= names
+    table = sc.scenario_table(variants, rates, pi0)
+    assert table["usable"].all()
+    rare = next(v for v in variants if v.name == "X1_hard_attack_mix_rare")
+    assert rare.after.attack_share == 0.02
+    gradual = next(v for v in variants if v.name == "X1_hard_attack_mix_gradual")
+    comps = sc.window_compositions(gradual, n_windows=20, onset=5)
+    shares = [sum(c.attack_mix.get("A:fuzzers", 0) for _ in [0]) for c in comps]
+    assert shares[5] < shares[10] < shares[14] == shares[19]
+
+
+def test_run_natural_reports_every_strategy(run):
+    cal, _ = run
+    part = _partition()
+    ref_idx, _ = ex.split_validation(len(part.y), SMALL.seed)
+    ref = ex.a_reference(part.subset(ref_idx), SMALL)
+    nat = ex.run_natural(part, cal, SMALL, ref)
+    assert set(nat["strategy"]) == {"A", "B_F1", "B", "C_active"}
+    assert (nat["windows"] == len(part.y) // SMALL.window_size).all()

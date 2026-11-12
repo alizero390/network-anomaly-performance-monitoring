@@ -16,11 +16,14 @@ Steps (STRATEGY_DESIGN_SPEC.md, RESEARCH_DECISIONS.md section 16):
  4. Scenarios S0, H1-H3, X1-X2 from the stream half; only those with clean ground truth.
  5. Calibration: Strategy A threshold q on S0 streams; association period L per delay on
     X1/X2 streams. Written to configs/strategies.toml (frozen values for the test run).
- 6. Grid: every scenario x stream x label condition x strategy (D14).
+ 6. Grid: every scenario x stream x label condition x strategy (D14), plus harder
+    variants of each harmful scenario (approved 2026-11-12): `_rare` (attack share
+    falls to 2% as well) and `_gradual` (change builds up over 10 windows).
+ 7. All strategies on the real validation windows in time order (no injected change).
 
 Outputs in results/strategies/validation[_quick]/:
     calibration.json, scenarios.csv, stream_results.csv.gz, summary.csv, summary.md,
-    paired_B_vs_B_F1.csv, paired_C_active_vs_B.csv
+    paired_B_vs_B_F1.csv, paired_C_active_vs_B.csv, natural_validation.csv
 The calibrated settings go to configs/strategies.toml (full run only; a quick run
 writes strategies_quick.toml in its own folder so the frozen file is never replaced
 by quick values).
@@ -188,16 +191,19 @@ def main() -> None:
     print("4. Scenarios ...")
     rates = sc.stratum_rates(pool.strata, pool.y, pool.p)
     all_scen = sc.standard_scenarios(rates, cal.pi0)
+    base_usable = set(sc.scenario_table(all_scen, rates, cal.pi0).query("usable")["scenario"])
+    all_scen += sc.harder_variants([s for s in all_scen if s.name in base_usable])
     table = sc.scenario_table(all_scen, rates, cal.pi0)
     table.to_csv(out / "scenarios.csv", index=False, lineterminator="\n")
     usable = set(table.loc[table["usable"], "scenario"])
     scenarios = [s for s in all_scen if s.name in usable]
+    base_scenarios = [s for s in scenarios if s.ramp == 0 and not s.name.endswith("_rare")]
     print(
         table[["scenario", "intended", "label", "cal_f1_change", "usable"]].to_string(index=False)
     )
 
     print("5. Calibration ...")
-    cal = ex.calibrate(pool, scenarios, cal, settings, ref)
+    cal = ex.calibrate(pool, base_scenarios, cal, settings, ref)
     print(f"   q = {cal.q:.3f}; association periods {cal.periods}")
     config_path = out / "strategies_quick.toml" if args.quick else CONFIG
     write_config(cal, settings, args.quick, config_path)
@@ -228,6 +234,31 @@ def main() -> None:
     print("\nOverview (random-label conditions pooled):")
     cols = ["scenario", "strategy", "event_recall", "false_alert_rate", "median_delay"]
     print(overview[cols].round(3).to_string(index=False))
+
+    print("\n7. Real validation windows in time order ...")
+    natural = ex.run_natural(part, cal, settings, ref, seed=settings.seed)
+    natural.to_csv(out / "natural_validation.csv", index=False, lineterminator="\n")
+    with (out / "summary.md").open("a", encoding="utf-8") as f:
+        f.write(
+            "\n## Real validation windows in time order (no injected change)\n\n"
+            "Every alarm is listed by window (1-based). The Strategy A reference sample "
+            "is drawn from validation itself, so this view is descriptive.\n\n"
+            "| Strategy | Condition | Windows | Alarms | Alarm windows |\n"
+            "|---|---|---:|---:|---|\n"
+        )
+        for r in natural.itertuples(index=False):
+            f.write(
+                f"| {r.strategy} | {r.condition} | {r.windows} | {r.alarms} | {r.alarm_windows} |\n"
+            )
+    a_row = natural[natural["strategy"] == "A"]
+    if len(a_row):
+        r = a_row.iloc[0]
+        print(
+            f"   A: {r['flagged_window_share']:.0%} of windows flagged, {r['alarms']} warnings "
+            f"(median share of features changed {r['median_changed_proportion']:.2f})"
+        )
+    nat = natural[natural["condition"].isin(["inputs", "d0_p100", "d10_p20"])]
+    print(nat[["strategy", "condition", "alarms", "alarm_windows"]].to_string(index=False))
     print(f"\nDone in {(time.time() - start) / 60:.1f} minutes. Outputs in {out}")
     print(f"Calibrated settings written to {config_path}")
     np.seterr(all="warn")

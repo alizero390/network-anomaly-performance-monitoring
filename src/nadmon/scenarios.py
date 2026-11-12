@@ -204,6 +204,7 @@ class Scenario:
     before: Composition
     after: Composition
     note: str = ""
+    ramp: int = 0  # windows over which the change builds up; 0 = abrupt
 
 
 def _smallest_harmful(base, make, rates, pi0) -> tuple[Composition | None, float | None]:
@@ -370,12 +371,14 @@ def _blend(a: Composition, b: Composition, t: float) -> Composition:
 
 
 def window_compositions(
-    scenario: Scenario, n_windows: int = 40, onset: int = 20, ramp: int = 0
+    scenario: Scenario, n_windows: int = 40, onset: int = 20, ramp: int | None = None
 ) -> list[Composition]:
     """Composition of each window (0-based). ``onset`` is the first changed window.
 
     With ``ramp`` > 0 the change grows linearly and is complete at ``onset + ramp - 1``.
+    ``ramp=None`` uses the scenario's own ``ramp``.
     """
+    ramp = scenario.ramp if ramp is None else ramp
     if not 0 < onset < n_windows:
         raise ValueError("onset must be inside the stream")
     out = []
@@ -397,7 +400,7 @@ def build_stream(
     window_size: int = 5000,
     n_windows: int = 40,
     onset: int = 20,
-    ramp: int = 0,
+    ramp: int | None = None,
 ) -> np.ndarray:
     """Record positions for one stream: ``n_windows * window_size`` indices.
 
@@ -423,3 +426,29 @@ def build_stream(
         rng.shuffle(window)
         parts.append(window)
     return np.concatenate(parts)
+
+
+def harder_variants(
+    scenarios: list[Scenario], low_share: float = 0.02, ramp: int = 10
+) -> list[Scenario]:
+    """Extra harmful scenarios (approved 2026-11-12, extending D3).
+
+    For each harmful scenario: ``<name>_rare`` makes the same change while the attack
+    share also falls to ``low_share`` (labelled attacks become scarce; the ground truth
+    is unchanged because calibrated F1 does not depend on the attack share), and
+    ``<name>_gradual`` builds the same change up over ``ramp`` windows.
+    """
+    out = []
+    for s in scenarios:
+        if s.intended != "harmful":
+            continue
+        out.append(
+            replace(
+                s,
+                name=f"{s.name}_rare",
+                after=replace(s.after, attack_share=low_share),
+                note=f"{s.note}; attack share -> {low_share}",
+            )
+        )
+        out.append(replace(s, name=f"{s.name}_gradual", ramp=ramp, note=f"{s.note}; ramp {ramp}"))
+    return out

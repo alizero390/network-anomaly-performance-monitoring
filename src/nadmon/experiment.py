@@ -138,7 +138,7 @@ def _stream_rng(s: Settings, scenario_no: int, stream: int, salt: int = 0) -> np
 
 def a_proportions(part: Partition, idx: np.ndarray, ref: st.Reference, s: Settings) -> np.ndarray:
     W = s.window_size
-    windows = [part.features.iloc[idx[w * W : (w + 1) * W]] for w in range(s.n_windows)]
+    windows = [part.features.iloc[idx[w * W : (w + 1) * W]] for w in range(len(idx) // W)]
     return st.changed_proportion(ref, windows, s.a_alpha)
 
 
@@ -308,4 +308,57 @@ def run_grid(
             rows += run_stream(pool, idx, scen, k, conditions, cal, s, ref, seed)
             if progress and (k + 1) % 25 == 0:
                 print(f"  {scen.name}: {k + 1}/{s.n_streams} streams")
+    return pd.DataFrame(rows)
+
+
+def run_natural(
+    part: Partition, cal: Calibration, s: Settings, ref: st.Reference | None, seed: int = 0
+) -> pd.DataFrame:
+    """All strategies on the partition's own windows in time order (no injected change).
+
+    There is no ground truth here: every alarm is reported with its window. Returns one
+    row per (strategy, condition): alarms, alarm windows, and for A the share of windows
+    flagged.
+    """
+    W = s.window_size
+    n = len(part.y) // W
+    idx = np.arange(n * W)
+    rows = []
+    warnings = None
+    if ref is not None and cal.q is not None:
+        props = a_proportions(part, idx, ref, s)
+        warnings = st.a_warnings(props, cal.q, s.a_consecutive)
+        rows.append(
+            {
+                "strategy": "A",
+                "condition": "inputs",
+                "windows": n,
+                "alarms": len(warnings),
+                "alarm_windows": " ".join(str(w + 1) for w in warnings),
+                "flagged_window_share": float(np.mean(props >= cal.q)),
+                "median_changed_proportion": float(np.median(props)),
+            }
+        )
+    for k, cond in enumerate(label_conditions(s)):
+        cohorts = _cohorts(part, idx, cond, cal, s, seed + 1000 * (k + 1))
+        runs = {
+            "B_F1": st.b_monitor(cohorts, _b_rule(cal, s, "f1")),
+            "B": st.b_monitor(cohorts, _b_rule(cal, s, "f1_calibrated")),
+        }
+        if warnings is not None:
+            period = cal.periods.get(cond.delay, st.association_period(cond.delay))
+            runs["C_active"] = st.c_active(
+                cohorts, _b_rule(cal, s, "f1_calibrated"), warnings, period
+            )
+        for name, m in runs.items():
+            data, times = _alarms(m)
+            rows.append(
+                {
+                    "strategy": name,
+                    "condition": cond.name,
+                    "windows": n,
+                    "alarms": len(times),
+                    "alarm_windows": " ".join(str(d + 1) for d in data),
+                }
+            )
     return pd.DataFrame(rows)

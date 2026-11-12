@@ -114,6 +114,16 @@ X2 moves 70% of benign traffic towards `none|udp|INT`, `none|udp|REQ` and `ftp|t
 105 records, so its records repeat within X2 windows. Each stratum's
 recall and FPR come from the partition the stream is drawn from.
 
+**Harder variants (approved by Ali, 2026-11-12, after the quick validation run).** The
+quick run gave 100% detection and 0% false alerts almost everywhere, so the label
+conditions could not separate the strategies. Added for every harmful scenario:
+`_rare` (the same change while the attack share also falls to 2%, so labelled attacks are
+scarce; ground truth unchanged because calibrated F1 does not depend on the share) and
+`_gradual` (the change builds up over 10 windows). Calibration of q and L still uses
+S0, X1 and X2 only. All strategies are also run on the real validation windows in time
+order, to show how often each alarms on real traffic (A's threshold from resampled
+stable streams may be too sensitive there).
+
 Natural-order runs (February test in time order; CIC Friday) are reported as case
 studies alongside the controlled scenarios, without constructed ground truth.
 

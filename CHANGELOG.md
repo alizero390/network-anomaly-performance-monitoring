@@ -13,6 +13,12 @@ The format follows these categories:
 ## [Unreleased]
 
 ### Added
+- Harder scenario variants `_rare` and `_gradual` for each harmful scenario (`nadmon.scenarios.harder_variants`), and `nadmon.experiment.run_natural` for the real validation windows in time order; both in `run_strategy_experiment.py` (approved 2026-11-12).
+
+### Research
+- Quick validation run (Ali, 20 streams): all six scenarios usable; q = 0.038 (one feature in 26); B with calibrated F1 detected every harmful stream with no false alerts, plain F1 alarmed on every H1 stream, A warned on every input shift, C-active one window faster. Near-ceiling results motivated the harder variants.
+
+### Added
 - `nadmon.evaluation`: event scoring per stream (D12), Wilson intervals, bootstrap median delay, McNemar and Wilcoxon paired comparisons (D13).
 - `nadmon.experiment`: partitions, label conditions, per-stream runs of A, B-F1, B, C-passive and C-active, calibration of Strategy A's q and Strategy C's association period, full grid (D14).
 - `scripts/run_strategy_experiment.py`: loads February validation features, calibrates, writes `configs/strategies.toml`, runs the validation grid, writes `results/strategies/validation/`. `--quick` for a short first run.
