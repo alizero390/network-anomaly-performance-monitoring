@@ -83,6 +83,7 @@ detection with delayed labels, which supports the thesis gap (RQ4).
 |---|---|---|---|
 | namiot2022shift | Намиот Д.Е., Ильюшин Е.А. Мониторинг сдвига данных в моделях машинного обучения // International Journal of Open Information Technologies. 2022. Т. 10, № 12. С. 84-93 ([PDF](https://injoit.ru/index.php/j1/article/download/1462/1350)) | Survey of label-free shift detection (KS, chi-square, PSI, DDM) and a monitoring architecture | Russian-language basis for Strategy A |
 | kotenko2024attacks | Котенко И.В. и др. Атаки и методы защиты в системах машинного обучения // Вопросы кибербезопасности. 2024. № 1(59). С. 24-37. DOI 10.21681/2311-3456-2024-1-24-37 ([PDF](https://cyberrus.info/wp-content/uploads/2024/02/vokib-2024-1-st03-s024-037.pdf)) | Review of adversarial attacks and defences for ML | Context only; shows that journal publishes in Russian with English abstracts |
+| pokidko2025transfer | Покидько А.Ю., Степанов И.А., Гетьман А.И. Перенос обучения в сетевых системах обнаружения вторжений: обзор методов и подходов // Труды ИСП РАН. 2025. Т. 37, № 6. С. 73-90. DOI 10.15514/ISPRAS-2025-37(6)-37 ([link](https://ispranproceedings.elpub.ru/jour/article/view/2085/1907)) | Review of transfer learning for NIDS, framed around drift of network data and new attack types | Russian-language source on drift in NIDS; published in the fallback journal (Труды ИСП РАН). Adaptation, not monitoring |
 | bashmakova2024botnet | Башмакова Н.М. и др. Обнаружение сетевых атак ботнетов на основе технологий машинного обучения и переноса знаний // Информационно-управляющие системы. 2024. № 5. С. 41-56. DOI 10.31799/1684-8853-2024-5-41-56 ([PDF](https://i-us.ru/index.php/ius/article/download/16320/15374)) | ML botnet detection with transfer between datasets; names concept drift as an open problem | Russian-language context for the unseen-Botnet result |
 
 Included earlier (`scoping_review.md`): Zoghi and Serpen; Flood et al.; Arp et al.;
@@ -123,5 +124,6 @@ metrics behave on NIDS traffic**, not as a discovery that F1 depends on prevalen
 - Web search only; Scopus, IEEE Xplore and ACM DL not queried. On 2026-11-12 the IEEE and eLibrary queries were rerun as site-restricted web searches (6 studies added, none changing the novelty assessment); the database searches remain open.
 - Zoghi and Serpen 2024 was read from a PDF supplied by the author of this thesis (the
   publisher page blocked automated access); the label-delay study from the author's copy.
-- Russian-language literature: two web queries only (three studies included); a search in
-  eLibrary is still needed.
+- Russian-language literature: eLibrary searched on 2026-11-12 (Q1-Q4: 7, 16, 0 and 131
+  results; one new study, pokidko2025transfer). No Russian-language study on monitoring
+  deployed detectors or on metric behaviour under changing attack share was found.

@@ -51,6 +51,10 @@ bibliographic databases for the systematic review.
 | 2026-11-12 | IEEE Xplore (same settings) | Q2 of database_queries.md | 193 | 6 | dasgupta2026drift, doynov2026lowbase, katiyar2026health, zhang2026tgnnaudit, khan2026leakage, qiu2025streaming |
 | 2026-11-12 | IEEE Xplore (same settings) | Q3 of database_queries.md | 1 | 1 | doynov2026lowbase (also in Q2) |
 | 2026-11-12 | IEEE Xplore (same settings) | Q4 of database_queries.md | 490 | 3 | ghausi2026leakage, bernardo2025driftgen, shukla2025ddos |
+| 2026-11-12 | eLibrary (advanced search: title, abstract, keywords; morphology on; 2018-2026; via Ali's browser, no login) | Q1 обнаружение вторжений дрейф | 7 | 1 | pokidko2025transfer; also seen: Konovalov and Gerasimov 2026 (streaming anomaly detection algorithms, Вестник Технологического университета), context only |
+| 2026-11-12 | eLibrary (same settings) | Q2 мониторинг моделей машинного обучения сдвиг данных | 16 | 0 | Only relevant record is namiot2022shift (already included) |
+| 2026-11-12 | eLibrary (same settings) | Q3 обнаружение сетевых атак метрики оценки несбалансированные классы | 0 | 0 | |
+| 2026-11-12 | eLibrary (same settings) | Q4 UNSW-NB15 CICIDS2017 | 131 | 0 | Both pages screened by title: mostly English-language new-detector papers indexed in eLibrary; none on evaluation over time, monitoring or metric behaviour |
 
 **2026-11-12 note.** Scopus, IEEE Xplore and eLibrary could not be opened from the
 research environment (no browser; direct access refused). The IEEE and eLibrary queries
@@ -68,5 +72,6 @@ alarm): 199 left. Stage 2: titles screened; papers proposing a new detector with
 evaluation or monitoring question excluded: 48 left. Stage 3: 11 abstracts read in full;
 9 included. No CSV export was saved (the result list was read in the browser); a CSV
 can be exported from IEEE Xplore without a login if a file record is needed.
-Scopus asked for a login; eLibrary was not readable by the browser extension (site
-permission). Both remain open.
+Scopus asked for a login and remains open. eLibrary was searched later the same day
+after Ali allowed the site in the extension (no login needed; titles screened from the
+result pages, shown machine-translated by the browser and checked against the original).
