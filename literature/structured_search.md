@@ -56,6 +56,27 @@ Not opened: "A Change Detector for Prior Probabilities of Classes" (IEEE SSCI 20
 
 The Russian-language site-restricted searches found no study on monitoring deployed detectors or on metric behaviour under changing prevalence. The novelty assessment below is unchanged.
 
+**IEEE Xplore database search, 2026-11-12** (684 records, 9 included; screening in `search_log.md`):
+
+| Key | Study | What it shows | Relevance to Paper 1 |
+|---|---|---|---|
+| dasgupta2026drift | Dasgupta, Biswas and Kar, "Evaluation of Intrusion Detection Systems Under Concept Drift and Severe Class Imbalance", ICC-CNS 2026, doi 10.1109/ICC-CNS70518.2026.11606116 | UNSW-NB15 streaming evaluation over 36 rolling windows with controlled synthetic drift; accuracy hides failure (2.14 vs 39.77 percentage-point gap under balanced accuracy); static Random Forest does not recover after drift; recommends balanced accuracy, per-class recall and FPR | **Closest study found.** Windowed UNSW-NB15 metrics, but synthetic drift, no changing attack prevalence, no alarm rule or alarm evaluation, no label delay. Claim 4 qualifies its balanced-accuracy recommendation; it supports reporting per-class recall and FPR. Must be cited and positioned |
+| doynov2026lowbase | Doynov, Nenova and Manolova, "Recall-First Temporal Routing for Low-Base-Rate IDS ...", ECTI DAMT & NCON 2026, doi 10.1109/ECTIDAMTNCON67592.2026.11460005 | Multi-window protocol that selects low-base-rate windows: recall 0.9997 overall, but worst-case FPR 1.0 and 100% alert rate in low-base windows | Independent evidence that aggregate metrics hide behaviour in low-attack windows (claim 1 context); no monitoring alarms |
+| katiyar2026health | Katiyar and Silva, "Early Detection of Classifier Health Deterioration Under Zero-Day Cyberattacks", ICNCCom 2026, doi 10.1109/ICNCCom69117.2026.11736219 | Label-free health index from SVM margins on CIC-IDS2017 with unseen attacks added; beats KS, Page-Hinkley and cluster distance; flags deterioration while macro-F1 stays above 97% | Label-free monitoring compared with KS: relevant to Strategy A and the thesis; Paper 1 context (F1 as a monitoring signal) |
+| ghausi2026leakage | Ghausi et al., "Poster: Rethinking Intrusion Detection Evaluation: The Impact of Cross-Scenario Leakage", SVCC 2026, doi 10.1109/SVCC69905.2026.11642257 | CIC-IDS2017 day-based holdout: attack recall drops sharply though ROC-AUC and PR-AUC stay high; notes holdout changes attack-family composition and class ratios | Supports the day-split CIC-IDS-2017 design and claim 5 (attack mix) |
+| khan2026leakage | Khan, "Leakage-Aware IDS Evaluation under Unseen Attacks and Cross-Dataset Shift", IAICT 2026, doi 10.1109/IAICT71158.2026.11620817 | CIC-IDS2017 and UNSW-NB15: F1 0.994/0.959 in-domain, sharp drop for unseen PortScan and cross-dataset transfer | Supports the unseen-attack CIC result |
+| zhang2026tgnnaudit | Zhang et al., "Are Temporal Graph Based Intrusion Detection Results Trustworthy? A Dataset Audit and Evaluation Framework", IMNS 2026, doi 10.1109/IMNS67862.2026.11655312 | Names temporal concentration of attack traffic as a dataset flaw; proposes an attack-aware chronological split | Matches the January finding (all attacks in 2 hours) and our attack-period split |
+| bernardo2025driftgen | Bernardo, Faria and Miani, "Drift Dataset Generator for Evaluating Flow-Based Intrusion Detection Systems", IEEE CCNC 2025, doi 10.1109/CCNC54725.2025.10976194 | Injects controlled drifts into public IDS datasets (case study on CIC-IDS2017) | Alternative to the thesis scenario construction (design spec D3); cite there |
+| shukla2025ddos | Shukla et al., "Efficient DDoS Detection Under Distribution Shift ...", ACET 2025, doi 10.1109/ACET67282.2025.11430287 | CIC-DDoS2019: chronological vs random splits, window summaries | Context for time-ordered evaluation |
+| qiu2025streaming | Qiu and Heywood, "Benchmarking Streaming Evolutionary Ensemble Learning under Shifting Imbalanced Data", IEEE CEC 2025, doi 10.1109/CEC65147.2025.11043023 | Streaming botnet benchmark with shifting class imbalance; prequential metrics | Context only |
+
+**Effect on the novelty assessment.** Dasgupta et al. (2026) is now the closest work: it
+evaluates detectors in windows on UNSW-NB15 under drift and imbalance. It still differs on
+every point Paper 1 claims: drift is injected synthetically, the attack share does not
+change on its own, no alarm rule is applied or evaluated, and it recommends balanced
+accuracy, which claim 4 qualifies. IEEE Q1 returned no paper at all on intrusion
+detection with delayed labels, which supports the thesis gap (RQ4).
+
 **Russian-language studies** (needed for a Russian journal):
 
 | Key | Study | What it shows | Relevance to Paper 1 |
@@ -78,9 +99,9 @@ Garg et al.; Białek et al.; Lipton et al.; Žliobaitė; Solozobov; Engelen et a
 | 4 | Balanced accuracy hides false-positive bursts | Balanced accuracy is recommended as prevalence-independent (Guesné) | Counter-evidence for monitoring: January UNSW-NB15 FPR bursts (4-9%) that F1 flags and balanced accuracy barely registers | Low; directly qualifies a published recommendation |
 | 5 | Attack-type mix explains window recall | Generic dominance and Fuzzers' difficulty at dataset level (Zoghi and Serpen; Flood) | Temporal: category mix explains R² 0.31-0.76 of window recall across 6 runs | Low-medium: cite the dataset-level work |
 
-**Overall.** No paper found combines windowed performance monitoring of NIDS models, attack
+**Overall** (updated 2026-11-12 after the IEEE Xplore search). No paper found combines windowed performance monitoring of NIDS models, attack
 prevalence that changes over time, alarm-level evaluation and attribution of alarms to
-causes. The closest are Jin and Lee (2026: shift and calibrated alerting, monitoring only
+causes. The closest are Dasgupta et al. (2026: windowed UNSW-NB15 evaluation under synthetic drift, no alarms, recommends balanced accuracy), Jin and Lee (2026: shift and calibrated alerting, monitoring only
 recommended) and INSOMNIA (2021: windowed F1 under drift, no study of the metric's own
 behaviour). Paper 1 should position itself as **an empirical study of how monitoring
 metrics behave on NIDS traffic**, not as a discovery that F1 depends on prevalence.

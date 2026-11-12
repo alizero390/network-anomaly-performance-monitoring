@@ -47,6 +47,10 @@ bibliographic databases for the systematic review.
 | 2026-11-12 | Web, cyberleninka.ru and elibrary.ru only (eLibrary Q4) | UNSW-NB15 CICIDS2017 обнаружение атак машинное обучение | 10 | 1 | protic2023datasets (context only) |
 | 2026-11-12 | Web, follow-up | "Detecting Distributional Shift Responsible for Predictive Model's Failure" | 10 | 1 | cai2023disde (IEEE page not readable; arXiv paper on the same question); ackerman drift paper found while looking up the prior-change detector |
 | 2026-11-12 | Web, verification | "Evaluation of Intrusion Detection Systems Under Concept Drift and Severe Class Imbalance" (title from an AI-generated summary the author received) | 10 | 1 | No paper with that title found; biswas2026protocol found instead. The summary's other three items: an MCC study already included (thiyagarajan2025mcc), and two resampling/new-model papers excluded by the inclusion rules |
+| 2026-11-12 | IEEE Xplore (Command search, All Metadata, 2015-2026, via Ali's browser) | Q1 of database_queries.md | 0 | 0 | No IEEE paper combines intrusion detection, drift/monitoring and delayed labels |
+| 2026-11-12 | IEEE Xplore (same settings) | Q2 of database_queries.md | 193 | 6 | dasgupta2026drift, doynov2026lowbase, katiyar2026health, zhang2026tgnnaudit, khan2026leakage, qiu2025streaming |
+| 2026-11-12 | IEEE Xplore (same settings) | Q3 of database_queries.md | 1 | 1 | doynov2026lowbase (also in Q2) |
+| 2026-11-12 | IEEE Xplore (same settings) | Q4 of database_queries.md | 490 | 3 | ghausi2026leakage, bernardo2025driftgen, shukla2025ddos |
 
 **2026-11-12 note.** Scopus, IEEE Xplore and eLibrary could not be opened from the
 research environment (no browser; direct access refused). The IEEE and eLibrary queries
@@ -55,3 +59,14 @@ IEEE Xplore pages need JavaScript and could not be read, so papers were read fro
 or author copies. This is not a database search: Scopus has no stand-in, and result
 counts are search-engine counts. The database searches in `database_queries.md` remain
 open.
+
+**IEEE Xplore screening (2026-11-12).** 684 records retrieved through IEEE Xplore's own
+search (Q1 0, Q2 193, Q3 1, Q4 490). Stage 1: keyword filter on title and abstract
+(drift, monitoring, chronological/temporal evaluation, prevalence/base rate, label
+delay/scarcity/noise, unseen/zero-day, audit, benchmark, MCC, balanced accuracy, false
+alarm): 199 left. Stage 2: titles screened; papers proposing a new detector without an
+evaluation or monitoring question excluded: 48 left. Stage 3: 11 abstracts read in full;
+9 included. No CSV export was saved (the result list was read in the browser); a CSV
+can be exported from IEEE Xplore without a login if a file record is needed.
+Scopus asked for a login; eLibrary was not readable by the browser extension (site
+permission). Both remain open.
