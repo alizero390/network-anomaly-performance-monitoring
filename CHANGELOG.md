@@ -13,6 +13,7 @@ The format follows these categories:
 ## [Unreleased]
 
 ### Research
+- With benign strata by service, protocol and state, all six scenarios have clean ground truth on February validation; X2 reaches FPR 6.4% via `none|udp|INT` (FPR 24.8%) and `none|udp|REQ`. This strata level is now the standard (design spec D3).
 - Scenario check on February validation (Ali's run, 2026-11-12): S0, H1, H2, H3 and X1 have clean ground truth; X2 cannot be built from services alone, because the noisiest benign service has FPR 1.1% (ftp) and moving all benign traffic there lowers calibrated F1 by only about 0.01.
 
 ### Changed

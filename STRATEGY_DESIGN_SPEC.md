@@ -82,7 +82,11 @@ for every record is computed once, so a stream is only a list of record indices.
 - Stream: 40 windows of 5,000 records. Windows 1-20 follow the partition's normal
   composition; the change starts at window 21 (onset) and lasts to window 40.
 - Abrupt change is primary; a 10-window ramp is a robustness check.
-- Strata: benign records by `service`; attack records by attack category.
+- Strata: attack records by attack category; benign records by service, protocol and
+  connection state (`service|proto|state`). Service alone was not enough: no service is
+  noisy enough for X2 (maximum FPR 1.1%), while `none|udp|INT` has FPR 24.8%
+  (`results/scenarios/README.md`, Ali's run 2026-11-12). All six scenarios are built at
+  this level so they share one definition.
 - Records are drawn with replacement within each stratum. Paper 1's exchangeability
   limitation applies; a block-sampling variant (runs of consecutive records) is an
   optional robustness check.
@@ -106,7 +110,11 @@ strata whose rate was close to the **pooled** rate. On UNSW-NB15 no attack categ
 close to the pooled recall (0.968 sits between Generic at 1.0 and Fuzzers at 0.58), so H3
 could not be built; H2 barely changed the input. Both now replace the largest stratum.
 On February validation (attack strata only), H1, H3 and X1 get clean ground truth; X1
-needs half of all attacks to be Fuzzers (recall 0.77, calibrated F1 -0.11). Each stratum's
+needs half of all attacks to be Fuzzers (recall 0.77, calibrated F1 -0.11).
+With service, protocol and state strata (Ali's run), all six have clean ground truth;
+X2 moves 70% of benign traffic towards `none|udp|INT`, `none|udp|REQ` and `ftp|tcp|FIN`
+(FPR 6.4%, close to the January bursts of 4-9%). Limitation: `none|udp|REQ` has only
+105 records, so its records repeat within X2 windows. Each stratum's
 recall and FPR come from the partition the stream is drawn from.
 
 Natural-order runs (February test in time order; CIC Friday) are reported as case
