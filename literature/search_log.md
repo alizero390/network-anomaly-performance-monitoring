@@ -37,3 +37,20 @@ bibliographic databases for the systematic review.
 | 2026-11-10 | Web | обнаружение сетевых атак машинное обучение дрейф данных концептуальный дрейф мониторинг качества модели статья | 9 | 3 | namiot2022shift, kotenko2024attacks, bashmakova2024botnet |
 | 2026-11-10 | Web | UNSW-NB15 CICIDS2017 оценка систем обнаружения вторжений несбалансированные классы метрики F1 статья ВАК | 9 | 0 | English results only |
 | 2026-11-10 | Web | "Towards more realistic evaluations: The impact of label delays in malware detection pipelines" pdf arxiv | 10 | 1 | botacin2024labeldelays (author's copy) |
+| 2026-11-12 | Web, ieeexplore.ieee.org only (stand-in for IEEE Xplore Q1) | intrusion detection concept drift delayed labels label latency performance monitoring | 10 | 1 | wang2021robustness (others already included: zliobaite2010, xu2020lagged) |
+| 2026-11-12 | Web, ieeexplore.ieee.org only (IEEE Q2) | intrusion detection class imbalance prevalence F1 Matthews correlation balanced accuracy temporal drift evaluation | 10 | 1 | cantone2024crossdataset; rest are resampling/new-model papers |
+| 2026-11-12 | Web, ieeexplore.ieee.org only (IEEE Q3) | drift detection false alarms label shift prior probability shift model monitoring | 10 | 1 | cai2023disde found via a follow-up search; "A Change Detector for Prior Probabilities of Classes" (SSCI 2020) could not be opened |
+| 2026-11-12 | Web, ieeexplore.ieee.org only (IEEE Q4) | UNSW-NB15 CICIDS2017 temporal chronological concept drift unseen attacks evaluation | 10 | 1 | apruzzese2023pragmatic (read via arXiv) |
+| 2026-11-12 | Web, cyberleninka.ru and elibrary.ru only (stand-in for eLibrary Q1) | обнаружение вторжений дрейф концепций машинное обучение | 10 | 0 | General reviews; none on drift monitoring of detectors |
+| 2026-11-12 | Web, cyberleninka.ru and elibrary.ru only (eLibrary Q2) | мониторинг моделей машинного обучения сдвиг данных деградация качества | 10 | 0 | None on monitoring of deployed models |
+| 2026-11-12 | Web, cyberleninka.ru and elibrary.ru only (eLibrary Q3) | обнаружение сетевых атак метрики оценки несбалансированные классы F-мера | 10 | 0 | None on metric behaviour under changing prevalence |
+| 2026-11-12 | Web, cyberleninka.ru and elibrary.ru only (eLibrary Q4) | UNSW-NB15 CICIDS2017 обнаружение атак машинное обучение | 10 | 1 | protic2023datasets (context only) |
+| 2026-11-12 | Web, follow-up | "Detecting Distributional Shift Responsible for Predictive Model's Failure" | 10 | 1 | cai2023disde (IEEE page not readable; arXiv paper on the same question); ackerman drift paper found while looking up the prior-change detector |
+
+**2026-11-12 note.** Scopus, IEEE Xplore and eLibrary could not be opened from the
+research environment (no browser; direct access refused). The IEEE and eLibrary queries
+were therefore run as web searches restricted to those sites (eLibrary plus CyberLeninka).
+IEEE Xplore pages need JavaScript and could not be read, so papers were read from arXiv
+or author copies. This is not a database search: Scopus has no stand-in, and result
+counts are search-engine counts. The database searches in `database_queries.md` remain
+open.

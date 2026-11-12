@@ -40,6 +40,21 @@ All queries, with counts, are in `search_log.md`.
 | botacin2024labeldelays | Botacin and Gomes, *Computers & Security* 2024 ([author's copy](https://marcusbotacin.github.io/files/label-delays.pdf)) | Label delays from analyst/sandbox queues delay drift-triggered retraining; an 81-epoch delay raises exposure (accumulated false negatives) by about 50% | Direct precedent for RQ4 (label delay); malware, not NIDS; proposes a time-aware 'exposure' metric |
 | hindy2020zeroday | Hindy et al. 2020, arXiv 2006.15344 ([link](https://arxiv.org/abs/2006.15344)) | Autoencoder trained on benign traffic detects unseen CIC-IDS-2017 attacks at 75-98% | Context for the CIC-IDS-2017 unseen-attack result (different set-up: one-class) |
 
+**Added 2026-11-12** (site-restricted web searches standing in for IEEE Xplore and eLibrary; see `search_log.md`):
+
+| Key | Study | What it shows | Relevance |
+|---|---|---|---|
+| cai2023disde | Cai, Namkoong and Yadlowsky, "Diagnosing Model Performance Under Distribution Shift", arXiv 2303.02011 ([link](https://arxiv.org/abs/2303.02011)) | Splits a performance drop under shift into harder-but-seen examples, changed feature-outcome relation and unseen examples | Method-level precedent for decomposing a drop (Paper 1 F1 decomposition; thesis harmful vs harmless shift); no NIDS data, no windows or alarms |
+| wang2021robustness | Wang and Machida, "A Robustness Evaluation of Concept Drift Detectors against Unreliable Data Streams" (IEEE; [author copy](https://www.cs.tsukuba.ac.jp/~machida/wfiot2021-wang.pdf)) | Six drift detectors on a synthetic stream: wrong labels hurt delay and precision far more than missing labels; CUSUM most robust | Precedent for the thesis's partial-label condition; synthetic data, no label delay, no NIDS |
+| cantone2024crossdataset | Cantone, Marrocco and Bria, *J. Information Security and Applications* 2024 (arXiv [2402.10974](https://arxiv.org/abs/2402.10974)) | Near-perfect within-dataset NIDS results collapse across datasets; reports MCC and F1, drops accuracy for imbalance | Random 80:20 splits, no time windows: supports that temporal evaluation is missing; cite with Jin and Lee |
+| apruzzese2023pragmatic | Apruzzese, Laskov and Schneider, "SoK: Pragmatic Assessment of Machine Learning for Network Intrusion Detection", IEEE EuroS&P 2023 (arXiv [2305.00550](https://arxiv.org/abs/2305.00550)) | Benchmark-driven NIDS research ignores deployment factors; proposes "pragmatic assessment" | Context for the deployment framing; the abstract does not cover monitoring or labels |
+| ackerman2020drift | Ackerman et al. (IBM Research), "Detection of Data Drift and Outliers Affecting Machine Learning Model Performance Over Time", arXiv 2012.09258 ([link](https://arxiv.org/abs/2012.09258)) | Label-free drift detection from the model's confidence distribution, with change-point models that hold the false-alarm rate fixed | Candidate label-free signal for a Strategy A ablation; covers prior-probability shift; no NIDS |
+| protic2023datasets | Protić and Stanković, *Vojnotehnički glasnik* 71(4), 2023 ([CyberLeninka](https://cyberleninka.ru/article/n/cybersecurity-attacks-which-dataset-should-be-used-to-evaluate-an-intrusion-detection-system)) | Review of IDS datasets including UNSW-NB15 and CIC-IDS-2017 | Context only; no metrics, imbalance or drift analysis |
+
+Not opened: "A Change Detector for Prior Probabilities of Classes" (IEEE SSCI 2020): every copy found was blocked. Worth a look in IEEE Xplore when the database search is run.
+
+The Russian-language site-restricted searches found no study on monitoring deployed detectors or on metric behaviour under changing prevalence. The novelty assessment below is unchanged.
+
 **Russian-language studies** (needed for a Russian journal):
 
 | Key | Study | What it shows | Relevance to Paper 1 |
@@ -83,7 +98,7 @@ metrics behave on NIDS traffic**, not as a discovery that F1 depends on prevalen
 
 ## Limits of this search
 
-- Web search only; Scopus, IEEE Xplore and ACM DL not queried.
+- Web search only; Scopus, IEEE Xplore and ACM DL not queried. On 2026-11-12 the IEEE and eLibrary queries were rerun as site-restricted web searches (6 studies added, none changing the novelty assessment); the database searches remain open.
 - Zoghi and Serpen 2024 was read from a PDF supplied by the author of this thesis (the
   publisher page blocked automated access); the label-delay study from the author's copy.
 - Russian-language literature: two web queries only (three studies included); a search in
