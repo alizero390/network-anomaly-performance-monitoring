@@ -62,15 +62,30 @@ def stratum_rates(strata: np.ndarray, y_true: np.ndarray, y_pred: np.ndarray) ->
     return out.drop(columns="mixed")
 
 
-def unsw_strata(labels: np.ndarray, categories: np.ndarray, services: np.ndarray) -> np.ndarray:
+def unsw_strata(
+    labels: np.ndarray,
+    categories: np.ndarray,
+    services: np.ndarray,
+    protos: np.ndarray | None = None,
+    states: np.ndarray | None = None,
+) -> np.ndarray:
     """UNSW-NB15 strata: ``A:<attack category>`` for attacks, ``B:<service>`` for benign.
 
-    The service value ``-`` (no identified service) becomes ``B:none``.
+    The service value ``-`` (no identified service) becomes ``none``. With ``protos`` and
+    ``states``, benign strata are finer: ``B:<service>|<proto>|<state>``.
     """
     labels = np.asarray(labels)
-    svc = pd.Series(np.asarray(services, dtype=str)).str.strip().replace({"-": "none", "": "none"})
+
+    def clean(values):
+        return (
+            pd.Series(np.asarray(values, dtype=str)).str.strip().replace({"-": "none", "": "none"})
+        )
+
+    benign = clean(services)
+    if protos is not None and states is not None:
+        benign = benign + "|" + clean(protos) + "|" + clean(states)
     cat = pd.Series(np.asarray(categories, dtype=str)).str.strip()
-    return np.where(labels == 1, "A:" + cat, "B:" + svc).astype(str)
+    return np.where(labels == 1, "A:" + cat, "B:" + benign).astype(str)
 
 
 def stratum_index(strata: np.ndarray) -> dict[str, np.ndarray]:

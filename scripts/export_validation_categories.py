@@ -9,7 +9,8 @@ results/validation_predictions.csv. Output: results/validation_categories.csv
 (about 10 MB; not committed). Then run scripts/analyze_attack_share.py or
 scripts/check_scenarios.py.
 
-The Service column (added 2026-11-12) defines the benign strata of the thesis scenarios.
+The Service, Proto and State columns (added 2026-11-12) define the benign strata of the
+thesis scenarios.
 
 attack_cat is used only for analysis, never as a model feature.
 """
@@ -23,6 +24,8 @@ from nadmon import dataset
 from nadmon.config import load_paths
 
 SERVICE_INDEX = dataset.COLUMN_NAMES.index("service")
+PROTO_INDEX = dataset.COLUMN_NAMES.index("proto")
+STATE_INDEX = dataset.COLUMN_NAMES.index("state")
 
 
 def main() -> None:
@@ -50,6 +53,8 @@ def main() -> None:
             "CategoryLabel": labels,
             "AttackCategory": category.to_numpy(),
             "Service": validation[SERVICE_INDEX].astype(str).str.strip().to_numpy(),
+            "Proto": validation[PROTO_INDEX].astype(str).str.strip().to_numpy(),
+            "State": validation[STATE_INDEX].astype(str).str.strip().to_numpy(),
         }
     )
     path = paths.results_dir / "validation_categories.csv"

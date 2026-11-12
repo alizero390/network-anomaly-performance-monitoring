@@ -12,6 +12,12 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- Scenario check on February validation (Ali's run, 2026-11-12): S0, H1, H2, H3 and X1 have clean ground truth; X2 cannot be built from services alone, because the noisiest benign service has FPR 1.1% (ftp) and moving all benign traffic there lowers calibrated F1 by only about 0.01.
+
+### Changed
+- Benign strata can be finer (service, protocol and connection state) to look for concentrated false positives for X2; `export_validation_categories.py` exports Proto and State, and `check_scenarios.py` reports both levels.
+
 ### Added
 - `nadmon.labels`: label availability (random and alert-first), release delay, labelled cohort counts, cohort pooling and `n_min` (design spec D7, D8).
 - `nadmon.scenarios`: strata, compositions, expected calibrated F1, ground-truth classification (D4) and the stream builder with onset and ramp; standard scenarios S0, H1-H3, X1-X2 (D3).

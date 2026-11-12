@@ -8,8 +8,9 @@ results/validation_categories.csv with its Service column
 never touches the test partition.
 
 Writes results/scenarios/:
-    feb_rf_validation_strata.csv     records, positive predictions and rate per stratum
-    feb_rf_validation_scenarios.csv  intended vs computed ground truth (design spec D4)
+    feb_rf_validation_strata_<level>.csv     records, positive predictions and rate per stratum
+    feb_rf_validation_scenarios_<level>.csv  intended vs computed ground truth (design spec D4)
+<level> is 'service', and 'service_proto_state' when the export has Proto and State.
     feb_rf_validation_labels.csv     cohorts after pooling, per label availability (D7, D8)
     README.md                        the two tables in readable form
 """
@@ -44,10 +45,20 @@ def main() -> None:
         raise SystemExit("Category file does not line up with the predictions file.")
 
     y, p = data["TrueLabel"].to_numpy(), data["Prediction"].to_numpy()
-    strata = sc.unsw_strata(y, data["AttackCategory"], data["Service"])
-    rates = sc.stratum_rates(strata, y, p)
     pi0 = float(y.mean())
-    table = sc.scenario_table(sc.standard_scenarios(rates, pi0), rates, pi0)
+    levels = {"service": sc.unsw_strata(y, data["AttackCategory"], data["Service"])}
+    if {"Proto", "State"} <= set(data.columns):
+        levels["service_proto_state"] = sc.unsw_strata(
+            y, data["AttackCategory"], data["Service"], data["Proto"], data["State"]
+        )
+    else:
+        print("No Proto/State columns: re-run export_validation_categories.py for finer strata.")
+    tables, all_rates = {}, {}
+    for level, strata in levels.items():
+        all_rates[level] = sc.stratum_rates(strata, y, p)
+        tables[level] = sc.scenario_table(
+            sc.standard_scenarios(all_rates[level], pi0), all_rates[level], pi0
+        )
 
     recall = float(p[y == 1].mean())
     rule = lb.PoolingRule(n_min=lb.n_min_for_recall(recall))
@@ -67,8 +78,11 @@ def main() -> None:
     label_table = pd.DataFrame(label_rows)
 
     OUT.mkdir(parents=True, exist_ok=True)
-    rates.to_csv(OUT / "feb_rf_validation_strata.csv", lineterminator="\n")
-    table.to_csv(OUT / "feb_rf_validation_scenarios.csv", index=False, lineterminator="\n")
+    for level in levels:
+        all_rates[level].to_csv(OUT / f"feb_rf_validation_strata_{level}.csv", lineterminator="\n")
+        tables[level].to_csv(
+            OUT / f"feb_rf_validation_scenarios_{level}.csv", index=False, lineterminator="\n"
+        )
     label_table.to_csv(OUT / "feb_rf_validation_labels.csv", index=False, lineterminator="\n")
 
     cols = [
@@ -90,14 +104,18 @@ def main() -> None:
         f"Reference attack share for calibrated F1: {pi0:.4f}. "
         f"Validation recall {recall:.4f}, so n_min = {rule.n_min} labelled attacks.",
         "",
-        "## Scenarios",
-        "",
-        "| " + " | ".join(cols) + " |",
-        "|" + "---|" * len(cols),
     ]
-    for row in table[cols].itertuples(index=False):
-        cells = [f"{v:.4f}" if isinstance(v, float) else str(v) for v in row]
-        lines.append("| " + " | ".join(cells) + " |")
+    for level, table in tables.items():
+        lines += [
+            "",
+            f"## Scenarios, benign strata by {level.replace('_', ', ')}",
+            "",
+            "| " + " | ".join(cols) + " |",
+            "|" + "---|" * len(cols),
+        ]
+        for row in table[cols].itertuples(index=False):
+            cells = [f"{v:.4f}" if isinstance(v, float) else str(v) for v in row]
+            lines.append("| " + " | ".join(cells) + " |")
     lines += [
         "",
         "## Label cohorts (delay 0)",
@@ -112,8 +130,12 @@ def main() -> None:
         )
     (OUT / "README.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
-    print("\nStrata with at least", sc.MIN_STRATUM_RECORDS, "records:")
-    print(rates[rates["records"] >= sc.MIN_STRATUM_RECORDS].round(4).to_string())
+    for level, rates in all_rates.items():
+        big = rates[(rates["records"] >= sc.MIN_STRATUM_RECORDS) & ~rates["attack"]]
+        print(
+            f"\nBenign strata ({level}), highest FPR first, min {sc.MIN_STRATUM_RECORDS} records:"
+        )
+        print(big.sort_values("rate", ascending=False).head(12).round(4).to_string())
 
 
 if __name__ == "__main__":

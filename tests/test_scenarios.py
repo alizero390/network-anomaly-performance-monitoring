@@ -143,3 +143,14 @@ def test_unsw_strata_names():
         np.array(["http", "-", "dns", "-"]),
     )
     assert s.tolist() == ["A:Fuzzers", "B:none", "B:dns", "A:Generic"]
+
+
+def test_unsw_strata_fine_benign():
+    s = sc.unsw_strata(
+        np.array([0, 1]),
+        np.array(["Normal", "DoS"]),
+        np.array(["-", "http"]),
+        np.array(["udp", "tcp"]),
+        np.array(["INT", "FIN"]),
+    )
+    assert s.tolist() == ["B:none|udp|INT", "A:DoS"]
