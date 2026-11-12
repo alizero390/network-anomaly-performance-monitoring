@@ -55,6 +55,10 @@ bibliographic databases for the systematic review.
 | 2026-11-12 | eLibrary (same settings) | Q2 мониторинг моделей машинного обучения сдвиг данных | 16 | 0 | Only relevant record is namiot2022shift (already included) |
 | 2026-11-12 | eLibrary (same settings) | Q3 обнаружение сетевых атак метрики оценки несбалансированные классы | 0 | 0 | |
 | 2026-11-12 | eLibrary (same settings) | Q4 UNSW-NB15 CICIDS2017 | 131 | 0 | Both pages screened by title: mostly English-language new-detector papers indexed in eLibrary; none on evaluation over time, monitoring or metric behaviour |
+| 2026-11-12 | OpenAlex (stand-in for Scopus; title_and_abstract.search, from 2015, types article/review/preprint; via Ali's browser) | Q1 of database_queries.md (Scopus syntax converted to OpenAlex boolean) | 2 | 0 | Both off-topic (IoT drift review preprint; healthcare backups) |
+| 2026-11-12 | OpenAlex (same settings) | Q2 | 186 | 3 | nagtegaal2026imbalance, kumar2026foursins, dasgupta2026ssrn (no abstract; follow-up of dasgupta2026drift) |
+| 2026-11-12 | OpenAlex (same settings) | Q3 | 18 | 1 | palli2022driftimbalance |
+| 2026-11-12 | OpenAlex (same settings) | Q4 | 869 | 9 | ahmed2026dashboard, li2026alertbudget, youssef2026stream, bakhtiar2026floors, alalawi2026calibration, vo2026longterm, pall2026trustshift, jeon2026labelefficient (+ jin2026benchmarkshift, already included) |
 
 **2026-11-12 note.** Scopus, IEEE Xplore and eLibrary could not be opened from the
 research environment (no browser; direct access refused). The IEEE and eLibrary queries
@@ -75,3 +79,15 @@ can be exported from IEEE Xplore without a login if a file record is needed.
 Scopus asked for a login and remains open. eLibrary was searched later the same day
 after Ali allowed the site in the extension (no login needed; titles screened from the
 result pages, shown machine-translated by the browser and checked against the original).
+
+**Scopus replaced by OpenAlex (2026-11-12).** Ali's Elsevier account opened only Scopus
+Preview: full Scopus access has been suspended for Russian organisations, so an HSE login
+cannot restore it. The four Scopus queries were run in OpenAlex instead, an open index
+with coverage comparable to Scopus for this field and fully reproducible queries.
+1,075 records (1,029 after removing duplicates across queries). Stage 1: title filter
+(drift, monitoring, time-ordered evaluation, attack share or base rate, label delay,
+unseen attacks, audit, benchmark, metrics; titles proposing a new architecture
+excluded): 145. Stage 2: titles screened: about 18 candidates. Stage 3: 12 abstracts
+read; 12 included (one without an abstract, kept as a lead). Several included records are preprints
+(Zenodo, SSRN, arXiv, Preprints.org) or appear in low-visibility journals; they are
+marked as such and cited with care.

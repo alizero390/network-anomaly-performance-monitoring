@@ -77,6 +77,32 @@ change on its own, no alarm rule is applied or evaluated, and it recommends bala
 accuracy, which claim 4 qualifies. IEEE Q1 returned no paper at all on intrusion
 detection with delayed labels, which supports the thesis gap (RQ4).
 
+**OpenAlex search (stand-in for Scopus), 2026-11-12** (1,029 unique records, 12 included; screening in `search_log.md`). Peer-review status is given because several records are preprints.
+
+| Key | Study | What it shows | Relevance |
+|---|---|---|---|
+| ahmed2026dashboard | Ahmed, Rahaman, Roy, Alam, "The dashboard says 'perfect': a systematic audit of label-free model monitoring and test-time adaptation under temporal distribution shift in network intrusion detection", *Frontiers in AI* 2026, doi 10.3389/frai.2026.1928858 (peer-reviewed) | CIC-IDS2017 to CSE-CIC-IDS2018 one year later: label-free monitors give predicted accuracy 1.000 to a model whose recall on every attack family is 0; label-free selectors pick the wrong model in 10-12 of 12 trials; only the conformal abstention rate behaves correctly | **Key for the thesis**: label-free proxies (Strategy A-type signals) can certify a blind detector as healthy, so label-based confirmation (Strategy B) is needed. Paper 1 discussion: monitoring needs labels and trustworthy metrics |
+| li2026alertbudget | Li and Zhou, "From Risk Scores to Budget-Constrained Alert Streams: Temporal Evaluation of Flow-Level Network Intrusion Detection", *Electronics* 15(20):4854, 2026, doi 10.3390/electronics15204854 (peer-reviewed) | Forward-time replays on CICIDS2017, UNSW-NB15 and NF-ToN-IoT-v3: historical thresholds overrun false-positive budgets; reports alert load at an assumed attack prevalence; UNSW-NB15 diagnosis changes with the capture-session split | Close in spirit (time order, operational alert load, prevalence); no windowed degradation alarms. Supports reporting FPR separately (claims 1 and 4) and the session effect we saw (February vs January) |
+| youssef2026stream | Youssef, "Stream Assembly Is an Uncontrolled Treatment in Streaming Intrusion-Detection Benchmarks", arXiv 2605.24696, 2026 (preprint) | How evaluation streams are assembled changes test prevalence (CICIDS2017: 68.2% vs 25.2%) and can reverse which detector looks better | Supports claim 1 (prevalence changes measured results) and the design spec D3: stream construction must be controlled and reported |
+| nagtegaal2026imbalance | Nagtegaal and Oosterbeek, "Disentangling class imbalance from feature drift as causes of intrusion detector degradation: A controlled ablation", *Int. J. Communication and Information Technology* 7(3), 2026, doi 10.33545/2707661x.2026.v7.i3a.222 (low-visibility journal) | Random Forest F1 0.96 to 0.58 from 1:100 imbalance alone, vs 0.64 from high feature drift | Supports that imbalance alone moves F1 (claim 1); static ablation, not windowed monitoring. Cite with care |
+| kumar2026foursins | Kumar, "Four Sins of Intrusion-Detection Evaluation: Quantifying the Reported-to-Deployed Performance Gap with a Shapley Decomposition", Zenodo, 2026, doi 10.5281/zenodo.21454035 (not peer-reviewed; synthetic data) | Base-rate fallacy, temporal leakage, closed-world testing and threshold snooping decomposed as factors of the reported-to-deployed gap | Base-rate effect named as a known evaluation sin; synthetic only. Context for claim 1 |
+| bakhtiar2026floors | Bakhtiar, "Prospective Worst-Attack Reliability Floors for Flow-Based Machine-Learning Intrusion Detection under Forward-Time Shift", *AVITEC* 9(1), 2026, doi 10.28989/avitec.v9i1.4296 | UNSW-NB15 forward-time test: 95.9% accuracy but 68.1% balanced accuracy; worst attack-family recall 22%; Analysis, Backdoor, Reconnaissance fail their floors | Supports claim 5 (attack families drive recall) and per-family reporting on UNSW-NB15 |
+| alalawi2026calibration | Alalawi, "When Calibrated Detectors Meet New Attacks: Per-Category Reliability ...", *IJACSA* 17(8), 2026, doi 10.14569/ijacsa.2026.0170812 | Calibration holds on UNSW-NB15's official split (same categories) but fails on NSL-KDD's unseen attacks | Context for unseen-attack results (CIC Botnet) |
+| vo2026longterm | Vo and Truong, "Evaluating Long-Term Performance of ML-based Intrusion Detection Systems under Temporal and Structural Changes", 2026, doi 10.65153/bw356376 (regional journal) | Chronological train/test separation on CIC-IDS2017 and CSE-CIC-IDS2018; tree models overfit under temporal shift | Context for time-ordered evaluation |
+| pall2026trustshift | Pall, "TrustShift: Shift Type, Not Shift Magnitude, Determines Machine-Learning Failure Modes", Zenodo, 2026, doi 10.5281/zenodo.21805027 (not peer-reviewed) | Across four domains incl. CIC-DDoS2019 to CICIDS2017: shift magnitude does not predict damage; covariate shift alone broke nothing, novel-label shift blinded the detector | Thesis framing (harmless vs harmful shift; Strategy A detects magnitude, not harm) |
+| jeon2026labelefficient | Jeon and Kim, "A Label-Efficient Adaptive Retraining Framework for Network Intrusion Detection Under Streaming Arrival Bias", *Electronics* 15(17):3812, 2026, doi 10.3390/electronics15173812 (peer-reviewed) | Degradation severity cannot be inferred from distributional change; labels drawn from the first hours fail ("arrival bias") | Thesis: supports label-based confirmation and the partial/biased-label conditions (design spec D7) |
+| palli2022driftimbalance | Palli et al., "An Experimental Analysis of Drift Detection Methods on Multi-Class Imbalanced Data Streams", *Applied Sciences* 12(22):11688, 2022, doi 10.3390/app122211688 (peer-reviewed) | Class imbalance raises the false-alarm rate of most drift detectors | General support for claim 1 (imbalance and false alarms); not NIDS |
+| dasgupta2026ssrn | Dasgupta, "When Drift Injection and Drift Detection Disagree: Re-evaluating Phase-Based Drift Analysis for Network Intrusion Detection Models", SSRN, 2026, doi 10.2139/ssrn.7604719 (preprint; no abstract available) | Follow-up to dasgupta2026drift | Read before submission |
+
+**Effect on the novelty assessment (OpenAlex).** Several 2026 studies evaluate NIDS in
+time order or name the base rate as a source of misleading results (Li and Zhou;
+Youssef; Kumar). None applies a windowed degradation-alarm rule, measures false-alarm
+rates under pure attack-share change, attributes alarms to causes, or tests calibrated
+F1. Paper 1's claims stand, but the related-work section must acknowledge that the
+prevalence problem is increasingly recognised in 2026, and position Paper 1 as the
+monitoring-alarm study. For the thesis, Ahmed et al. (2026) is strong motivation:
+label-free monitors certified a blind detector as perfect.
+
 **Russian-language studies** (needed for a Russian journal):
 
 | Key | Study | What it shows | Relevance to Paper 1 |
@@ -121,7 +147,7 @@ metrics behave on NIDS traffic**, not as a discovery that F1 depends on prevalen
 
 ## Limits of this search
 
-- Web search only; Scopus, IEEE Xplore and ACM DL not queried. On 2026-11-12 the IEEE and eLibrary queries were rerun as site-restricted web searches (6 studies added, none changing the novelty assessment); the database searches remain open.
+- Database searches on 2026-11-12: IEEE Xplore (684 records), eLibrary (154) and OpenAlex as a stand-in for Scopus (1,029; Scopus access is suspended for Russian organisations). ACM DL not queried. Earlier on 2026-11-12 the IEEE and eLibrary queries were rerun as site-restricted web searches (6 studies added, none changing the novelty assessment); the database searches remain open.
 - Zoghi and Serpen 2024 was read from a PDF supplied by the author of this thesis (the
   publisher page blocked automated access); the label-delay study from the author's copy.
 - Russian-language literature: eLibrary searched on 2026-11-12 (Q1-Q4: 7, 16, 0 and 131
