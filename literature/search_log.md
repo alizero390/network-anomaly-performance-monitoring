@@ -46,6 +46,7 @@ bibliographic databases for the systematic review.
 | 2026-11-12 | Web, cyberleninka.ru and elibrary.ru only (eLibrary Q3) | обнаружение сетевых атак метрики оценки несбалансированные классы F-мера | 10 | 0 | None on metric behaviour under changing prevalence |
 | 2026-11-12 | Web, cyberleninka.ru and elibrary.ru only (eLibrary Q4) | UNSW-NB15 CICIDS2017 обнаружение атак машинное обучение | 10 | 1 | protic2023datasets (context only) |
 | 2026-11-12 | Web, follow-up | "Detecting Distributional Shift Responsible for Predictive Model's Failure" | 10 | 1 | cai2023disde (IEEE page not readable; arXiv paper on the same question); ackerman drift paper found while looking up the prior-change detector |
+| 2026-11-12 | Web, verification | "Evaluation of Intrusion Detection Systems Under Concept Drift and Severe Class Imbalance" (title from an AI-generated summary the author received) | 10 | 1 | No paper with that title found; biswas2026protocol found instead. The summary's other three items: an MCC study already included (thiyagarajan2025mcc), and two resampling/new-model papers excluded by the inclusion rules |
 
 **2026-11-12 note.** Scopus, IEEE Xplore and eLibrary could not be opened from the
 research environment (no browser; direct access refused). The IEEE and eLibrary queries
