@@ -61,6 +61,11 @@ Planned sensitivity analysis:
 
 **Status:** The operational rule is approved provisionally. The reference period and minimum labelled sample requirement remain unresolved.
 
+**Changed 2026-11-12 (see section 16, D5):** the primary monitored metric for Strategy B
+is now calibrated F1; plain F1 remains as a comparison variant. The 0.05 threshold and
+the two-window rule are unchanged; the reference period (D6) and the minimum labelled
+sample (D8) are now resolved.
+
 ## 4. Strategy A — Input-Distribution Monitoring
 
 ### Numerical Features
@@ -479,3 +484,38 @@ When a methodological decision changes:
 6. Preserve the ability to reproduce earlier experiments where possible.
 
 Do not silently change research thresholds, dataset splits, feature definitions, or event-matching rules.
+
+## 16. Strategy Design Decisions (approved 2026-11-12)
+
+All decisions D1-D14 of `STRATEGY_DESIGN_SPEC.md` were approved by Ali on 2026-11-12. The
+spec holds the full text and evidence; the essentials:
+
+| # | Decision |
+|---|---|
+| D1 | Calibrate every threshold on February validation; evaluate once on February test, after all calibrated values are frozen in `configs/strategies.toml` |
+| D2 | New CIC-IDS-2017 runs `cic2_rf`, `cic2_hgb`: train Monday-Wednesday plus the first 50% of Thursday, validate on the last 50% of Thursday, monitor Friday; Paper 1 runs unchanged |
+| D3 | Scenarios S0, H1-H3, X1-X2 built by resampling real records from strata (attack category; benign `service|proto|state`); 40 windows, onset at window 21 |
+| D4 | Ground truth from expected calibrated F1: harmful if it falls by at least 0.10; harmless if it changes by less than 0.02 and the stratum mix moves by at least 0.10 (total variation) |
+| D5 | Strategy B monitors calibrated F1 (reference share = pooled validation share); plain F1 kept as variant B-F1 |
+| D6 | B reference = pooled calibrated F1 over all validation windows, fixed before monitoring |
+| D7 | Labels released at the end of window w + d (d = 0, 5, 10); availability 100/50/20% independent of class; plus one alert-first condition (0.9 / 0.1) |
+| D8 | Eligible cohort: at least n_min labelled attacks (n_min = ceil(2.326^2 r(1-r)/0.05^2); 68 for feb_rf) and 500 labelled normal records; short cohorts pooled with later windows up to 5 windows |
+| D9 | B alarm: drop of at least 0.05 below the reference in 2 consecutive eligible cohorts |
+| D10 | Strategy A: KS (numeric), chi-square with sparse categories merged (categorical), Benjamini-Hochberg at 0.01; warn when a proportion q of features changed in 2 consecutive windows; q calibrated for at most 5% false warnings on S0 validation streams |
+| D11 | Strategy C in two variants: passive (labels A warnings as confirmed or not) and active (during a warning, B confirms on one flagged cohort); association period L = d + 5, then calibrated on validation harmful scenarios (95% of warning-to-confirmation gaps) |
+| D12 | One event per controlled stream; alarm state with re-arm after 2 unflagged eligible cohorts; true alert = alarm after onset on a harmful scenario |
+| D13 | 200 streams per scenario and condition, paired across strategies; Wilson intervals, bootstrap intervals for delays, McNemar and Wilcoxon tests |
+| D14 | Grid: 6 UNSW-NB15 scenarios plus natural CIC Friday; 9 + 1 label conditions; strategies A, B-F1, B, C-passive, C-active; models feb_rf (primary), feb_hgb, cic2_rf, cic2_hgb |
+
+**Change record for D5 (section 15 policy).**
+1. Original decision (section 3): primary metric F1.
+2. Reason: window F1 depends on the attack share, so an F1-based rule raises alarms when
+   only the share changes; under D4, scenario H1 would be "degraded" by F1 although the
+   model is unchanged.
+3. Evidence: Paper 1 simulation (`results/robustness_summary.md`, calibrated F1 section):
+   at 1% attacks, plain F1 false-alarms in 100% of UNSW-NB15 streams, calibrated F1 in
+   0-0.5%; calibrated F1 still flags both January false-positive bursts.
+4. Implementation and tests: `nadmon.attack_share.calibrated_f1`, `nadmon.strategies`.
+5. Recorded in CHANGELOG.md.
+6. Reproducibility: plain F1 remains available as variant B-F1.
+

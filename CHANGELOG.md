@@ -12,6 +12,12 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Changed
+- **Decision change (RESEARCH_DECISIONS.md sections 3 and 16):** Strategy B's primary metric is calibrated F1 instead of F1; plain F1 stays as variant B-F1. Approved by Ali on 2026-11-12 with all design-spec decisions D1-D14.
+
+### Added
+- `nadmon.strategies`: Strategy A (KS and chi-square tests with sparse categories merged, Benjamini-Hochberg, changed-feature proportion, warnings, calibration of q), Strategy B (cohort metric, alarm rule with alarm state and re-arm, label release times), Strategy C (passive warning classification, active single-cohort confirmation, association period). 14 tests.
+
 ### Research
 - With benign strata by service, protocol and state, all six scenarios have clean ground truth on February validation; X2 reaches FPR 6.4% via `none|udp|INT` (FPR 24.8%) and `none|udp|REQ`. This strata level is now the standard (design spec D3).
 - Scenario check on February validation (Ali's run, 2026-11-12): S0, H1, H2, H3 and X1 have clean ground truth; X2 cannot be built from services alone, because the noisiest benign service has FPR 1.1% (ftp) and moving all benign traffic there lowers calibrated F1 by only about 0.01.

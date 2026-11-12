@@ -1,11 +1,8 @@
 # Design Specification: Strategies A, B and C under Delayed and Partial Labels
 
-Status: **Proposed, 2026-11-12.** D3, D4, D7 and D8 are implemented as proposed
-(`nadmon.scenarios`, `nadmon.labels`; Ali: "do the next step", explicit approval still
-to be recorded). All other decisions are not yet approved. Each decision below (D1-D14) needs an
-"approve", "change" or "reject" before the code that depends on it is written. Approved
-decisions move into `RESEARCH_DECISIONS.md` under the change policy (section 15); until
-then that file stays authoritative.
+Status: **Approved by Ali, 2026-11-12** (all of D1-D14, as proposed; D3 refined as
+noted under D3). The approved decisions are recorded in `RESEARCH_DECISIONS.md` section 16;
+D5 changes section 3 and is recorded there under the change policy.
 
 This spec answers the ten open questions in `RESEARCH_DECISIONS.md` section 12, using the
 Paper 1 evidence (`results/robustness_summary.md`, `results/alarm_attribution/`).
