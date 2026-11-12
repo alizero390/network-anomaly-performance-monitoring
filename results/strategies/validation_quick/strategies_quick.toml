@@ -1,0 +1,36 @@
+# Strategy settings calibrated on February validation (STRATEGY_DESIGN_SPEC.md D1).
+# Written by scripts/run_strategy_experiment.py. Commit it before any test run;
+# the test run must use these values unchanged.
+calibrated_on = "February validation"
+quick_run = true
+
+[reference]
+attack_share = 0.198035
+recall = 0.967868
+f1_calibrated = 0.972821
+f1 = 0.972821
+
+[strategy_b]
+n_min = 68
+m_min = 500
+max_span = 5
+drop = 0.05
+consecutive = 2
+rearm = 2
+
+[strategy_a]
+q = 0.038461538461538464
+alpha = 0.01
+consecutive = 2
+reference_size = 20000
+
+[strategy_c.association_period]
+"0" = 1
+"5" = 5
+"10" = 10
+
+[streams]
+window_size = 5000
+n_windows = 40
+onset = 20
+seed = 20261112
