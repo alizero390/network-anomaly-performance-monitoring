@@ -1,6 +1,8 @@
 # Design Specification: Strategies A, B and C under Delayed and Partial Labels
 
-Status: **Proposed, 2026-11-12. Not yet approved.** Each decision below (D1-D14) needs an
+Status: **Proposed, 2026-11-12.** D3, D4, D7 and D8 are implemented as proposed
+(`nadmon.scenarios`, `nadmon.labels`; Ali: "do the next step", explicit approval still
+to be recorded). All other decisions are not yet approved. Each decision below (D1-D14) needs an
 "approve", "change" or "reject" before the code that depends on it is written. Approved
 decisions move into `RESEARCH_DECISIONS.md` under the change policy (section 15); until
 then that file stays authoritative.
@@ -89,13 +91,22 @@ for every record is computed once, so a stream is only a list of record indices.
 |---|---|---|
 | S0 Stable | Nothing | No alarm of any kind should fire |
 | H1 Fewer attacks | Attack share falls to 2%, category mix unchanged | Input changes; per-class performance does not (harmless) |
-| H2 Benign service mix | Benign traffic shifts towards services whose FPR is within 0.5 percentage points of the pooled FPR | Input changes; performance does not (harmless) |
-| H3 Easy attack mix | Attacks shift towards categories whose recall is within 0.02 of pooled recall | Input changes; performance does not (harmless) |
+| H2 Benign service mix | The largest benign service is replaced by other services whose FPR is within 0.5 percentage points of its own; noisy services keep their share | Input changes; performance does not (harmless) |
+| H3 Easy attack mix | The largest attack category is replaced by categories whose recall is within 0.03 of its own; hard categories keep their share | Input changes; performance does not (harmless) |
 | X1 Hard attack mix | Attacks shift towards Fuzzers (and other categories with low recall) | Recall falls (harmful) |
 | X2 False-positive burst | Benign traffic shifts towards services with high FPR | FPR rises (harmful) |
 | X3 Unseen attack (CIC only) | Natural Friday Botnet period | Recall of the new attack is 0 (harmful) |
 
-Shift sizes are set per scenario so the ground truth (D4) is unambiguous. Each stratum's
+Shift sizes are set per scenario so the ground truth (D4) is unambiguous: harmful
+shifts use the smallest share moved (10%, 20%, ... 100%) that reaches the harmful
+threshold. Strata with fewer than 50 records are not used as targets.
+
+*Implementation note (2026-11-12).* The first version of H2 and H3 moved traffic towards
+strata whose rate was close to the **pooled** rate. On UNSW-NB15 no attack category is
+close to the pooled recall (0.968 sits between Generic at 1.0 and Fuzzers at 0.58), so H3
+could not be built; H2 barely changed the input. Both now replace the largest stratum.
+On February validation (attack strata only), H1, H3 and X1 get clean ground truth; X1
+needs half of all attacks to be Fuzzers (recall 0.77, calibrated F1 -0.11). Each stratum's
 recall and FPR come from the partition the stream is drawn from.
 
 Natural-order runs (February test in time order; CIC Friday) are reported as case
@@ -119,6 +130,8 @@ the stratum mix and each stratum's recall and FPR:
 - **Harmless**: expected calibrated F1 changes by less than 0.02, and the input
   distribution measurably changes.
 - Anything in between is not used as a scenario.
+- "Measurably changes" = total variation distance between the stratum mixes of at
+  least 0.10.
 
 **Why.** Calibrated F1 combines recall and FPR but is not moved by the attack share
 (Paper 1, claim 6). So H1 is harmless by definition, which raw F1 would contradict. Gaps

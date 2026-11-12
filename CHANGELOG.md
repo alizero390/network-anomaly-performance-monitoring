@@ -13,6 +13,15 @@ The format follows these categories:
 ## [Unreleased]
 
 ### Added
+- `nadmon.labels`: label availability (random and alert-first), release delay, labelled cohort counts, cohort pooling and `n_min` (design spec D7, D8).
+- `nadmon.scenarios`: strata, compositions, expected calibrated F1, ground-truth classification (D4) and the stream builder with onset and ramp; standard scenarios S0, H1-H3, X1-X2 (D3).
+- `scripts/check_scenarios.py`: which scenarios can be built from February validation, plus label-cohort pooling per availability. Writes `results/scenarios/`.
+- 17 tests (`tests/test_labels.py`, `tests/test_scenarios.py`).
+
+### Changed
+- `scripts/export_validation_categories.py` also exports each record's `Service` (benign strata for H2 and X2). Re-run it before `check_scenarios.py`.
+
+### Added
 - `STRATEGY_DESIGN_SPEC.md`: proposed design for Strategies A, B and C under delayed and partial labels (decisions D1-D14, answering the open questions in RESEARCH_DECISIONS.md section 12). Awaiting approval; RESEARCH_DECISIONS.md stays authoritative until then.
 
 ### Added

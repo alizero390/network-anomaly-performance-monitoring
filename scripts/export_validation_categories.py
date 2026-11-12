@@ -1,4 +1,4 @@
-"""Export the attack category of every validation record.
+"""Export the attack category and service of every validation record.
 
 Run this on the machine that holds the raw dataset:
 
@@ -6,7 +6,10 @@ Run this on the machine that holds the raw dataset:
 
 It re-uses the frozen February split, so rows line up one-to-one with
 results/validation_predictions.csv. Output: results/validation_categories.csv
-(about 8 MB; not committed). Then run scripts/analyze_attack_share.py again.
+(about 10 MB; not committed). Then run scripts/analyze_attack_share.py or
+scripts/check_scenarios.py.
+
+The Service column (added 2026-11-12) defines the benign strata of the thesis scenarios.
 
 attack_cat is used only for analysis, never as a model feature.
 """
@@ -18,6 +21,8 @@ import pandas as pd
 
 from nadmon import dataset
 from nadmon.config import load_paths
+
+SERVICE_INDEX = dataset.COLUMN_NAMES.index("service")
 
 
 def main() -> None:
@@ -44,6 +49,7 @@ def main() -> None:
             "CategoryTimestamp": validation[dataset.STIME_INDEX].to_numpy(),
             "CategoryLabel": labels,
             "AttackCategory": category.to_numpy(),
+            "Service": validation[SERVICE_INDEX].astype(str).str.strip().to_numpy(),
         }
     )
     path = paths.results_dir / "validation_categories.csv"
@@ -51,6 +57,8 @@ def main() -> None:
 
     print("\nValidation records by category:")
     print(out["AttackCategory"].value_counts().to_string())
+    print("\nBenign validation records by service:")
+    print(out.loc[out["CategoryLabel"] == 0, "Service"].value_counts().head(15).to_string())
     print("\nSaved:", path)
 
 
