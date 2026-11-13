@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- Full validation run (Ali, 200 streams, 127 min) summarised in `results/strategies/validation/FINDINGS.md`: B with calibrated F1 detects every harmful stream with no false alerts under random labels; label delay sets detection delay (delay + 1 window) and scarce labels add up to 6 windows when attacks are rare; A is fastest but warns on all harmless streams and flags 100% of real time-ordered windows; C-active is one window faster than B; alert-first labelling makes B false-alarm on every stable stream and miss most harmful changes.
+
 ### Added
 - Harder scenario variants `_rare` and `_gradual` for each harmful scenario (`nadmon.scenarios.harder_variants`), and `nadmon.experiment.run_natural` for the real validation windows in time order; both in `run_strategy_experiment.py` (approved 2026-11-12).
 
