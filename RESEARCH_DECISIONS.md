@@ -519,3 +519,10 @@ spec holds the full text and evidence; the essentials:
 5. Recorded in CHANGELOG.md.
 6. Reproducibility: plain F1 remains available as variant B-F1.
 
+**Additions approved 2026-11-12 after the full validation run** (`results/strategies/validation/FINDINGS.md`):
+
+| # | Addition |
+|---|---|
+| D15 | Variant B_ipw: Strategy B on inverse-probability-weighted cohort counts, using the known labelling probabilities of each condition (alert-first: 0.9 for predicted attacks, 0.1 for predicted normal). Motivation: under alert-first labels, B false-alarmed on every stable stream and missed most harmful changes |
+| D16 | Variant A_natural (and C_active_natural): Strategy A's threshold set on the real time-ordered validation windows (at most 5% of windows flagged) instead of resampled stable streams. Motivation: as calibrated (q = 0.038), A flagged 100% of real validation windows |
+

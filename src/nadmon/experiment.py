@@ -22,7 +22,16 @@ from nadmon import labels as lb
 from nadmon import scenarios as sc
 from nadmon import strategies as st
 
-STRATEGIES = ("A", "B_F1", "B", "C_passive", "C_active")
+STRATEGIES = (
+    "A",
+    "A_natural",
+    "B_F1",
+    "B",
+    "B_ipw",
+    "C_passive",
+    "C_active",
+    "C_active_natural",
+)
 
 
 @dataclass
@@ -76,6 +85,7 @@ class Calibration:
     reference_f1_calibrated: float
     reference_f1: float
     q: float | None = None
+    q_natural: float | None = None
     periods: dict[int, int] = field(default_factory=dict)
     association_gaps: dict[int, int] = field(default_factory=dict)
 
@@ -161,6 +171,13 @@ def _cohorts(part, idx, cond: Condition, cal: Calibration, s: Settings, seed: in
     return lb.pool_cohorts(counts, lb.PoolingRule(cal.n_min, s.m_min, s.max_span), cond.delay)
 
 
+def _ipw(cohorts: pd.DataFrame, cond: Condition) -> pd.DataFrame:
+    """Weighted cohorts for B_ipw; the weights follow the condition's labelling policy."""
+    if cond.mode == "alert_first":
+        return lb.ipw_cohorts(cohorts, lb.P_ALERT, lb.P_NORMAL)
+    return lb.ipw_cohorts(cohorts, cond.availability, cond.availability)
+
+
 def _alarms(monitored: pd.DataFrame) -> tuple[list[int], list[int]]:
     a = monitored[monitored["alarm"]]
     return a["last"].astype(int).tolist(), a["available_at"].astype(int).tolist()
@@ -181,18 +198,26 @@ def run_stream(
     harmful = scenario.intended == "harmful"
     base = {"scenario": scenario.name, "harmful": harmful, "stream": stream}
     rows = []
-    warnings = None
+    warnings = warnings_nat = None
     if ref is not None and cal.q is not None:
         props = a_proportions(part, idx, ref, s)
         warnings = st.a_warnings(props, cal.q, s.a_consecutive)
         score = ev.score_events(warnings, warnings, s.onset, harmful)
         rows.append({**base, "strategy": "A", "condition": "inputs", **score})
+        if cal.q_natural is not None:
+            warnings_nat = st.a_warnings(props, cal.q_natural, s.a_consecutive)
+            score = ev.score_events(warnings_nat, warnings_nat, s.onset, harmful)
+            rows.append({**base, "strategy": "A_natural", "condition": "inputs", **score})
     for k, cond in enumerate(conditions):
         cohorts = _cohorts(part, idx, cond, cal, s, seed + 1000 * (k + 1))
         cbase = {**base, "condition": cond.name, "delay": cond.delay}
         b_alarms = {}
-        for name, metric in (("B_F1", "f1"), ("B", "f1_calibrated")):
-            b_alarms[name] = _alarms(st.b_monitor(cohorts, _b_rule(cal, s, metric)))
+        for name, metric, data_ in (
+            ("B_F1", "f1", cohorts),
+            ("B", "f1_calibrated", cohorts),
+            ("B_ipw", "f1_calibrated", _ipw(cohorts, cond)),
+        ):
+            b_alarms[name] = _alarms(st.b_monitor(data_, _b_rule(cal, s, metric)))
             data, times = b_alarms[name]
             rows.append(
                 {**cbase, "strategy": name, **ev.score_events(data, times, s.onset, harmful)}
@@ -227,6 +252,17 @@ def run_stream(
         rows.append(
             {**cbase, "strategy": "C_active", **ev.score_events(data, times, s.onset, harmful)}
         )
+        if warnings_nat is not None:
+            data, times = _alarms(
+                st.c_active(cohorts, _b_rule(cal, s, "f1_calibrated"), warnings_nat, period)
+            )
+            rows.append(
+                {
+                    **cbase,
+                    "strategy": "C_active_natural",
+                    **ev.score_events(data, times, s.onset, harmful),
+                }
+            )
     return rows
 
 
@@ -237,10 +273,20 @@ def calibrate(
     s: Settings,
     ref: st.Reference | None,
     progress: bool = True,
+    natural: Partition | None = None,
 ) -> Calibration:
-    """Fill ``cal.q`` (D10) and ``cal.periods`` (D11) from validation streams."""
+    """Fill ``cal.q`` (D10) and ``cal.periods`` (D11) from validation streams.
+
+    With ``natural`` (the validation partition in time order), also ``cal.q_natural``:
+    the threshold flagging at most ``target_false_warning`` of the real windows.
+    """
     if ref is None:
         return cal
+    if natural is not None:
+        W = s.window_size
+        n = len(natural.y) // W
+        props_nat = a_proportions(natural, np.arange(n * W), ref, s)
+        cal.q_natural = st.calibrate_q_windows(props_nat, s.target_false_warning)
     index = sc.stratum_index(pool.strata)
     by_name = {x.name: x for x in scenarios}
     stable = by_name["S0_stable"]
@@ -339,16 +385,35 @@ def run_natural(
                 "median_changed_proportion": float(np.median(props)),
             }
         )
+    warnings_nat = None
+    if warnings is not None and cal.q_natural is not None:
+        warnings_nat = st.a_warnings(props, cal.q_natural, s.a_consecutive)
+        rows.append(
+            {
+                "strategy": "A_natural",
+                "condition": "inputs",
+                "windows": n,
+                "alarms": len(warnings_nat),
+                "alarm_windows": " ".join(str(w + 1) for w in warnings_nat),
+                "flagged_window_share": float(np.mean(props >= cal.q_natural)),
+                "median_changed_proportion": float(np.median(props)),
+            }
+        )
     for k, cond in enumerate(label_conditions(s)):
         cohorts = _cohorts(part, idx, cond, cal, s, seed + 1000 * (k + 1))
         runs = {
             "B_F1": st.b_monitor(cohorts, _b_rule(cal, s, "f1")),
             "B": st.b_monitor(cohorts, _b_rule(cal, s, "f1_calibrated")),
+            "B_ipw": st.b_monitor(_ipw(cohorts, cond), _b_rule(cal, s, "f1_calibrated")),
         }
+        period = cal.periods.get(cond.delay, st.association_period(cond.delay))
         if warnings is not None:
-            period = cal.periods.get(cond.delay, st.association_period(cond.delay))
             runs["C_active"] = st.c_active(
                 cohorts, _b_rule(cal, s, "f1_calibrated"), warnings, period
+            )
+        if warnings_nat is not None:
+            runs["C_active_natural"] = st.c_active(
+                cohorts, _b_rule(cal, s, "f1_calibrated"), warnings_nat, period
             )
         for name, m in runs.items():
             data, times = _alarms(m)

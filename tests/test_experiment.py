@@ -57,7 +57,7 @@ def run():
         for x in sc.standard_scenarios(rates, cal.pi0)
         if table.set_index("scenario").loc[x.name, "usable"]
     ]
-    cal = ex.calibrate(pool, scenarios, cal, SMALL, ref, progress=False)
+    cal = ex.calibrate(pool, scenarios, cal, SMALL, ref, progress=False, natural=part)
     results = ex.run_grid(pool, scenarios, cal, SMALL, ref, progress=False)
     return cal, results
 
@@ -109,6 +109,9 @@ def test_alert_first_labels_inflate_fpr_and_cause_false_alarms(run):
     af = results[results["condition"].str.contains("alert_first")]
     s = ev.summarise(af, ["scenario", "strategy"]).set_index(["scenario", "strategy"])
     assert s.loc[("S0_stable", "B"), "false_alert_rate"] >= 0.8
+    # The weighted variant removes the bias.
+    assert s.loc[("S0_stable", "B_ipw"), "false_alert_rate"] <= 0.1
+    assert s.loc[("X1_hard_attack_mix", "B_ipw"), "event_recall"] >= 0.8
 
 
 def test_paired_comparison_runs(run):
@@ -153,5 +156,31 @@ def test_run_natural_reports_every_strategy(run):
     ref_idx, _ = ex.split_validation(len(part.y), SMALL.seed)
     ref = ex.a_reference(part.subset(ref_idx), SMALL)
     nat = ex.run_natural(part, cal, SMALL, ref)
-    assert set(nat["strategy"]) == {"A", "B_F1", "B", "C_active"}
+    assert set(nat["strategy"]) == {
+        "A",
+        "A_natural",
+        "B_F1",
+        "B",
+        "B_ipw",
+        "C_active",
+        "C_active_natural",
+    }
     assert (nat["windows"] == len(part.y) // SMALL.window_size).all()
+
+
+def test_b_ipw_equals_b_under_random_labels(run):
+    _, results = run
+    random = results[~results["condition"].str.contains("alert_first")]
+    b = random[random["strategy"] == "B"].set_index(["scenario", "stream", "condition"])
+    w = random[random["strategy"] == "B_ipw"].set_index(["scenario", "stream", "condition"])
+    assert (b["alarms"] == w["alarms"]).all()
+
+
+def test_a_natural_is_quieter(run):
+    cal, results = run
+    assert cal.q_natural >= cal.q
+    s = ev.summarise(results, ["scenario", "strategy"]).set_index(["scenario", "strategy"])
+    assert (
+        s.loc[("H1_fewer_attacks", "A_natural"), "false_alert_rate"]
+        <= s.loc[("H1_fewer_attacks", "A"), "false_alert_rate"]
+    )

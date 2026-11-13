@@ -160,3 +160,10 @@ def test_association_helpers():
     assert st.calibrate_association([1, 2, 3, 4, 10], quantile=0.8) == 4
     with pytest.raises(ValueError):
         st.calibrate_association([])
+
+
+def test_calibrate_q_windows():
+    props = np.array([0.1] * 90 + [0.5] * 8 + [0.9] * 2)
+    q = st.calibrate_q_windows(props, 0.05)
+    assert np.mean(props >= q) <= 0.05
+    assert q == 0.9

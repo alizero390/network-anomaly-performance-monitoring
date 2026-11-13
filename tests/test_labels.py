@@ -88,3 +88,19 @@ def test_release_time_respects_delay():
     assert len(lb.released_by(cohorts, 4)) == 0
     with pytest.raises(ValueError):
         lb.pool_cohorts(_counts([50]), rule, delay=-1)
+
+
+def test_ipw_cohorts_recover_true_rates():
+    rng = np.random.default_rng(4)
+    n = 400_000
+    y = (rng.random(n) < 0.2).astype(int)
+    p = np.where(y == 1, rng.random(n) < 0.9, rng.random(n) < 0.01).astype(int)
+    mask = lb.label_mask(n, 0.0, seed=5, mode="alert_first", y_pred=p)
+    c = lb.cohort_counts(y, p, mask, window_size=n)
+    raw_fpr = c.fp[0] / (c.fp[0] + c.tn[0])
+    w = lb.ipw_cohorts(c, lb.P_ALERT, lb.P_NORMAL)
+    fpr = w.fp[0] / (w.fp[0] + w.tn[0])
+    recall = w.tp[0] / (w.tp[0] + w.fn[0])
+    assert raw_fpr > 0.05  # biased upwards
+    assert abs(fpr - 0.01) < 0.002
+    assert abs(recall - 0.9) < 0.01

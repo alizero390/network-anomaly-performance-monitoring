@@ -24,6 +24,8 @@ import numpy as np
 import pandas as pd
 
 AVAILABILITY_MODES = ("random", "alert_first")
+P_ALERT = 0.9  # alert-first: chance that a predicted attack is labelled
+P_NORMAL = 0.1  # alert-first: chance that a record predicted normal is labelled
 
 
 def n_min_for_recall(recall: float, drop: float = 0.05, z: float = 2.326) -> int:
@@ -43,8 +45,8 @@ def label_mask(
     seed: int,
     mode: str = "random",
     y_pred: np.ndarray | None = None,
-    p_alert: float = 0.9,
-    p_normal: float = 0.1,
+    p_alert: float = P_ALERT,
+    p_normal: float = P_NORMAL,
 ) -> np.ndarray:
     """Boolean mask: which records ever receive a label.
 
@@ -145,3 +147,20 @@ def pool_cohorts(counts: pd.DataFrame, rule: PoolingRule, delay: int) -> pd.Data
 def released_by(cohorts: pd.DataFrame, t: int) -> pd.DataFrame:
     """Cohorts whose labels are available at the end of window ``t``."""
     return cohorts[cohorts["available_at"] <= t]
+
+
+def ipw_cohorts(cohorts: pd.DataFrame, p_flagged: float, p_unflagged: float) -> pd.DataFrame:
+    """Inverse-probability-weighted counts (approved 2026-11-12, variant B_ipw).
+
+    When a record's chance of being labelled depends only on the model's prediction
+    (``p_flagged`` for predicted attacks, ``p_unflagged`` for predicted normal), dividing
+    tp and fp by ``p_flagged`` and fn and tn by ``p_unflagged`` gives unbiased estimates
+    of the cohort's true counts, so recall and FPR are no longer distorted. Eligibility
+    stays based on the records actually labelled.
+    """
+    out = cohorts.copy()
+    for c in ("tp", "fp"):
+        out[c] = out[c] / p_flagged
+    for c in ("fn", "tn"):
+        out[c] = out[c] / p_unflagged
+    return out

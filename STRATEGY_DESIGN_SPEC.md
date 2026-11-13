@@ -196,7 +196,7 @@ normal records mostly false positives, so the estimated FPR is far too high (abo
 instead of 0.6% in the test data) and calibrated F1 alarms on a healthy model in nearly
 every stable stream. Plain F1 is less affected there. Because the labelling probabilities
 are known in this condition, an inverse-probability-weighted estimate of recall and FPR
-is a possible correction; to be decided after the validation results.
+is a possible correction. *Approved 2026-11-12 (D15): variant B_ipw.*
 
 **Why.** The first three items are the approved grid with its mechanics made explicit.
 The alert-first condition answers open question 8 with one realistic case instead of

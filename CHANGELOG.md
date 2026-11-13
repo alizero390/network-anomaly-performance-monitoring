@@ -12,6 +12,11 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- Variant **B_ipw** (`nadmon.labels.ipw_cohorts`): Strategy B on inverse-probability-weighted counts; removes the alert-first bias on synthetic data (RESEARCH_DECISIONS.md D15).
+- Variant **A_natural** and **C_active_natural** (`nadmon.strategies.calibrate_q_windows`): Strategy A's threshold set on the real time-ordered validation windows (D16).
+- `configs/strategies.toml` gains `q_natural` and the IPW probabilities; the full validation run must be repeated to fill them before the test run. 4 new tests (109 total).
+
 ### Research
 - Full validation run (Ali, 200 streams, 127 min) summarised in `results/strategies/validation/FINDINGS.md`: B with calibrated F1 detects every harmful stream with no false alerts under random labels; label delay sets detection delay (delay + 1 window) and scarce labels add up to 6 windows when attacks are rare; A is fastest but warns on all harmless streams and flags 100% of real time-ordered windows; C-active is one window faster than B; alert-first labelling makes B false-alarm on every stable stream and miss most harmful changes.
 

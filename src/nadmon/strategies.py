@@ -147,6 +147,20 @@ def calibrate_q(
     raise ValueError("no q in the grid meets the target rate")
 
 
+def calibrate_q_windows(proportions: np.ndarray, target_rate: float = 0.05) -> float:
+    """Smallest q flagging at most ``target_rate`` of the given (real) windows.
+
+    Used for variant A_natural: the threshold is set on the real time-ordered validation
+    windows instead of resampled stable streams.
+    """
+    props = np.asarray(proportions, dtype=float)
+    grid = sorted(set(props[props > 0])) + [float(props.max()) + 1e-9]
+    for q in grid:
+        if np.mean(props >= q) <= target_rate:
+            return float(q)
+    raise ValueError("no q meets the target rate")
+
+
 # ----------------------------------------------------------------------------
 # Strategy B: performance on delayed labels
 # ----------------------------------------------------------------------------
