@@ -20,9 +20,16 @@ rearm = 2
 
 [strategy_a]
 q = 0.038461538461538464
+# A_natural: threshold set on the real time-ordered validation windows
+q_natural = 1.000000001
 alpha = 0.01
 consecutive = 2
 reference_size = 20000
+
+[strategy_b_ipw]
+# alert-first labelling probabilities used for the weights
+p_alert = 0.9
+p_normal = 0.1
 
 [strategy_c.association_period]
 "0" = 1

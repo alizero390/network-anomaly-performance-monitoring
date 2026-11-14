@@ -6,6 +6,7 @@
     "reference_f1_calibrated": 0.9728214354334421,
     "reference_f1": 0.9728214354334422,
     "q": 0.038461538461538464,
+    "q_natural": 1.000000001,
     "periods": {
       "0": 1,
       "5": 5,
@@ -46,8 +47,8 @@
     "consecutive": 2,
     "rearm": 2
   },
-  "created_utc": "2026-11-12T10:32:38+00:00",
-  "git_commit": "ac5055692b6144c5b185554d087f4d25e35d9a2c",
+  "created_utc": "2026-11-14T07:31:42+00:00",
+  "git_commit": "196a615e478d45979cd6107f25972b01836604bf",
   "git_uncommitted_changes": true,
   "python": "3.14.3",
   "platform": "Windows-11-10.0.26200-SP0",
