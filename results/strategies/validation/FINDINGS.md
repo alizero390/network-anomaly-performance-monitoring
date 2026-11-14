@@ -1,10 +1,12 @@
 # Findings: strategy comparison on February validation
 
-Full run, 2026-11-12 (Ali's machine, 127 minutes): 10 scenarios x 200 streams x 10 label
+Full run, 2026-11-12 (Ali's machine, 127 minutes); repeated 2026-11-14 with variants
+B_ipw, A_natural and C_active_natural (124 minutes; all earlier numbers unchanged): 10 scenarios x 200 streams x 10 label
 conditions, Random Forest `feb_rf`. Numbers below from `summary.csv`,
 `paired_*.csv` and `natural_validation.csv` in this folder. Calibrated values in
 `configs/strategies.toml`: Strategy A q = 0.038 (one feature of 26), association period
-L = 1 / 5 / 10 windows for label delay 0 / 5 / 10, n_min = 68.
+L = 1 / 5 / 10 windows for label delay 0 / 5 / 10, n_min = 68; A_natural q = 1.0 (above
+every real window).
 
 ## 1. With random label availability, B (calibrated F1) is reliable
 
@@ -66,11 +68,39 @@ B (calibrated F1) raised 2 alarms in every random condition: at the start (windo
 near the end (windows 54-56), the low-Fuzzers-recall periods found in Paper 1. Plain F1
 raised one more in the middle (window 7, 10 or 52-53 depending on the condition).
 
-## Open decisions before the test run
+## 7. Weighting the labels repairs alert-first monitoring (variant B_ipw, D15)
 
-1. A correction for biased labels (inverse-probability weighting with the known labelling
-   probabilities) as an extra variant of B.
-2. Calibrating Strategy A's threshold on the real time-ordered validation windows instead
-   of resampled stable streams, as an extra variant of A.
-Both change `configs/strategies.toml`, so they must be settled before the test partition
-is used (design spec D1).
+Alert-first condition (delay 5), 200 streams per scenario:
+
+| Scenario | False-alert rate: B / B_F1 / B_ipw | Event recall: B / B_F1 / B_ipw |
+|---|---|---|
+| S0 stable, H2, H3 | 100% / 0% / 0% | – |
+| H1 fewer attacks | 100% / 100% / 2.5% | – |
+| X1 hard attack mix (abrupt, gradual, rare) | 100% / 0% / 0% | 11-13% / 0% (rare: 100%) / **100%** |
+| X2 false-positive burst (abrupt, gradual, rare) | 100% / 0% / 0% | 6-7% / 100% / **100%** |
+
+- Dividing the labelled counts by their known labelling probabilities removes the bias:
+  B_ipw behaves almost exactly as B does with random labels (median delay 6-8 windows
+  for abrupt changes, 10-12 for gradual ones).
+- With random labels, B_ipw equals B (the weights are constant and cancel).
+- On the real validation windows under alert-first labels, B raised 4 alarms (windows 2,
+  22, 38, 54); B_ipw raised 1 (window 2).
+- Requirement: the labelling probabilities must be known. In a SOC they follow from the
+  triage policy; if they had to be estimated, the correction would inherit that error.
+
+## 8. Strategy A cannot be both quiet and sensitive on this traffic (variant A_natural, D16)
+
+- Calibrated on the real time-ordered validation windows (at most 5% flagged), A's
+  threshold became q = 1.0: more than every feature, because real windows already differ
+  from the reference in a median of 96% of features. A_natural therefore never warns.
+- It detected **none** of the harmful streams; C_active_natural therefore equals B.
+- Together with section 3: with this feature-proportion rule, Strategy A is either
+  sensitive (q = 0.038, warns on every real window) or silent (q = 1.0). On UNSW-NB15
+  traffic it carries no usable information about harm. This supports the thesis claim
+  that performance monitoring with labels (Strategy B) is necessary.
+
+## Status before the test run
+
+Both open decisions are settled (D15, D16) and `configs/strategies.toml` holds the final
+calibrated values. Next: evaluate once on the February test partition with these values
+unchanged (design spec D1).

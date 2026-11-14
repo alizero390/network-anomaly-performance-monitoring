@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- Second full validation run (Ali, 2026-11-14) in `results/strategies/validation/FINDINGS.md` sections 7-8: B_ipw removes the alert-first bias (false alerts 100% -> 0%, harmful detection 6-13% -> 100%); A_natural's threshold becomes q = 1.0, so A is either always warning or never warning on real traffic. `configs/strategies.toml` is final for the test run.
+
 ### Added
 - Variant **B_ipw** (`nadmon.labels.ipw_cohorts`): Strategy B on inverse-probability-weighted counts; removes the alert-first bias on synthetic data (RESEARCH_DECISIONS.md D15).
 - Variant **A_natural** and **C_active_natural** (`nadmon.strategies.calibrate_q_windows`): Strategy A's threshold set on the real time-ordered validation windows (D16).
