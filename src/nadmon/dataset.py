@@ -140,6 +140,42 @@ def load_train_validation(
     return data
 
 
+def load_test(
+    files: Sequence[Path],
+    cutoff: int,
+    extra_columns: Sequence[int] = (),
+) -> pd.DataFrame:
+    """Load the February test partition: records after the cutoff, in stable time order.
+
+    Used only by the one-time test run (STRATEGY_DESIGN_SPEC.md D1). The cutoff never
+    splits a timestamp group (``find_validation_cutoff``), so this order continues the
+    training/validation order exactly.
+    """
+    columns = sorted(set(REQUIRED_COLUMNS) | set(extra_columns))
+    parts = []
+    for file in files:
+        print("Reading test features:", file.name)
+        for chunk in pd.read_csv(
+            file,
+            header=None,
+            usecols=columns,
+            chunksize=100_000,
+            low_memory=False,
+        ):
+            stime = chunk[STIME_INDEX]
+            selected = chunk[(stime > cutoff) & (stime < FEB_END)]
+            if not selected.empty:
+                parts.append(selected)
+
+    data = pd.concat(parts, ignore_index=True)
+    if len(data) != FEB_TOTAL - VALIDATION_END:
+        raise RuntimeError("Loaded test record count does not match the frozen split.")
+    data = data.sort_values(by=STIME_INDEX, kind="stable").reset_index(drop=True)
+    if not data[STIME_INDEX].is_monotonic_increasing:
+        raise RuntimeError("Chronological ordering verification failed.")
+    return data
+
+
 def normalize_attack_category(values: pd.Series) -> pd.Series:
     """Clean attack_cat: strip spaces, label blanks as Normal, merge spelling variants."""
     text = values.astype("string").str.strip().fillna("")

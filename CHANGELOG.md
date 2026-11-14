@@ -12,6 +12,11 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- `scripts/run_strategy_test.py`: the one-time February test run (design spec D1). Reads the frozen `configs/strategies.toml` and recalibrates nothing; refuses to run if the config comes from a quick run, differs from the validation run's `calibration.json`, is uncommitted (checked with git, or confirmed with `--confirm-committed` when git is not on PATH), or a test run already exists (`--resume-identical` only for an interrupted run with a byte-identical config). `--check-only` runs the guards alone.
+- `dataset.load_test` (February records after the validation cutoff, count-checked against 435,843); `nadmon.february` (validation/test partitions shared by both scripts); `nadmon.frozen` (config reading, checks, hash).
+- 5 tests for the guards (114 in total).
+
 ### Research
 - Second full validation run (Ali, 2026-11-14) in `results/strategies/validation/FINDINGS.md` sections 7-8: B_ipw removes the alert-first bias (false alerts 100% -> 0%, harmful detection 6-13% -> 100%); A_natural's threshold becomes q = 1.0, so A is either always warning or never warning on real traffic. `configs/strategies.toml` is final for the test run.
 

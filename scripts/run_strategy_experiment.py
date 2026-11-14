@@ -39,9 +39,9 @@ from dataclasses import replace
 import numpy as np
 import pandas as pd
 
-from nadmon import dataset
 from nadmon import evaluation as ev
 from nadmon import experiment as ex
+from nadmon import february
 from nadmon import scenarios as sc
 from nadmon.config import PROJECT_DIR, load_paths
 from nadmon.provenance import run_metadata
@@ -51,42 +51,11 @@ CONFIG = PROJECT_DIR / "configs" / "strategies.toml"
 
 
 def load_validation() -> ex.Partition:
-    paths = load_paths()
-    paths.check_raw_files()
-    timestamps = dataset.read_february_timestamps(paths.raw_files)
-    cutoff = dataset.find_validation_cutoff(timestamps)
-    data = dataset.load_train_validation(
-        paths.raw_files, cutoff, extra_columns=[dataset.ATTACK_CAT_INDEX]
-    )
-    X, y = dataset.preprocess(data)
-    X_val = X.iloc[dataset.TRAIN_END :].reset_index(drop=True)
-    y_val = y[dataset.TRAIN_END :]
-    category = dataset.normalize_attack_category(
-        data[dataset.ATTACK_CAT_INDEX].iloc[dataset.TRAIN_END :]
-    ).to_numpy()
-
+    X_val, y_val, category = february.load_frames(load_paths(), "validation")
     pred = pd.read_csv(RESULTS / "validation_predictions.csv")
     if len(pred) != len(y_val) or (pred["TrueLabel"].to_numpy() != y_val).any():
         raise SystemExit("validation_predictions.csv does not line up with the raw data.")
-
-    col = dataset.model_column
-    strata = sc.unsw_strata(
-        y_val,
-        category,
-        X_val[col(dataset.COLUMN_NAMES.index("service"))],
-        X_val[col(dataset.COLUMN_NAMES.index("proto"))],
-        X_val[col(dataset.COLUMN_NAMES.index("state"))],
-    )
-    numeric = tuple(col(i) for i in dataset.NUMERIC_FEATURES)
-    categorical = tuple(col(i) for i in dataset.CATEGORICAL_FEATURES)
-    return ex.Partition(
-        y_val.astype(int),
-        pred["Prediction"].to_numpy(dtype=int),
-        strata,
-        X_val,
-        numeric,
-        categorical,
-    )
+    return february.partition(X_val, y_val, category, pred["Prediction"].to_numpy())
 
 
 def write_config(cal: ex.Calibration, settings: ex.Settings, quick: bool, path) -> None:
