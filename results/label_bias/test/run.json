@@ -1,0 +1,27 @@
+{
+  "partition": "test",
+  "streams": 200,
+  "conditions": 32,
+  "scenarios": [
+    "S0_stable",
+    "H1_fewer_attacks",
+    "X1_hard_attack_mix",
+    "X2_false_positive_burst",
+    "X1_hard_attack_mix_rare",
+    "X2_false_positive_burst_rare"
+  ],
+  "config_sha256": "3941c54bb6e62397bd4ef304c03b95d94505cfe8f6df55f5778e759d7b4a886a",
+  "minutes": 13.5,
+  "created_utc": "2026-11-15T11:09:13+00:00",
+  "git_commit": "9e8ea339bdaa02cd4d5ead3be20489de48b1bba5",
+  "git_uncommitted_changes": false,
+  "python": "3.14.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.8.0",
+    "joblib": "1.5.3"
+  }
+}
