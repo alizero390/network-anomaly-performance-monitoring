@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- Label-bias study re-run on validation and confirmed on test (Ali, 2026-11-15); `results/label_bias/FINDINGS.md` replaces the validation-only file. B_ipw_ess (Kish effective sample size) keeps false alarms at 0-1% under every policy and under wrongly assumed rates, and stays silent below ~2.5% labelling of normal traffic, matching the bound m_min / (normals per window x max_span).
+
 ### Added
 - Variant B_ipw_ess (RESEARCH_DECISIONS.md D18): eligibility on the Kish effective sample size of the weighted labels (`labels.kish_ess`, `pool_cohorts(..., weights=...)`). 2 new tests (117 total).
 
