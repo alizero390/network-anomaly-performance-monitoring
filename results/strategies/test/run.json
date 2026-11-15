@@ -1,0 +1,27 @@
+{
+  "config_sha256": "3941c54bb6e62397bd4ef304c03b95d94505cfe8f6df55f5778e759d7b4a886a",
+  "reference_f1_calibrated": 0.972821,
+  "test_metrics": {
+    "records": 435843,
+    "attack_share": 0.20325667728975802,
+    "recall": 0.9716891678331151,
+    "fpr": 0.004630602871088969,
+    "f1": 0.9766502530123216,
+    "f1_calibrated_at_validation_share": 0.9763555052751482
+  },
+  "unusable_scenarios": [],
+  "streams_per_scenario": 200,
+  "minutes": 138.7,
+  "created_utc": "2026-11-15T08:59:39+00:00",
+  "git_commit": "e4d4f890880325eb934c44a03372e286a9dbba32",
+  "git_uncommitted_changes": false,
+  "python": "3.14.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.8.0",
+    "joblib": "1.5.3"
+  }
+}
