@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- One-time test run (Ali, 2026-11-15) summarised in `results/strategies/test/FINDINGS.md`: B with calibrated F1 and B_ipw hold out of sample (B_ipw: false alerts 0-0.5%, detection 99.5-100% under alert-first labels; B: 93.5-100% false alerts); Strategy A warns on every test stream before any change; C-active's speed-up shrinks from 58% to 26% of streams.
+
 ### Added
 - `scripts/run_strategy_test.py`: the one-time February test run (design spec D1). Reads the frozen `configs/strategies.toml` and recalibrates nothing; refuses to run if the config comes from a quick run, differs from the validation run's `calibration.json`, is uncommitted (checked with git, or confirmed with `--confirm-committed` when git is not on PATH), or a test run already exists (`--resume-identical` only for an interrupted run with a byte-identical config). `--check-only` runs the guards alone.
 - `dataset.load_test` (February records after the validation cutoff, count-checked against 435,843); `nadmon.february` (validation/test partitions shared by both scripts); `nadmon.frozen` (config reading, checks, hash).
