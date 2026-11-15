@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- Label-bias study for Paper 2 (RESEARCH_DECISIONS.md D17): `nadmon.label_bias` (fixed policy grid with audit sampling and wrong weights) and `scripts/run_label_bias.py` (`--partition validation|test`, no calibration). Label conditions now carry true and assumed labelling probabilities; new variant B_ipw_eff pools and checks eligibility on weighted counts. 1 new test (115 total).
+
 ### Research
 - One-time test run (Ali, 2026-11-15) summarised in `results/strategies/test/FINDINGS.md`: B with calibrated F1 and B_ipw hold out of sample (B_ipw: false alerts 0-0.5%, detection 99.5-100% under alert-first labels; B: 93.5-100% false alerts); Strategy A warns on every test stream before any change; C-active's speed-up shrinks from 58% to 26% of streams.
 

@@ -184,3 +184,40 @@ def test_a_natural_is_quieter(run):
         s.loc[("H1_fewer_attacks", "A_natural"), "false_alert_rate"]
         <= s.loc[("H1_fewer_attacks", "A"), "false_alert_rate"]
     )
+
+
+def test_policy_grid_and_effective_ipw():
+    from dataclasses import replace
+
+    from nadmon import label_bias as lbs
+
+    conds = lbs.policy_conditions()
+    names = [c.name for c in conds]
+    assert len(conds) == 2 + 24 + 6 and len(set(names)) == len(names)
+    assert lbs.parse_condition("pa90_pn02_d5_assume_pn_half") == {
+        "policy": "alert_first",
+        "p_alert": 0.9,
+        "p_normal": 0.02,
+        "weights": "pn_half",
+    }
+    part = _partition()
+    cal = ex.base_calibration(part)
+    rates = sc.stratum_rates(part.strata, part.y, part.p)
+    scen = {x.name: x for x in sc.standard_scenarios(rates, cal.pi0)}
+    picked = [scen["S0_stable"], scen["X1_hard_attack_mix"]]
+    chosen = [
+        c
+        for c in conds
+        if c.name in ("pa90_pn10_d5", "pa90_pn02_d5", "pa90_pn10_d5_assume_pn_double")
+    ]
+    s = replace(SMALL, n_streams=6, delays=(5,), ipw_effective=True)
+    r = ex.run_grid(part, picked, cal, s, None, progress=False, conditions=chosen)
+    assert {"B", "B_ipw", "B_ipw_eff", "B_F1"} == set(r["strategy"])
+    g = r.groupby(["scenario", "condition", "strategy"])
+    fa = g["any_false_alert"].mean()
+    det = g["detected"].mean()
+    # Correct weights: no false alarms on stable streams, harmful change found.
+    assert fa[("S0_stable", "pa90_pn10_d5", "B_ipw")] <= 0.2
+    assert det[("X1_hard_attack_mix", "pa90_pn10_d5", "B_ipw")] >= 0.8
+    # Uncorrected B is fooled by the policy.
+    assert fa[("S0_stable", "pa90_pn10_d5", "B")] >= 0.8

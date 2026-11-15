@@ -75,6 +75,7 @@ class Settings:
     drop: float = 0.05
     consecutive: int = 2
     rearm: int = 2
+    ipw_effective: bool = False  # also run B_ipw_eff (label-bias study, D17)
 
 
 @dataclass
@@ -95,10 +96,22 @@ class Calibration:
 
 @dataclass(frozen=True)
 class Condition:
+    """A label-feedback condition.
+
+    ``mode="random"`` labels every record with ``availability``. ``mode="alert_first"``
+    labels predicted attacks with ``p_alert`` and predicted normal records with
+    ``p_normal``. B_ipw weights by ``assumed_p_alert`` / ``assumed_p_normal`` when given
+    (to study wrongly known probabilities), otherwise by the true ones.
+    """
+
     name: str
     delay: int
     availability: float
     mode: str = "random"
+    p_alert: float = lb.P_ALERT
+    p_normal: float = lb.P_NORMAL
+    assumed_p_alert: float | None = None
+    assumed_p_normal: float | None = None
 
 
 def label_conditions(s: Settings) -> list[Condition]:
@@ -164,17 +177,35 @@ def _b_rule(cal: Calibration, s: Settings, metric: str) -> st.BRule:
     )
 
 
-def _cohorts(part, idx, cond: Condition, cal: Calibration, s: Settings, seed: int):
+def _window_counts(part, idx, cond: Condition, s: Settings, seed: int) -> pd.DataFrame:
+    """Labelled confusion counts per window under the condition's labelling policy."""
     y, p = part.y[idx], part.p[idx]
-    mask = lb.label_mask(len(idx), cond.availability, seed=seed, mode=cond.mode, y_pred=p)
-    counts = lb.cohort_counts(y, p, mask, s.window_size)
+    mask = lb.label_mask(
+        len(idx),
+        cond.availability,
+        seed=seed,
+        mode=cond.mode,
+        y_pred=p,
+        p_alert=cond.p_alert,
+        p_normal=cond.p_normal,
+    )
+    return lb.cohort_counts(y, p, mask, s.window_size)
+
+
+def _pool(counts: pd.DataFrame, cond: Condition, cal: Calibration, s: Settings) -> pd.DataFrame:
     return lb.pool_cohorts(counts, lb.PoolingRule(cal.n_min, s.m_min, s.max_span), cond.delay)
+
+
+def _cohorts(part, idx, cond: Condition, cal: Calibration, s: Settings, seed: int):
+    return _pool(_window_counts(part, idx, cond, s, seed), cond, cal, s)
 
 
 def _ipw(cohorts: pd.DataFrame, cond: Condition) -> pd.DataFrame:
     """Weighted cohorts for B_ipw; the weights follow the condition's labelling policy."""
     if cond.mode == "alert_first":
-        return lb.ipw_cohorts(cohorts, lb.P_ALERT, lb.P_NORMAL)
+        pa = cond.p_alert if cond.assumed_p_alert is None else cond.assumed_p_alert
+        pn = cond.p_normal if cond.assumed_p_normal is None else cond.assumed_p_normal
+        return lb.ipw_cohorts(cohorts, pa, pn)
     return lb.ipw_cohorts(cohorts, cond.availability, cond.availability)
 
 
@@ -209,14 +240,19 @@ def run_stream(
             score = ev.score_events(warnings_nat, warnings_nat, s.onset, harmful)
             rows.append({**base, "strategy": "A_natural", "condition": "inputs", **score})
     for k, cond in enumerate(conditions):
-        cohorts = _cohorts(part, idx, cond, cal, s, seed + 1000 * (k + 1))
+        counts = _window_counts(part, idx, cond, s, seed + 1000 * (k + 1))
+        cohorts = _pool(counts, cond, cal, s)
         cbase = {**base, "condition": cond.name, "delay": cond.delay}
         b_alarms = {}
-        for name, metric, data_ in (
+        variants = [
             ("B_F1", "f1", cohorts),
             ("B", "f1_calibrated", cohorts),
             ("B_ipw", "f1_calibrated", _ipw(cohorts, cond)),
-        ):
+        ]
+        if s.ipw_effective:
+            # Weight first, then pool and check eligibility on the weighted counts.
+            variants.append(("B_ipw_eff", "f1_calibrated", _pool(_ipw(counts, cond), cond, cal, s)))
+        for name, metric, data_ in variants:
             b_alarms[name] = _alarms(st.b_monitor(data_, _b_rule(cal, s, metric)))
             data, times = b_alarms[name]
             rows.append(
@@ -341,10 +377,15 @@ def run_grid(
     s: Settings,
     ref: st.Reference | None,
     progress: bool = True,
+    conditions: list[Condition] | None = None,
 ) -> pd.DataFrame:
-    """Every scenario x stream x label condition x strategy (D14)."""
+    """Every scenario x stream x label condition x strategy (D14).
+
+    ``conditions`` defaults to :func:`label_conditions`; the label-bias study passes its
+    own policy grid (D17).
+    """
     index = sc.stratum_index(pool.strata)
-    conditions = label_conditions(s)
+    conditions = label_conditions(s) if conditions is None else conditions
     rows = []
     for j, scen in enumerate(scenarios):
         for k in range(s.n_streams):
