@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- `scripts/run_label_bias.py --model feb_hgb` (D19): the label-bias study for the second detector. Its reference values come from its validation predictions (`nadmon.label_bias.model_reference`) and are written to `configs/reference_feb_hgb.toml`; outputs in `results/label_bias/feb_hgb/<partition>/`, now including `scenarios.csv`.
+
 ### Research
 - Label-bias study re-run on validation and confirmed on test (Ali, 2026-11-15); `results/label_bias/FINDINGS.md` replaces the validation-only file. B_ipw_ess (Kish effective sample size) keeps false alarms at 0-1% under every policy and under wrongly assumed rates, and stays silent below ~2.5% labelling of normal traffic, matching the bound m_min / (normals per window x max_span).
 

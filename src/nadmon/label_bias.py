@@ -18,9 +18,13 @@ The grid is fixed here, before results exist:
   eligibility on the weighted counts) and B_ipw_ess (eligibility on the Kish effective
   sample size of the weighted labels; added 2026-11-15 before the test run, D18).
 - Scenarios: S0, H1, X1, X2 and the `_rare` variants of X1 and X2.
+- Detectors: feb_rf (the thesis model) and, as a robustness check, feb_hgb (histogram
+  gradient boosting, same split; D19, added 2026-11-15 before any feb_hgb run).
 """
 
 from __future__ import annotations
+
+import numpy as np
 
 from nadmon.experiment import Condition
 
@@ -97,3 +101,55 @@ def parse_condition(name: str) -> dict:
     if "assume" in name:
         weights = "_".join(parts[parts.index("assume") + 1 :])
     return {"policy": "alert_first", "p_alert": pa, "p_normal": pn, "weights": weights}
+
+
+# ---------------------------------------------------------------------------
+# Second detector (D19): same grid and rule, model-specific reference values
+# ---------------------------------------------------------------------------
+
+MODELS = ("feb_rf", "feb_hgb")
+
+
+def model_reference(frozen_cal, validation_y, validation_p):
+    """The frozen calibration with the reference values of another detector.
+
+    Everything that defines the method (drop, consecutive, re-arm, m_min, max_span, the
+    stream settings, the reference share pi0) stays frozen. Only what describes the
+    detector itself is taken from *its* validation predictions: recall (and so n_min)
+    and the reference F1 values. The test partition is never used for this.
+    """
+    from dataclasses import replace
+
+    from nadmon import experiment as ex
+
+    y, p = np.asarray(validation_y, dtype=int), np.asarray(validation_p, dtype=int)
+    own = ex.base_calibration(ex.Partition(y, p, np.zeros(len(y))))
+    return replace(
+        frozen_cal,
+        recall=own.recall,
+        n_min=own.n_min,
+        reference_f1_calibrated=own.reference_f1_calibrated,
+        reference_f1=own.reference_f1,
+    )
+
+
+def reference_toml(cal, model: str) -> str:
+    return (
+        f"# Reference values of {model} on February validation (D19).\n"
+        "# Written by scripts/run_label_bias.py --partition validation --model "
+        f"{model}.\n# Commit before the test run; the test run checks it is unchanged.\n"
+        f'model = "{model}"\n'
+        f"recall = {cal.recall!r}\n"
+        f"n_min = {cal.n_min}\n"
+        f"f1_calibrated = {cal.reference_f1_calibrated!r}\n"
+        f"f1 = {cal.reference_f1!r}\n"
+    )
+
+
+def reference_matches(saved: dict, cal, tol: float = 1e-9) -> bool:
+    return (
+        int(saved["n_min"]) == cal.n_min
+        and abs(float(saved["recall"]) - cal.recall) <= tol
+        and abs(float(saved["f1_calibrated"]) - cal.reference_f1_calibrated) <= tol
+        and abs(float(saved["f1"]) - cal.reference_f1) <= tol
+    )

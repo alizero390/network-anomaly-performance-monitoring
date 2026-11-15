@@ -221,3 +221,28 @@ def test_policy_grid_and_effective_ipw():
     assert det[("X1_hard_attack_mix", "pa90_pn10_d5", "B_ipw")] >= 0.8
     # Uncorrected B is fooled by the policy.
     assert fa[("S0_stable", "pa90_pn10_d5", "B")] >= 0.8
+
+
+def test_model_reference_keeps_the_method_frozen():
+    from pathlib import Path
+
+    from nadmon import frozen
+    from nadmon import label_bias as lbs
+
+    cfg = frozen.read_config(Path(__file__).resolve().parents[1] / "configs" / "strategies.toml")
+    cal = frozen.calibration_from_config(cfg)
+    y = np.array([1] * 1000 + [0] * 4000)
+    p = np.array([1] * 990 + [0] * 10 + [1] * 40 + [0] * 3960)
+    other = lbs.model_reference(cal, y, p)
+    assert other.recall == 0.99 and other.n_min == lb_n_min(0.99)
+    assert other.pi0 == cal.pi0 and other.q == cal.q and other.periods == cal.periods
+    assert other.reference_f1 == 2 * 990 / (2 * 990 + 40 + 10)
+    parsed = __import__("tomllib").loads(lbs.reference_toml(other, "feb_hgb"))
+    assert lbs.reference_matches(parsed, other)
+    assert not lbs.reference_matches({**parsed, "n_min": parsed["n_min"] + 1}, other)
+
+
+def lb_n_min(r):
+    from nadmon import labels
+
+    return labels.n_min_for_recall(r)

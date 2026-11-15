@@ -5,6 +5,11 @@ Usage (repository root, virtual environment active):
     python scripts/run_label_bias.py --partition validation     # about 10-20 minutes
     python scripts/run_label_bias.py --partition test           # needs the raw files
 
+Second detector (D19), validation first, commit the reference file, then test:
+
+    python scripts/run_label_bias.py --partition validation --model feb_hgb
+    python scripts/run_label_bias.py --partition test --model feb_hgb
+
 Validation needs only results/validation_predictions.csv and
 results/validation_categories.csv (with Service, Proto, State). Test reads the raw files
 for the strata and uses results/strategies/test/test_predictions.csv when present
@@ -12,8 +17,14 @@ for the strata and uses results/strategies/test/test_predictions.csv when presen
 come from the frozen configs/strategies.toml, and the grid is fixed in
 src/nadmon/label_bias.py.
 
-Outputs in results/label_bias/<partition>/: stream_results.csv.gz, summary.csv,
-policy_table.csv, summary.md, run.json
+feb_hgb needs results/runs/feb_hgb/validation_predictions.csv and models/feb_hgb.joblib
+(both from scripts/train_model.py --session feb --model hgb). Its recall, n_min and
+reference F1 come from its own validation predictions and are written to
+configs/reference_feb_hgb.toml; every other setting stays frozen.
+
+Outputs in results/label_bias/<partition>/ (feb_rf) or
+results/label_bias/feb_hgb/<partition>/: stream_results.csv.gz, summary.csv,
+policy_table.csv, scenarios.csv, summary.md, run.json
 """
 
 from __future__ import annotations
@@ -40,9 +51,20 @@ CONFIG = PROJECT_DIR / "configs" / "strategies.toml"
 STRATEGIES = ("B_F1", "B", "B_ipw", "B_ipw_eff", "B_ipw_ess")
 
 
-def load_partition(which: str) -> ex.Partition:
+def validation_predictions(model: str) -> pd.DataFrame:
+    """Validation predictions of a detector with the column FebruarySortedIndex."""
+    if model == "feb_rf":
+        return pd.read_csv(RESULTS / "validation_predictions.csv")
+    path = RESULTS / "runs" / model / "validation_predictions.csv"
+    if not path.is_file():
+        raise SystemExit(f"{path} is missing. Run scripts/train_model.py --session feb --model hgb")
+    pred = pd.read_csv(path, usecols=["SortedIndex", "TrueLabel", "Prediction"])
+    return pred.rename(columns={"SortedIndex": "FebruarySortedIndex"})
+
+
+def load_partition(which: str, model: str) -> ex.Partition:
     if which == "validation":
-        pred = pd.read_csv(RESULTS / "validation_predictions.csv")
+        pred = validation_predictions(model)
         cats = pd.read_csv(RESULTS / "validation_categories.csv", keep_default_na=False)
         if not {"Service", "Proto", "State"} <= set(cats.columns):
             raise SystemExit("Re-run scripts/export_validation_categories.py (needs Proto, State).")
@@ -58,15 +80,57 @@ def load_partition(which: str) -> ex.Partition:
     paths = load_paths()
     X, y, category = february.load_frames(paths, "test")
     saved = RESULTS / "strategies" / "test" / "test_predictions.csv"
-    if saved.is_file():
+    if model != "feb_rf":
+        file = paths.models_dir / f"{model}.joblib"
+        if not file.is_file():
+            raise SystemExit(f"{file} is missing. Train it with scripts/train_model.py first.")
+        detector = joblib.load(file)
+        check_model_on_validation(detector, model, paths)
+        p = detector.predict(X).astype(int)
+    elif saved.is_file():
         pred = pd.read_csv(saved)
         if len(pred) != len(y) or (pred["TrueLabel"].to_numpy() != y).any():
             raise SystemExit("test_predictions.csv does not line up with the raw data.")
         p = pred["Prediction"].to_numpy(dtype=int)
     else:
         p = joblib.load(paths.models_dir / "random_forest_baseline.joblib").predict(X).astype(int)
+    print(f"   test attacks flagged {p[y == 1].mean():.3f}, normals flagged {p[y == 0].mean():.4f}")
     part = february.partition(X, y, category, p)
     return ex.Partition(part.y, part.p, part.strata)  # Strategy A is not part of this study
+
+
+def check_model_on_validation(detector, model: str, paths) -> None:
+    """The saved model must reproduce its saved validation predictions (same features)."""
+    X, y, _ = february.load_frames(paths, "validation")
+    saved = validation_predictions(model)
+    if len(saved) != len(y) or (saved["TrueLabel"].to_numpy() != y).any():
+        raise SystemExit("Saved validation predictions do not line up with the raw data.")
+    agree = float((detector.predict(X).astype(int) == saved["Prediction"].to_numpy()).mean())
+    print(f"   {model} reproduces its validation predictions: {agree:.4%}")
+    if agree < 0.9999:
+        raise SystemExit("The saved model does not reproduce its validation predictions.")
+
+
+def detector_calibration(frozen_cal: ex.Calibration, which: str, model: str) -> ex.Calibration:
+    """Frozen calibration (feb_rf) or the frozen method with feb_hgb's own reference values."""
+    if model == "feb_rf":
+        return frozen_cal
+    pred = validation_predictions(model)
+    cal = lbs.model_reference(frozen_cal, pred["TrueLabel"], pred["Prediction"])
+    ref_file = PROJECT_DIR / "configs" / f"reference_{model}.toml"
+    if which == "validation":
+        ref_file.write_text(lbs.reference_toml(cal, model), encoding="utf-8")
+        print(f"   wrote {ref_file.relative_to(PROJECT_DIR)} (commit it before the test run)")
+    else:
+        if not ref_file.is_file():
+            raise SystemExit(f"{ref_file.name} is missing. Run the validation partition first.")
+        if not lbs.reference_matches(frozen.read_config(ref_file), cal):
+            raise SystemExit(f"{ref_file.name} differs from the validation predictions.")
+    print(
+        f"   {model}: recall {cal.recall:.4f}, n_min {cal.n_min}, "
+        f"calibrated F1 {cal.reference_f1_calibrated:.4f}, F1 {cal.reference_f1:.4f}"
+    )
+    return cal
 
 
 def policy_table(results: pd.DataFrame) -> pd.DataFrame:
@@ -94,7 +158,7 @@ def write_markdown(table: pd.DataFrame, which: str, info: dict, path) -> None:
         return "–" if pd.isna(v) else f"{v:.0%}"
 
     lines = [
-        f"# Label-bias study (Paper 2): February {which}",
+        f"# Label-bias study (Paper 2): February {which}, detector {info['model']}",
         "",
         "Generated by `scripts/run_label_bias.py`; grid fixed in `src/nadmon/label_bias.py` "
         "(D17). Label delay 5 windows. Per condition: false-alert rate on stable and "
@@ -118,19 +182,23 @@ def write_markdown(table: pd.DataFrame, which: str, info: dict, path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--partition", choices=["validation", "test"], required=True)
+    parser.add_argument("--model", choices=lbs.MODELS, default="feb_rf")
     parser.add_argument("--streams", type=int, default=200)
     args = parser.parse_args()
     start = time.time()
 
     cfg = frozen.read_config(CONFIG)
-    cal = frozen.calibration_from_config(cfg)
+    frozen_cal = frozen.calibration_from_config(cfg)
     settings = replace(frozen.settings_from_config(cfg), n_streams=args.streams, ipw_effective=True)
     out = RESULTS / "label_bias" / args.partition
+    if args.model != "feb_rf":
+        out = RESULTS / "label_bias" / args.model / args.partition
     out.mkdir(parents=True, exist_ok=True)
 
-    print(f"1. Loading the {args.partition} partition ...")
-    part = load_partition(args.partition)
+    print(f"1. Loading the {args.partition} partition ({args.model}) ...")
+    part = load_partition(args.partition, args.model)
     print(f"   {len(part.y):,} records, attack share {part.y.mean():.3f}")
+    cal = detector_calibration(frozen_cal, args.partition, args.model)
 
     print("2. Scenarios ...")
     rates = sc.stratum_rates(part.strata, part.y, part.p)
@@ -139,6 +207,9 @@ def main() -> None:
     candidates = base + sc.harder_variants([s for s in base if s.name in ok])
     table = sc.scenario_table(candidates, rates, cal.pi0)
     usable = set(table.loc[table["usable"], "scenario"])
+    table[table["scenario"].isin(lbs.SCENARIOS)].to_csv(
+        out / "scenarios.csv", index=False, lineterminator="\n"
+    )
     scenarios = [s for s in candidates if s.name in usable and s.name in lbs.SCENARIOS]
     missing = sorted(set(lbs.SCENARIOS) - {s.name for s in scenarios})
     print("   using:", ", ".join(s.name for s in scenarios))
@@ -159,6 +230,10 @@ def main() -> None:
 
     info = {
         "partition": args.partition,
+        "model": args.model,
+        "recall": cal.recall,
+        "n_min": cal.n_min,
+        "reference_f1_calibrated": cal.reference_f1_calibrated,
         "streams": settings.n_streams,
         "conditions": len(conditions),
         "scenarios": [s.name for s in scenarios],
