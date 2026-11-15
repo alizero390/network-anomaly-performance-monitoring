@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- Label-bias study on validation (Ali, 9.2 min) summarised in `results/label_bias/validation/FINDINGS.md`: uncorrected monitoring fails once normal traffic is labelled at 10% or less; B_ipw repairs it down to 5% with 0-1.5% false alerts; at 1-2% the eligibility rule decides the outcome (B_ipw_eff recovers detection, adds false alarms); underestimating the labelling rate of normal traffic is the costly error.
+
 ### Added
 - Label-bias study for Paper 2 (RESEARCH_DECISIONS.md D17): `nadmon.label_bias` (fixed policy grid with audit sampling and wrong weights) and `scripts/run_label_bias.py` (`--partition validation|test`, no calibration). Label conditions now carry true and assumed labelling probabilities; new variant B_ipw_eff pools and checks eligibility on weighted counts. 1 new test (115 total).
 
