@@ -75,7 +75,7 @@ class Settings:
     drop: float = 0.05
     consecutive: int = 2
     rearm: int = 2
-    ipw_effective: bool = False  # also run B_ipw_eff (label-bias study, D17)
+    ipw_effective: bool = False  # also run B_ipw_eff and B_ipw_ess (label-bias study, D17, D18)
 
 
 @dataclass
@@ -200,13 +200,18 @@ def _cohorts(part, idx, cond: Condition, cal: Calibration, s: Settings, seed: in
     return _pool(_window_counts(part, idx, cond, s, seed), cond, cal, s)
 
 
-def _ipw(cohorts: pd.DataFrame, cond: Condition) -> pd.DataFrame:
-    """Weighted cohorts for B_ipw; the weights follow the condition's labelling policy."""
+def _assumed_probabilities(cond: Condition) -> tuple[float, float]:
+    """Labelling probabilities used for the weights (flagged, unflagged)."""
     if cond.mode == "alert_first":
         pa = cond.p_alert if cond.assumed_p_alert is None else cond.assumed_p_alert
         pn = cond.p_normal if cond.assumed_p_normal is None else cond.assumed_p_normal
-        return lb.ipw_cohorts(cohorts, pa, pn)
-    return lb.ipw_cohorts(cohorts, cond.availability, cond.availability)
+        return pa, pn
+    return cond.availability, cond.availability
+
+
+def _ipw(cohorts: pd.DataFrame, cond: Condition) -> pd.DataFrame:
+    """Weighted cohorts for B_ipw; the weights follow the condition's labelling policy."""
+    return lb.ipw_cohorts(cohorts, *_assumed_probabilities(cond))
 
 
 def _alarms(monitored: pd.DataFrame) -> tuple[list[int], list[int]]:
@@ -252,6 +257,15 @@ def run_stream(
         if s.ipw_effective:
             # Weight first, then pool and check eligibility on the weighted counts.
             variants.append(("B_ipw_eff", "f1_calibrated", _pool(_ipw(counts, cond), cond, cal, s)))
+            # Kish effective sample size of the weighted labels decides eligibility (D18).
+            pa, pn = _assumed_probabilities(cond)
+            ess = lb.pool_cohorts(
+                counts,
+                lb.PoolingRule(cal.n_min, s.m_min, s.max_span),
+                cond.delay,
+                weights=(1 / pa, 1 / pn),
+            )
+            variants.append(("B_ipw_ess", "f1_calibrated", _ipw(ess, cond)))
         for name, metric, data_ in variants:
             b_alarms[name] = _alarms(st.b_monitor(data_, _b_rule(cal, s, metric)))
             data, times = b_alarms[name]

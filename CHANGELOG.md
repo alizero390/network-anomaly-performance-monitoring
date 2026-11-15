@@ -12,6 +12,12 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- Variant B_ipw_ess (RESEARCH_DECISIONS.md D18): eligibility on the Kish effective sample size of the weighted labels (`labels.kish_ess`, `pool_cohorts(..., weights=...)`). 2 new tests (117 total).
+
+### Fixed
+- `pool_cohorts` cast weighted (float) counts to integers, truncating at most one count per cohort for B_ipw_eff. The validation label-bias run must be repeated before the test run.
+
 ### Research
 - Label-bias study on validation (Ali, 9.2 min) summarised in `results/label_bias/validation/FINDINGS.md`: uncorrected monitoring fails once normal traffic is labelled at 10% or less; B_ipw repairs it down to 5% with 0-1.5% false alerts; at 1-2% the eligibility rule decides the outcome (B_ipw_eff recovers detection, adds false alarms); underestimating the labelling rate of normal traffic is the costly error.
 

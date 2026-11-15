@@ -99,13 +99,40 @@ class PoolingRule:
     max_span: int = 5
 
 
-def pool_cohorts(counts: pd.DataFrame, rule: PoolingRule, delay: int) -> pd.DataFrame:
+def kish_ess(n_flagged: float, w_flagged: float, n_unflagged: float, w_unflagged: float) -> float:
+    """Kish effective sample size of labelled records with two weight levels.
+
+    ``(sum w)^2 / sum w^2`` for ``n_flagged`` records of weight ``w_flagged`` and
+    ``n_unflagged`` of weight ``w_unflagged``. Equals the raw count when the weights are
+    equal; shrinks when a few heavily weighted records carry the estimate.
+    """
+    total = n_flagged * w_flagged + n_unflagged * w_unflagged
+    square = n_flagged * w_flagged**2 + n_unflagged * w_unflagged**2
+    return float(total * total / square) if square > 0 else 0.0
+
+
+def _sum(values: np.ndarray) -> int | float:
+    total = values.sum()
+    return int(total) if np.issubdtype(values.dtype, np.integer) else float(total)
+
+
+def pool_cohorts(
+    counts: pd.DataFrame,
+    rule: PoolingRule,
+    delay: int,
+    weights: tuple[float, float] | None = None,
+) -> pd.DataFrame:
     """Group consecutive windows into evaluation cohorts.
 
     Walks forward from the first window: a cohort grows one window at a time until it
     has ``n_min`` labelled attacks and ``m_min`` labelled normal records, or reaches
     ``max_span`` windows. The next cohort starts after it. A cohort can be evaluated
     once the labels of its last window are released: ``available_at = last + delay``.
+
+    With ``weights = (w_flagged, w_unflagged)`` (raw counts in, approved 2026-11-15, D18),
+    the attack and normal sizes are Kish effective sample sizes of the weighted records
+    (:func:`kish_ess`) instead of raw counts. Float counts (already weighted) are kept as
+    floats.
 
     Returns one row per cohort: first, last, span, tp, fp, fn, tn, attacks, normals,
     eligible, available_at.
@@ -119,8 +146,13 @@ def pool_cohorts(counts: pd.DataFrame, rule: PoolingRule, delay: int) -> pd.Data
     while i < n:
         j = i
         while True:
-            a = int(tp[i : j + 1].sum() + fn[i : j + 1].sum())
-            m = int(fp[i : j + 1].sum() + tn[i : j + 1].sum())
+            s_tp, s_fp = _sum(tp[i : j + 1]), _sum(fp[i : j + 1])
+            s_fn, s_tn = _sum(fn[i : j + 1]), _sum(tn[i : j + 1])
+            if weights is None:
+                a, m = s_tp + s_fn, s_fp + s_tn
+            else:
+                wf, wu = weights
+                a, m = kish_ess(s_tp, wf, s_fn, wu), kish_ess(s_fp, wf, s_tn, wu)
             eligible = a >= rule.n_min and m >= rule.m_min
             if eligible or j - i + 1 >= rule.max_span or j == n - 1:
                 break
@@ -130,10 +162,10 @@ def pool_cohorts(counts: pd.DataFrame, rule: PoolingRule, delay: int) -> pd.Data
                 "first": int(windows[i]),
                 "last": int(windows[j]),
                 "span": j - i + 1,
-                "tp": int(tp[i : j + 1].sum()),
-                "fp": int(fp[i : j + 1].sum()),
-                "fn": int(fn[i : j + 1].sum()),
-                "tn": int(tn[i : j + 1].sum()),
+                "tp": s_tp,
+                "fp": s_fp,
+                "fn": s_fn,
+                "tn": s_tn,
                 "attacks": a,
                 "normals": m,
                 "eligible": eligible,

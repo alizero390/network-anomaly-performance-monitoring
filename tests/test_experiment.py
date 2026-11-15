@@ -212,7 +212,7 @@ def test_policy_grid_and_effective_ipw():
     ]
     s = replace(SMALL, n_streams=6, delays=(5,), ipw_effective=True)
     r = ex.run_grid(part, picked, cal, s, None, progress=False, conditions=chosen)
-    assert {"B", "B_ipw", "B_ipw_eff", "B_F1"} == set(r["strategy"])
+    assert {"B", "B_ipw", "B_ipw_eff", "B_ipw_ess", "B_F1"} == set(r["strategy"])
     g = r.groupby(["scenario", "condition", "strategy"])
     fa = g["any_false_alert"].mean()
     det = g["detected"].mean()

@@ -104,3 +104,28 @@ def test_ipw_cohorts_recover_true_rates():
     assert raw_fpr > 0.05  # biased upwards
     assert abs(fpr - 0.01) < 0.002
     assert abs(recall - 0.9) < 0.01
+
+
+def test_kish_ess():
+    assert lb.kish_ess(100, 1.0, 0, 10.0) == 100
+    assert lb.kish_ess(50, 2.0, 50, 2.0) == pytest.approx(100)
+    # 40 heavily weighted records dominate: ESS close to 40, not to the weighted total
+    assert lb.kish_ess(20, 1 / 0.9, 40, 100.0) == pytest.approx(40.4, abs=0.5)
+    assert lb.kish_ess(0, 1.0, 0, 1.0) == 0.0
+
+
+def test_pooling_with_weights_uses_effective_size():
+    import pandas as pd
+
+    counts = pd.DataFrame(
+        {"window": [0, 1], "tp": [900, 900], "fn": [2, 2], "fp": [20, 20], "tn": [40, 40]}
+    )
+    rule = lb.PoolingRule(n_min=68, m_min=500, max_span=5)
+    raw = lb.pool_cohorts(counts, rule, delay=0)
+    ess = lb.pool_cohorts(counts, rule, delay=0, weights=(1 / 0.9, 100.0))
+    assert not raw["eligible"].any()  # 60 raw normals per window
+    assert not ess["eligible"].any()
+    weighted = lb.ipw_cohorts(counts, 0.9, 0.01)
+    eff = lb.pool_cohorts(weighted, rule, delay=0)
+    assert eff["eligible"].all()  # weighted counts look large
+    assert isinstance(eff["tn"].iloc[0], float)

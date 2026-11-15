@@ -14,8 +14,9 @@ The grid is fixed here, before results exist:
   the wrong ``p_alert`` (0.7 instead of 0.9).
 - **Reference conditions:** random labelling at 100% and 20%.
 - Label delay 5 windows throughout.
-- Strategies: B_F1, B, B_ipw (approved eligibility rule, D8) and B_ipw_eff (pooling and
-  eligibility on the weighted counts).
+- Strategies: B_F1, B, B_ipw (approved eligibility rule, D8), B_ipw_eff (pooling and
+  eligibility on the weighted counts) and B_ipw_ess (eligibility on the Kish effective
+  sample size of the weighted labels; added 2026-11-15 before the test run, D18).
 - Scenarios: S0, H1, X1, X2 and the `_rare` variants of X1 and X2.
 """
 

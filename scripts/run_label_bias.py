@@ -37,7 +37,7 @@ from nadmon.provenance import run_metadata
 
 RESULTS = PROJECT_DIR / "results"
 CONFIG = PROJECT_DIR / "configs" / "strategies.toml"
-STRATEGIES = ("B_F1", "B", "B_ipw", "B_ipw_eff")
+STRATEGIES = ("B_F1", "B", "B_ipw", "B_ipw_eff", "B_ipw_ess")
 
 
 def load_partition(which: str) -> ex.Partition:
@@ -180,9 +180,9 @@ def main() -> None:
     print("\nFalse alerts on stable/harmless streams and detection of harmful ones:")
     print(show.round(3).to_string())
     wrong = ptable[ptable["weights"] != "correct"]
-    print("\nWrong weights (B_ipw and B_ipw_eff):")
+    print("\nWrong weights (B_ipw, B_ipw_eff, B_ipw_ess):")
     print(
-        wrong[wrong["strategy"].isin(["B_ipw", "B_ipw_eff"])][
+        wrong[wrong["strategy"].isin(["B_ipw", "B_ipw_eff", "B_ipw_ess"])][
             [
                 "condition",
                 "strategy",
