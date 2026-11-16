@@ -110,3 +110,63 @@ effective-sample-size rule gives 0% false alarms and goes silent below about 2%.
 message: a stronger detector has fewer harmful changes to find (X1 does not exist for
 feb_hgb; on test, neither does X2), so the size of a harmful change must be reported per
 detector.
+
+## 6. Second dataset: CIC-IDS-2017 Friday in time order (D20, run 2026-11-16)
+
+Detectors cic2_rf and cic2_hgb (split D2), reference from the validation half of Thursday,
+Friday monitored in time order, 32 label conditions x 200 label draws. Outputs in
+`results/label_bias/cic2_<model>/` (`windows.csv` has the ground truth per window).
+
+**Ground truth.** Neither detector raises false positives (0-2 on Friday), so every
+change is a change of recall.
+
+| Detector | Reference recall / calibrated F1 | Harmful events on Friday |
+|---|---|---|
+| cic2_rf | 0.195 / 0.327 | 2: a Portscan variant missed completely (17:54-17:56, windows 55-70, recall 0) and DDoS (18:54-19:16, windows 83-105, recall 0.01-0.05) |
+| cic2_hgb | 0.516 / 0.681 | none: Friday recall (0.81-0.99 Portscan, 0.59-0.68 DDoS) is above the reference |
+
+Botnet (13:02-13:55, recall 0 for both) never reaches n_min attacks in a window
+(at most 222), so it is not an event and cannot be judged.
+
+**cic2_rf: share of the two events detected (200 draws):**
+
+| Labelling | B | B_ipw | B_ipw_eff | B_ipw_ess |
+|---|---|---|---|---|
+| random 100% | 100% | 100% | 100% | 100% |
+| random 20% | 50% | 50% | 100% | 50% |
+| alerts 90%, normal 50% | 94% | 94% | 100% | 94% |
+| alerts 90%, normal 20% | 50% | 50% | 100% | 50% |
+| alerts 90%, normal 10% | 0% | 42% | 100% | 0% |
+| alerts 90%, normal 5% / 2% / 1% | 0% | 0% | 100% | 0% |
+
+No strategy raised a false alarm under any correct-weight condition, for either detector
+(median delay 12-14 windows where detected).
+
+**Why the pattern differs from UNSW-NB15.** In these attack-heavy windows (85-99%
+attacks) there are only 50-700 normal records per window. The eligibility rule needs
+m_min = 500 labelled normal records per cohort (to estimate the false-positive rate), so
+labelling fewer normal records leaves the cohorts ineligible and the monitor silent,
+already under random 20% labelling for the Portscan event. Weighting the counts before
+the check (B_ipw_eff) passes the rule and detects both events at every policy. Because the
+detectors make no false positives, the noisy false-positive estimate that caused
+B_ipw_eff's false alarms on UNSW-NB15 does no harm here.
+
+**Wrong labelling rates (cic2_hgb, no events, so every alarm is false):** with the
+assumed p_normal halved, draws with a false alarm: B_ipw 42% (true policy 0.9/0.1),
+B_ipw_eff 92% / 97% (0.9/0.1, 0.9/0.02), **B_ipw_ess 0%**. Doubling the rate or assuming
+p_alert 0.7: 0% for all. Same asymmetry as on UNSW-NB15.
+
+**What this adds to Paper 2.**
+
+1. The bias problem is general, but its form depends on the detector: with false
+   positives (UNSW-NB15) alert-first labels cause false alarms; without them (CIC-IDS-2017)
+   they starve the monitor of labelled normal traffic, and real degradations go unseen.
+2. The choice of eligibility rule is a trade-off, not a free win: the effective-sample-size
+   rule never false-alarms (both datasets, also with wrong rates) but is silent on CIC
+   below 50% normal labelling; the weighted-count rule detects on CIC at every policy but
+   false-alarms on UNSW-NB15 and with underestimated rates.
+3. Practical reading: the needed audit rate depends on how many normal records a cohort
+   holds; in attack-heavy periods the minimum is far above the ~2.5% of section 3.
+4. Limitations: one Friday, no held-out CIC test set (D2), Botnet too small to judge,
+   cic2_rf is a weak detector (validation recall 0.20); cic2_hgb has no harmful event,
+   so on CIC it informs only the false-alarm side.

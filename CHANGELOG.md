@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- CIC-IDS-2017 Friday label-bias runs (Ali, 2026-11-16); section 6 of `results/label_bias/FINDINGS.md`. cic2_rf has two harmful events (missed Portscan variant, DDoS); alert-first labels leave the attack-heavy cohorts without enough labelled normal records, so B, B_ipw and B_ipw_ess go silent while B_ipw_eff detects both events at every policy; no false alarms with correct weights. cic2_hgb has no harmful event; with a halved assumed rate only B_ipw_ess stays free of false alarms.
+
 ### Added
 - `scripts/run_label_bias_cic.py` and `nadmon.natural_bias` (D20): label-bias study on CIC-IDS-2017 Friday in time order with real events as ground truth; outputs in `results/label_bias/cic2_<model>/`.
 
