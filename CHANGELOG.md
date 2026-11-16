@@ -13,6 +13,9 @@ The format follows these categories:
 ## [Unreleased]
 
 ### Added
+- `scripts/run_label_bias_cic.py` and `nadmon.natural_bias` (D20): label-bias study on CIC-IDS-2017 Friday in time order with real events as ground truth; outputs in `results/label_bias/cic2_<model>/`.
+
+### Added
 - `scripts/train_cicids2017.py --split cic2` (D2): train Monday-Wednesday plus the first 50% of Thursday, validate on the last 50% of Thursday, monitor Friday (`nadmon.cicids2017.split_day_boundary`). Outputs in `results/runs/cic2_<model>/`; prediction files keep destination port and protocol for the scenario strata. The Paper 1 split is unchanged.
 
 ### Research
