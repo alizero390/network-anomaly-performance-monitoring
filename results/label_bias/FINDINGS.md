@@ -70,3 +70,43 @@ leaves B_ipw_ess largely silent rather than wrong.
    monitor stay silent, not wrong, when labels are too few.
 4. Practical requirement: audit at least ~2.5-5% of unflagged traffic (bound above), and
    when the audit rate is uncertain, assume it higher rather than lower.
+
+## 5. Second detector: feb_hgb (D19, run 2026-11-16)
+
+Same grid, rule and settings; feb_hgb's own reference values (recall 0.9913, n_min 19,
+calibrated F1 0.9614; `configs/reference_feb_hgb.toml`). Outputs in
+`results/label_bias/feb_hgb/`.
+
+**Which scenarios exist.** The same construction rule gives fewer harmful scenarios for
+the stronger detector:
+
+| | S0, H1 | X1 (Fuzzers) | X2 (false-positive burst) |
+|---|---|---|---|
+| Validation | usable | not harmful at any alpha | harmful at alpha 0.3 (FPR 1.8% -> 7.8%) |
+| Test | usable | not harmful | not harmful at any alpha |
+
+So on test, feb_hgb confirms only the false-alarm side; detection evidence for feb_hgb
+comes from validation X2 and X2_rare. The rule was not changed after the test run.
+
+**Results (p_alert 0.9; V = validation, T = test):**
+
+| p_normal | B false alarms (V / T) | B_ipw false alarms | B_ipw caught (V) | B_ipw_ess false alarms | B_ipw_ess caught (V) |
+|---|---|---|---|---|---|
+| 0.20 | 100% / 100% | 0% / 0% | 100% | 0% / 0% | 100% (delay 6) |
+| 0.10 | 100% / 100% | 0% / 0% | 100% | 0% / 0% | 100% (delay 8) |
+| 0.05 | 100% / 100% | 0% / 0% | 100% | 0% / 0% | 100% (delay 10) |
+| 0.02 | 100% / 100% | 0.2% / 0% | 100% | 0% / 0% | 50% (X2_rare only, delay 14) |
+| 0.01 | 100% / 60% | 0.2% / 0.2% | 100% (burst artefact) | 0% / 0% | 0% |
+
+Unweighted B catches none of the bursts under biased labels (0-6% at p_alert 0.9).
+Wrong rates: halving the assumed p_normal at (0.9, 0.1) gives false alarms of 4.5% / 3.5%
+for B_ipw and 1% / 0.2% for B_ipw_ess, and lowers detection (B_ipw 46%, B_ipw_ess 33%);
+doubling it or assuming p_alert 0.7 changes almost nothing.
+
+**Conclusion.** Every message above holds for a second, stronger detector: alert-first
+labels break unweighted monitoring at 20% or less normal labelling (feb_hgb is more
+sensitive than feb_rf, which still worked at 20%); weighting repairs it; the
+effective-sample-size rule gives 0% false alarms and goes silent below about 2%. New
+message: a stronger detector has fewer harmful changes to find (X1 does not exist for
+feb_hgb; on test, neither does X2), so the size of a harmful change must be reported per
+detector.

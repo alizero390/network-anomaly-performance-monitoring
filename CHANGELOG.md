@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- Label-bias study for feb_hgb on validation and test (Ali, 2026-11-16); section 5 of `results/label_bias/FINDINGS.md`. The messages for feb_rf hold for feb_hgb (B_ipw_ess 0% false alarms everywhere); only X2 is harmful for feb_hgb on validation and no harmful scenario exists on test.
+
 ### Added
 - `scripts/run_label_bias.py --model feb_hgb` (D19): the label-bias study for the second detector. Its reference values come from its validation predictions (`nadmon.label_bias.model_reference`) and are written to `configs/reference_feb_hgb.toml`; outputs in `results/label_bias/feb_hgb/<partition>/`, now including `scenarios.csv`.
 
