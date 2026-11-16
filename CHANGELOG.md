@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- `scripts/plot_label_bias.py`: Paper 2 Figures 2 (false alarms and detection over p_alert x p_normal, per rule) and 3 (against p_normal at p_alert 0.9, 95% Wilson intervals, audit bound 2.5%) for feb_rf and feb_hgb, validation and test, in `results/label_bias/figures/` (PNG, PDF and the plotted values as CSV).
+
 ### Research
 - CIC-IDS-2017 Friday label-bias runs (Ali, 2026-11-16); section 6 of `results/label_bias/FINDINGS.md`. cic2_rf has two harmful events (missed Portscan variant, DDoS); alert-first labels leave the attack-heavy cohorts without enough labelled normal records, so B, B_ipw and B_ipw_ess go silent while B_ipw_eff detects both events at every policy; no false alarms with correct weights. cic2_hgb has no harmful event; with a halved assumed rate only B_ipw_ess stays free of false alarms.
 
