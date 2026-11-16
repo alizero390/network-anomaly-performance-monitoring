@@ -1,0 +1,3 @@
+event,first_window,last_window,start,categories,median_calibrated_f1
+1,55,70,2017-07-07 17:54:17.828318119,Portscan,0.0
+2,83,105,2017-07-07 18:54:22.829547882,DDoS,0.061651713825626876

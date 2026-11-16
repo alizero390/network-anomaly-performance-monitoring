@@ -1,0 +1,25 @@
+{
+  "run": "cic2_rf",
+  "draws": 200,
+  "conditions": 32,
+  "recall": 0.19544934859627083,
+  "n_min": 341,
+  "reference_f1_calibrated": 0.32698892483528935,
+  "reference_share": 0.39133773020028945,
+  "windows": 109,
+  "events": 2,
+  "config_sha256": "3941c54bb6e62397bd4ef304c03b95d94505cfe8f6df55f5778e759d7b4a886a",
+  "minutes": 4.0,
+  "created_utc": "2026-11-16T10:52:24+00:00",
+  "git_commit": "a17f2172c6ef7b929ee56f9e06a03820e29a7b45",
+  "git_uncommitted_changes": false,
+  "python": "3.14.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.8.0",
+    "joblib": "1.5.3"
+  }
+}
