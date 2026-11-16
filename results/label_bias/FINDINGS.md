@@ -162,8 +162,8 @@ p_alert 0.7: 0% for all. Same asymmetry as on UNSW-NB15.
    positives (UNSW-NB15) alert-first labels cause false alarms; without them (CIC-IDS-2017)
    they starve the monitor of labelled normal traffic, and real degradations go unseen.
 2. The choice of eligibility rule is a trade-off, not a free win: the effective-sample-size
-   rule never false-alarms (both datasets, also with wrong rates) but is silent on CIC
-   below 50% normal labelling; the weighted-count rule detects on CIC at every policy but
+   rule never false-alarms (both datasets, also with wrong rates) but on CIC misses
+   one of the two events at 20% normal labelling and both at 10% or less; the weighted-count rule detects on CIC at every policy but
    false-alarms on UNSW-NB15 and with underestimated rates.
 3. Practical reading: the needed audit rate depends on how many normal records a cohort
    holds; in attack-heavy periods the minimum is far above the ~2.5% of section 3.
