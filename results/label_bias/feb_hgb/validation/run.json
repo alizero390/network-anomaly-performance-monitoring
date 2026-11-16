@@ -1,0 +1,29 @@
+{
+  "partition": "validation",
+  "model": "feb_hgb",
+  "recall": 0.9913457528152371,
+  "n_min": 19,
+  "reference_f1_calibrated": 0.9613819254265852,
+  "streams": 200,
+  "conditions": 32,
+  "scenarios": [
+    "S0_stable",
+    "H1_fewer_attacks",
+    "X2_false_positive_burst",
+    "X2_false_positive_burst_rare"
+  ],
+  "config_sha256": "3941c54bb6e62397bd4ef304c03b95d94505cfe8f6df55f5778e759d7b4a886a",
+  "minutes": 7.7,
+  "created_utc": "2026-11-16T07:26:58+00:00",
+  "git_commit": "fd55567d05d5d0c1497b83bf9aeeebfd154843a0",
+  "git_uncommitted_changes": true,
+  "python": "3.14.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.8.0",
+    "joblib": "1.5.3"
+  }
+}

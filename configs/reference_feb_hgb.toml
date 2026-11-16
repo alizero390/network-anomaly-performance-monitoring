@@ -1,0 +1,8 @@
+# Reference values of feb_hgb on February validation (D19).
+# Written by scripts/run_label_bias.py --partition validation --model feb_hgb.
+# Commit before the test run; the test run checks it is unchanged.
+model = "feb_hgb"
+recall = 0.9913457528152371
+n_min = 19
+f1_calibrated = 0.9613819254265852
+f1 = 0.9613819254265852
