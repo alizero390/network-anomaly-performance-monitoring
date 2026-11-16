@@ -3,6 +3,9 @@
 Decisions (RESEARCH_DECISIONS.md, section 14, approved 2026-11-09):
 
 - Split: train on Monday-Thursday, monitor Friday. No test set is held out.
+- Split ``cic2`` for the thesis (D2, approved 2026-11-12): train on Monday-Wednesday plus
+  the first 50% of Thursday's records in time order, validate on the last 50% of
+  Thursday, monitor Friday. The Paper 1 split above is unchanged.
 - "Attempted" flows (failed attack connections) are labelled BENIGN, as in the
   dataset authors' own benchmark.
 - The 8 rows with infinite Flow Bytes/s or Flow Packets/s are dropped; negative
@@ -34,6 +37,9 @@ DERIVED = ("category", "time", "day", "label", "timestamp")  # added by load_day
 CATEGORICAL = ("Protocol",)
 INF_COLUMNS = ("Flow Bytes/s", "Flow Packets/s")
 SKIP_ON_READ = ("id", "Flow ID", "Src IP", "Dst IP")  # identifiers, never used
+SPLIT_DAY = "thursday"
+SPLIT_SHARE = 0.5  # share of the split day's records that goes to training (D2)
+MIN_ATTACKS = 100  # per partition, as in scripts/train_model.py
 
 
 def feature_columns(columns: Sequence[str]) -> tuple[list[str], list[str]]:
@@ -94,3 +100,19 @@ def preprocess(data: pd.DataFrame) -> tuple[pd.DataFrame, np.ndarray]:
     if not np.isfinite(X[numeric].to_numpy()).all():
         raise RuntimeError("Non-finite feature values remain after cleaning.")
     return X, data["label"].to_numpy()
+
+
+def split_day_boundary(data: pd.DataFrame, day: str = SPLIT_DAY, share: float = SPLIT_SHARE) -> int:
+    """Row index where validation starts: ``share`` of ``day``'s records go to training.
+
+    ``data`` is the time-sorted output of :func:`load_days`; ``day`` must be its last
+    day and form one contiguous block at the end (checked).
+    """
+    if not 0 < share < 1:
+        raise ValueError("share must be between 0 and 1")
+    rows = np.flatnonzero(data["day"].to_numpy() == day)
+    if len(rows) == 0:
+        raise ValueError(f"no records for {day}")
+    if rows[-1] != len(data) - 1 or rows[-1] - rows[0] + 1 != len(rows):
+        raise ValueError(f"{day} is not one contiguous block at the end of the data")
+    return int(rows[0] + int(len(rows) * share))

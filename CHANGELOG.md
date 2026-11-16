@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- `scripts/train_cicids2017.py --split cic2` (D2): train Monday-Wednesday plus the first 50% of Thursday, validate on the last 50% of Thursday, monitor Friday (`nadmon.cicids2017.split_day_boundary`). Outputs in `results/runs/cic2_<model>/`; prediction files keep destination port and protocol for the scenario strata. The Paper 1 split is unchanged.
+
 ### Research
 - Label-bias study for feb_hgb on validation and test (Ali, 2026-11-16); section 5 of `results/label_bias/FINDINGS.md`. The messages for feb_rf hold for feb_hgb (B_ipw_ess 0% false alarms everywhere); only X2 is harmful for feb_hgb on validation and no harmful scenario exists on test.
 

@@ -146,3 +146,36 @@ def test_cicids2017_train_and_analyze(cic_folder, tmp_path, monkeypatch, model):
     result = json.loads((out / "summary.json").read_text(encoding="utf-8"))
     assert result["categories"]["easy_share_of_attacks"] is None
     assert not (out / "figures" / "fig5_attack_categories_by_window.png").exists()
+
+
+def test_split_day_boundary():
+    data = pd.DataFrame({"day": ["monday"] * 4 + ["thursday"] * 6})
+    assert cic.split_day_boundary(data) == 4 + 3
+    with pytest.raises(ValueError):
+        cic.split_day_boundary(pd.DataFrame({"day": ["thursday", "monday"]}))
+    with pytest.raises(ValueError):
+        cic.split_day_boundary(data, share=1.0)
+
+
+@pytest.mark.parametrize("model", ["rf", "hgb"])
+def test_cic2_split_run(cic_folder, tmp_path, monkeypatch, model):
+    train = _load_script("train_cicids2017")
+    results = tmp_path / "results"
+    monkeypatch.setattr(train, "load_cicids2017_dir", lambda: cic_folder)
+    monkeypatch.setattr(train, "RESULTS", results)
+    monkeypatch.setattr(train, "MODELS_DIR", tmp_path / "models")
+    monkeypatch.setattr(train, "WINDOW_SIZE", 100)
+    monkeypatch.setattr(cic, "MIN_ATTACKS", 50)
+    monkeypatch.setattr(sys, "argv", ["train_cicids2017.py", "--model", model, "--split", "cic2"])
+    train.main()
+
+    run_dir = results / "runs" / f"cic2_{model}"
+    summary = json.loads((run_dir / "summary.json").read_text(encoding="utf-8"))
+    total = 4 * 1200 - 1  # one inf row dropped on Monday
+    assert summary["split"]["train_end"] == 3 * 1200 - 1 + 600
+    assert summary["validation"]["records"] == total - summary["split"]["train_end"]
+    assert summary["monitor"]["records"] == 1200
+    val = pd.read_csv(run_dir / "validation_predictions.csv")
+    assert val["SortedIndex"].iloc[0] == summary["split"]["train_end"]
+    assert {"DstPort", "Protocol"} <= set(val.columns)
+    assert (run_dir / "monitor_window_metrics.csv").is_file()
