@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this code or these results, please cite the paper below."
+title: "network-anomaly-performance-monitoring"
+authors:
+  - family-names: Raza
+    given-names: Ali
+    affiliation: HSE University
+    email: alraza@edu.hse.ru
+license: MIT
+repository-code: "https://github.com/alizero390/network-anomaly-performance-monitoring"
+preferred-citation:
+  type: article
+  title: "When Is a Drop Real? Evaluating Performance-Monitoring Metrics for Machine-Learning Intrusion Detectors under Changing Attack Prevalence"
+  authors:
+    - family-names: Raza
+      given-names: Ali
+  journal: "Informatics and Automation"
+  year: 2026
+  status: submitted

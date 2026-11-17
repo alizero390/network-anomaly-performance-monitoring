@@ -13,6 +13,9 @@ The format follows these categories:
 ## [Unreleased]
 
 ### Added
+- `LICENSE` (MIT) and `CITATION.cff`, before making the repository public for the Paper 1 submission.
+
+### Added
 - `scripts/plot_label_bias.py`: Paper 2 Figures 2 (false alarms and detection over p_alert x p_normal, per rule) and 3 (against p_normal at p_alert 0.9, 95% Wilson intervals, audit bound 2.5%) for feb_rf and feb_hgb, validation and test, in `results/label_bias/figures/` (PNG, PDF and the plotted values as CSV).
 
 ### Research
