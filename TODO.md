@@ -50,58 +50,34 @@ Status definitions:
 
 ## 3. Strategy A — Input-Distribution Monitoring
 
-- [ ] Implement numerical feature distribution tests.
-- [ ] Implement categorical feature distribution tests.
-- [ ] Implement Benjamini-Hochberg correction.
-- [ ] Implement combined-feature warning logic.
-- [ ] Calibrate warning threshold using validation data.
-- [ ] Retain individual-feature monitoring results for ablation.
-- [ ] Test stable traffic behaviour.
-- [ ] Test harmless distribution shifts.
-- [ ] Measure false warnings.
-- [ ] Evaluate computational overhead.
+- [x] Numerical (Kolmogorov-Smirnov) and categorical (chi-square) tests, Benjamini-Hochberg correction, proportion threshold q (`nadmon.strategies`, D10).
+- [x] Calibrate q on stable validation streams; variant A_natural (D16).
+- [x] Validation and one-time test run (`results/strategies/`): on test, the fixed validation reference made A warn on 100% of streams before any change.
+- [~] D21: moving reference (A_rolling) and B-anchored reference (A_anchored) (`nadmon.rolling_a`, `scripts/run_strategy_a_rolling.py`). Code and tests done; validation calibration and test run pending (Ali's machine).
+- [ ] Practical-significance floor and single-feature ablation (D10).
+- [ ] Measure computational overhead.
 
 ## 4. Strategy B — Delayed Performance Monitoring
 
-- [ ] Design prediction and label identifier matching.
-- [ ] Implement simulated label delays.
-- [ ] Implement partial label availability.
-- [ ] Define minimum labelled sample requirements.
-- [ ] Implement eligible-window handling.
-- [ ] Implement F1 degradation calculation.
-- [ ] Implement two-consecutive-window confirmation.
-- [ ] Test insufficient-label scenarios.
-- [ ] Test delayed and partially available labels.
-- [ ] Evaluate detection delay and missed events.
-- [ ] Consider ADWIN as a secondary comparison.
+- [x] Label delays, partial availability, minimum labelled sample (n_min, m_min) and cohort pooling (D7, D8).
+- [x] Calibrated-F1 rule, two consecutive eligible cohorts, re-arm (D5, D9).
+- [x] Validation and one-time test run: every harmful stream detected, no false alerts under random labels.
+- [x] Alert-first (biased) labels and inverse-probability weighting, B_ipw_eff, B_ipw_ess (D17-D20, Paper 2).
+- [ ] ADWIN as a secondary comparison (optional).
 
 ## 5. Strategy C — Combined Monitoring
 
-- [ ] Define monitoring state transitions.
-- [ ] Implement provisional warnings from Strategy A.
-- [ ] Implement performance confirmation from Strategy B.
-- [ ] Preserve the independent performance-confirmation path.
-- [ ] Define and calibrate the warning association period.
-- [ ] Record confirmed and unconfirmed warnings.
-- [ ] Calculate warning lead time.
-- [ ] Test all state transitions.
-- [ ] Compare results with Strategies A and B.
+- [x] C passive and C active, association period L calibrated per delay (D11).
+- [x] Validation and test: C active faster than B in 58% of harmful streams on validation, 26% on test (never slower).
+- [~] C_active_rolling with A_rolling's warnings (D21): pending runs.
 
 ## 6. Controlled Research Experiments
 
-- [ ] Define stable traffic scenario.
-- [ ] Define harmless traffic-shift scenario.
-- [ ] Define harmful traffic-shift scenario.
-- [ ] Establish verified degradation events.
-- [ ] Run experiments with no label delay.
-- [ ] Run experiments with 5-window label delay.
-- [ ] Run experiments with 10-window label delay.
-- [ ] Run experiments with 100% label availability.
-- [ ] Run experiments with 50% label availability.
-- [ ] Run experiments with 20% label availability.
-- [ ] Repeat experiments using reproducible seeds.
-- [ ] Calculate uncertainty estimates.
-- [ ] Compare all three strategies.
+- [x] Scenarios S0, H1-H3, X1-X2 plus rare and gradual variants; ground truth by expected calibrated F1 (D3, D4).
+- [x] Delays 0/5/10, availability 100/50/20%, alert-first condition; 200 streams each; Wilson intervals and paired tests (D13, D14).
+- [x] Real windows in time order (validation and test).
+- [ ] Attribute the real test alarms (windows 45-49 and 54) to attack categories.
+- [ ] D21 runs: validation (calibration), then one test run.
 
 ## 7. Software Testing
 
@@ -165,10 +141,8 @@ Status definitions:
 
 ## 11. Immediate Next Actions
 
-1. Audit attack-category composition across validation windows.
-2. Investigate the variation in baseline window-level F1.
-3. Establish whether a stable reference period can be justified.
-4. Define minimum labelled sample requirements.
-5. Finalize Strategy A calibration.
-6. Begin monitoring implementation only after the relevant design decisions are sufficiently specified.
-
+1. D21 validation run: `python scripts/run_strategy_a_rolling.py --partition validation --quick`, then the full run; commit `configs/strategy_a_rolling.toml`.
+2. D21 test run (once): `python scripts/run_strategy_a_rolling.py --partition test --confirm-committed`.
+3. Attribute the real test alarms (windows 45-49 and 54) to attack categories.
+4. Thesis outline, chapter by chapter, from the existing results.
+5. Later: API and dashboard on top of the monitoring modules.

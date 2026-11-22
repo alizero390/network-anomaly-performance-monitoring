@@ -13,6 +13,9 @@ The format follows these categories:
 ## [Unreleased]
 
 ### Added
+- D21 (approved 2026-11-23): Strategy A with a moving reference. `nadmon.rolling_a` (A_rolling, A_anchored, C_active_rolling; calibration, grid and time-ordered runs on the streams and label draws of the earlier strategy runs), `scripts/run_strategy_a_rolling.py` (validation calibration to `configs/strategy_a_rolling.toml`, then a one-time test run with the same guards as `scripts/run_strategy_test.py`), and `tests/test_rolling_a.py`.
+
+### Added
 - `LICENSE` (MIT) and `CITATION.cff`, before making the repository public for the Paper 1 submission.
 
 ### Added
