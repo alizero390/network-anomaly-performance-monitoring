@@ -143,7 +143,7 @@ Status definitions:
 ## 11. Immediate Next Actions
 
 1. Decide on D22 (practical-significance floor for Strategy A).
-2. Paper 1: transferred to Computer Networks (2026-11-23); wait for the decision.
+2. Paper 1: transfer to Computer Networks (started 2026-11-23), then wait for the decision.
 3. Attribute the real test alarms (windows 45-49 and 54) to attack categories.
 4. Thesis outline, chapter by chapter, from the existing results.
 5. Later: API and dashboard on top of the monitoring modules.
