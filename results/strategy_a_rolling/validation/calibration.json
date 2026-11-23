@@ -1,0 +1,60 @@
+{
+  "calibration": {
+    "lookback": 10,
+    "gap": 5,
+    "q_rolling": 0.038461538461538464,
+    "q_anchored": 0.038461538461538464,
+    "periods": {
+      "0": 1,
+      "5": 5,
+      "10": 10
+    },
+    "association_gaps": {
+      "0": 600,
+      "5": 600,
+      "10": 600
+    }
+  },
+  "settings": {
+    "window_size": 5000,
+    "n_windows": 40,
+    "onset": 20,
+    "n_streams": 200,
+    "n_calibration": 100,
+    "seed": 20261112,
+    "delays": [
+      0,
+      5,
+      10
+    ],
+    "availabilities": [
+      1.0,
+      0.5,
+      0.2
+    ],
+    "alert_first_delay": 5,
+    "m_min": 500,
+    "max_span": 5,
+    "a_alpha": 0.01,
+    "a_consecutive": 2,
+    "a_reference_size": 20000,
+    "target_false_warning": 0.05,
+    "association_quantile": 0.95,
+    "drop": 0.05,
+    "consecutive": 2,
+    "rearm": 2,
+    "ipw_effective": false
+  },
+  "created_utc": "2026-11-23T08:32:45+00:00",
+  "git_commit": "8fee8835b716737c5204e0fb782850f6420fe7b5",
+  "git_uncommitted_changes": true,
+  "python": "3.14.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.8.0",
+    "joblib": "1.5.3"
+  }
+}

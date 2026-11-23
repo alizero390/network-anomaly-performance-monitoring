@@ -1,0 +1,18 @@
+{
+  "partition": "validation",
+  "streams_per_scenario": 20,
+  "minutes": 25.9,
+  "base_config_sha256": "3941c54bb6e62397bd4ef304c03b95d94505cfe8f6df55f5778e759d7b4a886a",
+  "created_utc": "2026-11-23T08:18:03+00:00",
+  "git_commit": "8fee8835b716737c5204e0fb782850f6420fe7b5",
+  "git_uncommitted_changes": false,
+  "python": "3.14.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.8.0",
+    "joblib": "1.5.3"
+  }
+}

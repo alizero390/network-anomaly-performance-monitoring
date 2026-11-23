@@ -1,0 +1,19 @@
+# Strategy A with a moving reference (RESEARCH_DECISIONS.md D21), calibrated on
+# February validation by scripts/run_strategy_a_rolling.py. Commit it before the
+# test run; the test run must use these values unchanged.
+base_config_sha256 = "3941c54bb6e62397bd4ef304c03b95d94505cfe8f6df55f5778e759d7b4a886a"
+quick_run = false
+
+[a_rolling]
+lookback = 10
+gap = 5
+q = 0.038461538461538464
+
+[a_anchored]
+calibrated_under = "d5_p100"
+q = 0.038461538461538464
+
+[c_active_rolling.association_period]
+"0" = 1
+"5" = 5
+"10" = 10
