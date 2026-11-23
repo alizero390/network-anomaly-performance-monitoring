@@ -90,6 +90,40 @@ def window_feature_pvalues(reference: Reference, window: pd.DataFrame) -> pd.Ser
     return pd.Series(p)
 
 
+def total_variation(reference_counts: pd.Series, window_values: pd.Series) -> float:
+    """Total variation distance between two category distributions (0 to 1)."""
+    win = window_values.astype(str).value_counts()
+    cats = reference_counts.index.union(win.index)
+    a = reference_counts.reindex(cats, fill_value=0).to_numpy(dtype=float)
+    b = win.reindex(cats, fill_value=0).to_numpy(dtype=float)
+    if a.sum() == 0 or b.sum() == 0:
+        return 0.0
+    return float(0.5 * np.abs(a / a.sum() - b / b.sum()).sum())
+
+
+def window_feature_tests(reference: Reference, window: pd.DataFrame) -> pd.DataFrame:
+    """Per feature: raw p-value and effect size (D22).
+
+    Effect size: the Kolmogorov-Smirnov statistic for numeric features, the total
+    variation distance of the category mix for categorical features; both lie in [0, 1].
+    The p-values equal those of :func:`window_feature_pvalues`.
+    """
+    rows = {}
+    for c, ref in reference.numeric.items():
+        res = stats.ks_2samp(ref, window[c].to_numpy(dtype=float), method="asymp")
+        rows[c] = (float(res.pvalue), float(res.statistic))
+    for c, ref_counts in reference.categorical.items():
+        rows[c] = (chi_square_p(ref_counts, window[c]), total_variation(ref_counts, window[c]))
+    return pd.DataFrame.from_dict(rows, orient="index", columns=["p", "effect"])
+
+
+def changed_features_floor(
+    tests: pd.DataFrame, alpha: float = 0.01, floor: float = 0.0
+) -> pd.Series:
+    """Changed = Benjamini-Hochberg significant at ``alpha`` and effect >= ``floor`` (D22)."""
+    return changed_features(tests["p"], alpha) & (tests["effect"] >= floor)
+
+
 def changed_features(pvalues: pd.Series, alpha: float = 0.01) -> pd.Series:
     """Benjamini-Hochberg: True for features whose adjusted p-value is at most alpha."""
     adjusted = stats.false_discovery_control(pvalues.to_numpy(), method="bh")

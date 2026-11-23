@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- D22 (approved 2026-11-23): Strategy A with a minimum effect size. `strategies.window_feature_tests` (p-value and effect size: Kolmogorov-Smirnov statistic, total variation distance), `nadmon.effect_floor` (A_floor, C_active_floor; epsilon calibrated on real validation windows, q on stable streams), `scripts/run_strategy_a_floor.py` and `tests/test_effect_floor.py`.
+
 ### Research
 - D21 validation and test runs (Ali, 2026-11-23); `results/strategy_a_rolling/FINDINGS.md`. Both success criteria met on test: A_rolling 0% false warnings on stable streams (fixed reference 100%), C_active_rolling faster than B in 54% of harmful streams (fixed-reference C_active 26%), never slower. On real time-ordered windows A (fixed or rolling) still flags every window: statistical tests detect differences too small to matter (practical-significance floor needed).
 
