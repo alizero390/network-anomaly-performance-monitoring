@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- D21 validation and test runs (Ali, 2026-11-23); `results/strategy_a_rolling/FINDINGS.md`. Both success criteria met on test: A_rolling 0% false warnings on stable streams (fixed reference 100%), C_active_rolling faster than B in 54% of harmful streams (fixed-reference C_active 26%), never slower. On real time-ordered windows A (fixed or rolling) still flags every window: statistical tests detect differences too small to matter (practical-significance floor needed).
+
 ### Added
 - D21 (approved 2026-11-23): Strategy A with a moving reference. `nadmon.rolling_a` (A_rolling, A_anchored, C_active_rolling; calibration, grid and time-ordered runs on the streams and label draws of the earlier strategy runs), `scripts/run_strategy_a_rolling.py` (validation calibration to `configs/strategy_a_rolling.toml`, then a one-time test run with the same guards as `scripts/run_strategy_test.py`), and `tests/test_rolling_a.py`.
 

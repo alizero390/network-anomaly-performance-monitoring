@@ -53,8 +53,8 @@ Status definitions:
 - [x] Numerical (Kolmogorov-Smirnov) and categorical (chi-square) tests, Benjamini-Hochberg correction, proportion threshold q (`nadmon.strategies`, D10).
 - [x] Calibrate q on stable validation streams; variant A_natural (D16).
 - [x] Validation and one-time test run (`results/strategies/`): on test, the fixed validation reference made A warn on 100% of streams before any change.
-- [~] D21: moving reference (A_rolling) and B-anchored reference (A_anchored) (`nadmon.rolling_a`, `scripts/run_strategy_a_rolling.py`). Code and tests done; validation calibration and test run pending (Ali's machine).
-- [ ] Practical-significance floor and single-feature ablation (D10).
+- [x] D21: moving reference (A_rolling) and B-anchored reference (A_anchored): validation and test runs done (`results/strategy_a_rolling/FINDINGS.md`). On test: 0% false warnings on stable streams (fixed reference: 100%); on real time-ordered windows A still flags every window.
+- [ ] Practical-significance floor (proposed D22) and single-feature ablation (D10).
 - [ ] Measure computational overhead.
 
 ## 4. Strategy B — Delayed Performance Monitoring
@@ -69,7 +69,7 @@ Status definitions:
 
 - [x] C passive and C active, association period L calibrated per delay (D11).
 - [x] Validation and test: C active faster than B in 58% of harmful streams on validation, 26% on test (never slower).
-- [~] C_active_rolling with A_rolling's warnings (D21): pending runs.
+- [x] C_active_rolling (D21): faster than B in 54% of harmful test streams, never slower.
 
 ## 6. Controlled Research Experiments
 
@@ -77,7 +77,8 @@ Status definitions:
 - [x] Delays 0/5/10, availability 100/50/20%, alert-first condition; 200 streams each; Wilson intervals and paired tests (D13, D14).
 - [x] Real windows in time order (validation and test).
 - [ ] Attribute the real test alarms (windows 45-49 and 54) to attack categories.
-- [ ] D21 runs: validation (calibration), then one test run.
+- [x] D21 runs: validation (calibration), then one test run.
+- [ ] Find the cause of the small B differences from the earlier runs (FINDINGS D21, section 4).
 
 ## 7. Software Testing
 
@@ -141,8 +142,8 @@ Status definitions:
 
 ## 11. Immediate Next Actions
 
-1. D21 validation run: `python scripts/run_strategy_a_rolling.py --partition validation --quick`, then the full run; commit `configs/strategy_a_rolling.toml`.
-2. D21 test run (once): `python scripts/run_strategy_a_rolling.py --partition test --confirm-committed`.
+1. Decide on D22 (practical-significance floor for Strategy A).
+2. Paper 1: transferred to Computer Networks (2026-11-23); wait for the decision.
 3. Attribute the real test alarms (windows 45-49 and 54) to attack categories.
 4. Thesis outline, chapter by chapter, from the existing results.
 5. Later: API and dashboard on top of the monitoring modules.
