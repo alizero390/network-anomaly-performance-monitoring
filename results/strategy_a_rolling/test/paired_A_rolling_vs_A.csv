@@ -1,0 +1,11 @@
+a,b,scenario,condition,streams,false_alert_p,detection_p,delay_p
+A_rolling,A,H1_fewer_attacks,inputs,200,1.0,,
+A_rolling,A,H2_benign_mix,inputs,200,1.0,,
+A_rolling,A,H3_easy_attack_mix,inputs,200,1.0,,
+A_rolling,A,S0_stable,inputs,200,1.2446030555722283e-60,,
+A_rolling,A,X1_hard_attack_mix,inputs,200,1.2446030555722283e-60,3.0814879110195774e-33,4.2380554260794433e-10
+A_rolling,A,X1_hard_attack_mix_gradual,inputs,200,1.2446030555722283e-60,1.1920928955078125e-07,6.662328415246656e-24
+A_rolling,A,X1_hard_attack_mix_rare,inputs,200,1.2446030555722283e-60,1.5407439555097887e-33,3.297053268997287e-09
+A_rolling,A,X2_false_positive_burst,inputs,200,1.2446030555722283e-60,7.703719777548943e-34,1.5417257900279904e-08
+A_rolling,A,X2_false_positive_burst_gradual,inputs,200,1.2446030555722283e-60,9.860761315262648e-32,2.6645720641602064e-17
+A_rolling,A,X2_false_positive_burst_rare,inputs,200,1.2446030555722283e-60,6.018531076210112e-36,3.297053268997287e-09
