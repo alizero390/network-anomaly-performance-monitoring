@@ -130,16 +130,18 @@ Status definitions:
 
 ## 10. Final Thesis and Publication Preparation
 
-- [ ] Complete targeted literature review.
-- [ ] Establish research gap using supporting literature.
-- [ ] Finalize experimental methodology.
-- [ ] Complete primary experiments.
+- [x] Complete targeted literature review.
+- [x] Establish research gap using supporting literature.
+- [x] Finalize experimental methodology.
+- [x] Complete primary experiments.
 - [ ] Complete sensitivity and ablation experiments.
-- [ ] Analyze and interpret results.
+- [x] Analyze and interpret results.
 - [ ] Prepare research tables and figures.
-- [ ] Write methodology chapter.
-- [ ] Write experimental results chapter.
-- [ ] Write discussion and limitations.
+- [x] Write methodology chapter.
+- [x] Write experimental results chapter.
+- [x] Write discussion and limitations.
+- [x] Thesis chapters 1-9 drafted as Google Docs (Drive folder "05 Thesis"); chapter 11 next; chapter 10 after the API and dashboard.
+- [ ] **Reminder:** once Paper 1 is accepted and published, update Chapter 1.6 (Publications) with its final title, journal details and DOI or preprint link.
 - [ ] Prepare final thesis.
 - [ ] Prepare conference presentation or research article.
 
