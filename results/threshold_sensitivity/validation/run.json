@@ -1,0 +1,25 @@
+{
+  "partition": "validation",
+  "quick": false,
+  "drops": [
+    0.03,
+    0.05,
+    0.1
+  ],
+  "streams_per_scenario": 200,
+  "config_sha256": "3941c54bb6e62397bd4ef304c03b95d94505cfe8f6df55f5778e759d7b4a886a",
+  "reproduced": "DIFFERENT in 9006 of 60000 rows: {('B', 'd0_p100'): 156, ('B', 'd0_p20'): 462, ('B', 'd0_p50'): 239, ('B', 'd10_p100'): 156, ('B', 'd10_p20'): 490, ('B', 'd10_p50'): 221, ('B', 'd5_alert_first'): 714, ('B', 'd5_p100'): 156, ('B', 'd5_p20'): 470, ('B', 'd5_p50'): 233, ('B_F1', 'd0_p100'): 158, ('B_F1', 'd0_p20'): 467, ('B_F1', 'd0_p50'): 225, ('B_F1', 'd10_p100'): 158, ('B_F1', 'd10_p20'): 489, ('B_F1', 'd10_p50'): 216, ('B_F1', 'd5_alert_first'): 179, ('B_F1', 'd5_p100'): 158, ('B_F1', 'd5_p20'): 457, ('B_F1', 'd5_p50'): 230, ('B_ipw', 'd0_p100'): 156, ('B_ipw', 'd0_p20'): 462, ('B_ipw', 'd0_p50'): 239, ('B_ipw', 'd10_p100'): 156, ('B_ipw', 'd10_p20'): 490, ('B_ipw', 'd10_p50'): 221, ('B_ipw', 'd5_alert_first'): 389, ('B_ipw', 'd5_p100'): 156, ('B_ipw', 'd5_p20'): 470, ('B_ipw', 'd5_p50'): 233}",
+  "minutes": 13.8,
+  "created_utc": "2026-11-26T11:00:27+00:00",
+  "git_commit": "8e01324abb5881533dabf56e94cff105513e5408",
+  "git_uncommitted_changes": false,
+  "python": "3.14.3",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.8.0",
+    "joblib": "1.5.3"
+  }
+}
