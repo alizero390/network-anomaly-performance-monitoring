@@ -12,7 +12,7 @@ only: nothing was tuned. Details in `summary.md`, `windows.csv`, `categories.csv
 88-100% of the missed attacks. None is an attack-share effect, a false-positive burst
 alone or a window with too few attacks. Every alarm that B, B_ipw and C_active_natural
 raised on the real test windows under random labels falls inside the degraded period
-44-56: at windows 48, 49 or 54 (flagged windows) in 17 of 18 condition-alarms, and once
+44-56: at windows 48, 49 or 54 (flagged windows) in 13 of its 14 alarms over the nine conditions (B_ipw and C_active_natural identical), and once
 at window 45 (50% labels), which confirms windows 44-45; window 44 is flagged and window
 45 misses the 0.05 mark with full labels by a little (drop 0.041). **None of B's
 real-traffic alarms is a false alarm.**
