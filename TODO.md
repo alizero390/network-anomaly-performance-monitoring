@@ -64,8 +64,8 @@ Status definitions:
 - [x] Calibrated-F1 rule, two consecutive eligible cohorts, re-arm (D5, D9).
 - [x] Validation and one-time test run: every harmful stream detected, no false alerts under random labels.
 - [x] Alert-first (biased) labels and inverse-probability weighting, B_ipw_eff, B_ipw_ess (D17-D20, Paper 2).
-- [ ] D23: attribute the real test-window alarms (windows 45-49, 54) to causes and attack categories (`scripts/attribute_test_alarms.py`).
-- [ ] D23: alarm-drop sensitivity 0.03 / 0.10, validation then test (`scripts/run_threshold_sensitivity.py`).
+- [x] D23: real test-window alarms attributed: all missed Fuzzers, dip 43-57 mostly attack-mix change (`results/test_alarm_attribution/FINDINGS.md`).
+- [x] D23: alarm-drop sensitivity 0.03 / 0.10 on validation and test: 0.05 kept (`results/threshold_sensitivity/FINDINGS.md`).
 - [ ] ADWIN as a secondary comparison (optional).
 
 ## 5. Strategy C — Combined Monitoring

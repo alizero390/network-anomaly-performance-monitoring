@@ -154,3 +154,34 @@ def test_unsw_strata_fine_benign():
         np.array(["INT", "FIN"]),
     )
     assert s.tolist() == ["B:none|udp|INT", "A:DoS"]
+
+
+def test_streams_do_not_depend_on_python_hash_seed(tmp_path):
+    """Same seed, same stream in every Python process (bug fixed 2026-11-26)."""
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    code = (
+        "import sys, numpy as np\n"
+        f"sys.path[:0] = [{str(root / 'src')!r}, {str(root / 'tests')!r}]\n"
+        "from nadmon import experiment as ex, scenarios as sc\n"
+        "from test_experiment import _partition\n"
+        "part = _partition()\n"
+        "cal = ex.base_calibration(part)\n"
+        "rates = sc.stratum_rates(part.strata, part.y, part.p)\n"
+        "base = sc.standard_scenarios(rates, cal.pi0)\n"
+        "scen = base + sc.harder_variants(base)\n"
+        "index = sc.stratum_index(part.strata)\n"
+        "out = [sc.build_stream(x, index, np.random.default_rng(7), 500, 12, 5)[:3000]"
+        " for x in scen]\n"
+        "print(np.concatenate(out).sum(), np.concatenate(out)[:50].tolist())\n"
+    )
+    results = set()
+    for seed in ("1", "2", "3"):
+        env = {**__import__("os").environ, "PYTHONHASHSEED": seed}
+        r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=env)
+        assert r.returncode == 0, r.stderr
+        results.add(r.stdout)
+    assert len(results) == 1

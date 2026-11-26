@@ -135,7 +135,7 @@ def shift_mix(mix: Mapping[str, float], targets: Iterable[str], alpha: float) ->
     if not targets:
         raise ValueError("no target stratum is present in the mix")
     target_mix = _normalise({t: mix[t] for t in targets})
-    keys = set(mix) | set(target_mix)
+    keys = sorted(set(mix) | set(target_mix))  # sorted: dict order must not follow hashing
     return _normalise(
         {k: (1 - alpha) * mix.get(k, 0.0) + alpha * target_mix.get(k, 0.0) for k in keys}
     )
@@ -157,7 +157,7 @@ def expected_calibrated_f1(comp: Composition, rates: pd.DataFrame, pi0: float) -
 def mix_distance(a: Composition, b: Composition) -> float:
     """Total variation distance between the stratum mixes of two compositions."""
     ma, mb = a.record_mix(), b.record_mix()
-    return 0.5 * sum(abs(ma.get(k, 0.0) - mb.get(k, 0.0)) for k in set(ma) | set(mb))
+    return 0.5 * sum(abs(ma.get(k, 0.0) - mb.get(k, 0.0)) for k in sorted(set(ma) | set(mb)))
 
 
 def ground_truth(
@@ -357,8 +357,10 @@ def scenario_table(scenarios: list[Scenario], rates: pd.DataFrame, pi0: float) -
 
 
 def _blend(a: Composition, b: Composition, t: float) -> Composition:
-    keys_a = set(a.attack_mix) | set(b.attack_mix)
-    keys_b = set(a.benign_mix) | set(b.benign_mix)
+    # Sorted keys: the order of the mix decides which stratum gets which multinomial draw
+    # in build_stream, so it must not depend on Python's string hashing (fixed 2026-11-26).
+    keys_a = sorted(set(a.attack_mix) | set(b.attack_mix))
+    keys_b = sorted(set(a.benign_mix) | set(b.benign_mix))
     return Composition(
         attack_share=(1 - t) * a.attack_share + t * b.attack_share,
         attack_mix={

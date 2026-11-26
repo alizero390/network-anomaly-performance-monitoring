@@ -12,6 +12,12 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Fixed
+- Resampled streams depended on Python's string-hash seed: `scenarios._blend` and `shift_mix` built stratum mixes from sets, so the same seed gave different streams in every process. Keys are now sorted; `tests/test_scenarios.py::test_streams_do_not_depend_on_python_hash_seed`. Explains the B differences in the D21/D22 reproduction checks; earlier conclusions unchanged (comparisons are within runs).
+
+### Research
+- D23 runs (Ali, 2026-11-26). Attribution: all 11 degraded test windows are missed Fuzzers; the dip of windows 43-57 is about 80% a change of attack mix (Generic 74% -> 8% of attacks, Fuzzers 4% -> 28%), every B alarm on real test windows falls inside the degraded period. Sensitivity: under random labels 0.03 = 0.05 (no false alerts, 1-2 windows earlier on gradual changes); 0.10 misses changes near the harm boundary (X1 rare 85% on test); with alert-first labels only 0.05 keeps B_ipw clean. Threshold stays 0.05.
+
 ### Added
 - D23 (approved 2026-11-26): attribution of the real test-window alarms (`nadmon.window_attribution`, `scripts/attribute_test_alarms.py`) and the B alarm-threshold sensitivity analysis with drops 0.03 and 0.10 (`scripts/run_threshold_sensitivity.py`); `tests/test_window_attribution.py`.
 

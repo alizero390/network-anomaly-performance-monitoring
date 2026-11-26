@@ -57,8 +57,9 @@ differ, almost all in the alert-first condition (number of false alerts, e.g. 2 
 in the gradual and rare scenarios (detection delay +-1 window); abrupt scenarios and S0
 under random labels match. Detection and false-alert rates are unchanged. Part of the
 cause on validation is that the frozen config stores reference values rounded to 6
-decimals while the earlier validation run used unrounded values; the cause on test is
-not yet identified. The D21 comparisons are unaffected: B, A_rolling and
+decimals while the earlier validation run used unrounded values; the main cause, found
+later, is that stream construction depended on Python's hash seed (fixed 2026-11-26; see
+`results/threshold_sensitivity/FINDINGS.md`, section 6). The D21 comparisons are unaffected: B, A_rolling and
 C_active_rolling come from the same run and share every label draw.
 
 ## 5. Next
@@ -66,4 +67,4 @@ C_active_rolling come from the same run and share every label draw.
 - D22 (proposal): a practical-significance floor for Strategy A (a minimum effect size
   per feature, e.g. Kolmogorov-Smirnov statistic or Cramer's V, besides the p-value),
   calibrated on real validation windows; it decides whether A can be used on real traffic.
-- Find the cause of the remaining B differences (section 4).
+- ~~Find the cause of the remaining B differences (section 4).~~ Found and fixed 2026-11-26.
