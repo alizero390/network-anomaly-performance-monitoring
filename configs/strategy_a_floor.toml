@@ -1,0 +1,17 @@
+# Strategy A with a minimum effect size (RESEARCH_DECISIONS.md D22), calibrated on
+# February validation by scripts/run_strategy_a_floor.py. Commit it before the test
+# run; the test run must use these values unchanged.
+base_config_sha256 = "3941c54bb6e62397bd4ef304c03b95d94505cfe8f6df55f5778e759d7b4a886a"
+d21_config_sha256 = "a539e1c36ccbbe2d94d5babdebb20c163166ed668130ed0cb17199a5c0ec47f9"
+quick_run = false
+
+[a_floor]
+epsilon = 0.3
+q = 1e-09
+lookback = 10
+gap = 5
+
+[c_active_floor.association_period]
+"0" = 1
+"5" = 5
+"10" = 10

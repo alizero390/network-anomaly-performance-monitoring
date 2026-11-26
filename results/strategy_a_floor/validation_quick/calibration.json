@@ -1,0 +1,65 @@
+{
+  "calibration": {
+    "epsilon": 0.3,
+    "q": 1e-09,
+    "lookback": 10,
+    "gap": 5,
+    "periods": {
+      "0": 1,
+      "5": 5,
+      "10": 10
+    },
+    "real_window_share": {
+      "0.02": 1.0,
+      "0.03": 1.0,
+      "0.05": 0.9772727272727273,
+      "0.075": 0.9772727272727273,
+      "0.1": 0.9318181818181818,
+      "0.15": 0.7272727272727273,
+      "0.2": 0.5454545454545454,
+      "0.3": 0.2727272727272727
+    }
+  },
+  "settings": {
+    "window_size": 5000,
+    "n_windows": 40,
+    "onset": 20,
+    "n_streams": 20,
+    "n_calibration": 20,
+    "seed": 20261112,
+    "delays": [
+      0,
+      5,
+      10
+    ],
+    "availabilities": [
+      1.0,
+      0.5,
+      0.2
+    ],
+    "alert_first_delay": 5,
+    "m_min": 500,
+    "max_span": 5,
+    "a_alpha": 0.01,
+    "a_consecutive": 2,
+    "a_reference_size": 20000,
+    "target_false_warning": 0.05,
+    "association_quantile": 0.95,
+    "drop": 0.05,
+    "consecutive": 2,
+    "rearm": 2,
+    "ipw_effective": false
+  },
+  "created_utc": "2026-11-26T04:32:09+00:00",
+  "git_commit": "05fc3f98d58874c4f5fe61defd1fcbbfa7462a17",
+  "git_uncommitted_changes": false,
+  "python": "3.14.3",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.8.0",
+    "joblib": "1.5.3"
+  }
+}
