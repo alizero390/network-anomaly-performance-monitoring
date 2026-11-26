@@ -54,7 +54,7 @@ Status definitions:
 - [x] Calibrate q on stable validation streams; variant A_natural (D16).
 - [x] Validation and one-time test run (`results/strategies/`): on test, the fixed validation reference made A warn on 100% of streams before any change.
 - [x] D21: moving reference (A_rolling) and B-anchored reference (A_anchored): validation and test runs done (`results/strategy_a_rolling/FINDINGS.md`). On test: 0% false warnings on stable streams (fixed reference: 100%); on real time-ordered windows A still flags every window.
-- [~] D22: minimum effect size (A_floor, C_active_floor). Code and tests done; validation and test runs pending (Ali's machine).
+- [x] D22: minimum effect size (A_floor, C_active_floor): validation and test runs done; criteria not met (`results/strategy_a_floor/FINDINGS.md`). RQ1 answered: label-free monitoring cannot replace label-based monitoring on real traffic.
 - [ ] Single-feature ablation (D10).
 - [ ] Measure computational overhead.
 
@@ -143,7 +143,7 @@ Status definitions:
 
 ## 11. Immediate Next Actions
 
-1. D22 runs: `python scripts/run_strategy_a_floor.py --partition validation --quick`, then the full validation run; commit `configs/strategy_a_floor.toml`; then the test run.
+1. Draft thesis chapters (English, international structure) in Google Docs, starting with chapters 3 and 5.
 2. Paper 1: transfer to Computer Networks (started 2026-11-23), then wait for the decision.
 3. Attribute the real test alarms (windows 45-49 and 54) to attack categories.
 4. Thesis outline, chapter by chapter, from the existing results.

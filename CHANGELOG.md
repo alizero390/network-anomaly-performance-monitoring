@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Research
+- D22 validation and test runs (Ali, 2026-11-26); `results/strategy_a_floor/FINDINGS.md`. No epsilon kept real validation windows at 5% flagged (0.3: 27%); at epsilon 0.3, 21% of real test windows flagged and no harmful change detected: pre-registered criteria not met. On real test windows, an input shift at windows 43-49 preceded B's alarms and moved C_active_floor's alarms about 5 windows earlier (one event).
+
 ### Added
 - D22 (approved 2026-11-23): Strategy A with a minimum effect size. `strategies.window_feature_tests` (p-value and effect size: Kolmogorov-Smirnov statistic, total variation distance), `nadmon.effect_floor` (A_floor, C_active_floor; epsilon calibrated on real validation windows, q on stable streams), `scripts/run_strategy_a_floor.py` and `tests/test_effect_floor.py`.
 
