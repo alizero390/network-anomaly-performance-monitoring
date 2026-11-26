@@ -64,6 +64,8 @@ Status definitions:
 - [x] Calibrated-F1 rule, two consecutive eligible cohorts, re-arm (D5, D9).
 - [x] Validation and one-time test run: every harmful stream detected, no false alerts under random labels.
 - [x] Alert-first (biased) labels and inverse-probability weighting, B_ipw_eff, B_ipw_ess (D17-D20, Paper 2).
+- [ ] D23: attribute the real test-window alarms (windows 45-49, 54) to causes and attack categories (`scripts/attribute_test_alarms.py`).
+- [ ] D23: alarm-drop sensitivity 0.03 / 0.10, validation then test (`scripts/run_threshold_sensitivity.py`).
 - [ ] ADWIN as a secondary comparison (optional).
 
 ## 5. Strategy C — Combined Monitoring

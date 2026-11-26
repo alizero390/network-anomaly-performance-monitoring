@@ -12,6 +12,9 @@ The format follows these categories:
 
 ## [Unreleased]
 
+### Added
+- D23 (approved 2026-11-26): attribution of the real test-window alarms (`nadmon.window_attribution`, `scripts/attribute_test_alarms.py`) and the B alarm-threshold sensitivity analysis with drops 0.03 and 0.10 (`scripts/run_threshold_sensitivity.py`); `tests/test_window_attribution.py`.
+
 ### Research
 - D22 validation and test runs (Ali, 2026-11-26); `results/strategy_a_floor/FINDINGS.md`. No epsilon kept real validation windows at 5% flagged (0.3: 27%); at epsilon 0.3, 21% of real test windows flagged and no harmful change detected: pre-registered criteria not met. On real test windows, an input shift at windows 43-49 preceded B's alarms and moved C_active_floor's alarms about 5 windows earlier (one event).
 
